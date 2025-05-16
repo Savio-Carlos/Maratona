@@ -23,6 +23,17 @@ void dfs(int v, int p){
     }
 }
 
+void dfs2(int v, int p, int acc){
+    int size = sz[0] - sz[v];
+    ans[v] = size + distsum[v] + acc;
+    //cout << "v: " << v+1 << " distsum[v]: " << distsum[v] << " size: " << size << " acc: " << acc << endl; 
+    for(int u : graph[v]){ 
+        if(u == p) continue;
+        int sum = ans[v] - distsum[u] - sz[u];
+        dfs2(u,v,sum);
+    }
+}
+
 
 signed main(){
     winton;
@@ -35,8 +46,12 @@ signed main(){
         graph[b].push_back(a);
     }
     dfs(0,-1);
-    for (int i = 0; i < n; i++){
-        cout << distsum[i] << " ";
+    // for (int i = 0; i < n; i++){
+    //     cout << distsum[i] << " ";
+    // }cout << endl;
+    dfs2(0,-1, 0);
+        for (int i = 0; i < n; i++){
+        cout << ans[i] << " ";
     }
 
 }
