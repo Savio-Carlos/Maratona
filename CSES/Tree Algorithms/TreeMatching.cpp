@@ -41,7 +41,7 @@ signed main(){
     }
     cout << endl;
     for (int i = 0; i < 2; i++){
-        for (int j = 0; j < n; j++){
+        for (int j = 0; j <= MAX; j++){
             cout << dp[j][i] << " ";
         }
         cout << endl;
