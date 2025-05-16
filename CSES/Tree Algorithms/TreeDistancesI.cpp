@@ -12,7 +12,7 @@ int ans[MAX], maxdist[MAX];
 vector<vector<int>> graph;
 
 void dfs1(int v, int p){
-    for(auto u : graph[v]){
+    for(auto u : graph[v]){ 
         if(u==p)continue;
         dfs1(u,v);
         maxdist[v] = max(maxdist[v],maxdist[u]+1);   
