@@ -23,14 +23,12 @@ void dfs(int v, int p){
     }
 }
 
-void dfs2(int v, int p, int acc){
-    int size = sz[0] - sz[v];
-    ans[v] = size + distsum[v] + acc;
+void dfs2(int v, int p){
     //cout << "v: " << v+1 << " distsum[v]: " << distsum[v] << " size: " << size << " acc: " << acc << endl; 
     for(int u : graph[v]){ 
         if(u == p) continue;
-        int sum = ans[v] - distsum[u] - sz[u];
-        dfs2(u,v,sum);
+        ans[u] = ans[v] - 2*sz[u] + sz[0];
+        dfs2(u,v);
     }
 }
 
@@ -49,7 +47,8 @@ signed main(){
     // for (int i = 0; i < n; i++){
     //     cout << distsum[i] << " ";
     // }cout << endl;
-    dfs2(0,-1, 0);
+    ans[0] = distsum[0];
+    dfs2(0,-1);
         for (int i = 0; i < n; i++){
         cout << ans[i] << " ";
     }
