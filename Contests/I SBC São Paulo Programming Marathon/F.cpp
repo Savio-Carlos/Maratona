@@ -14,7 +14,8 @@ int n, k, temp[MAX], mx, ans = 0;
 bool dfs(int v, int p,int depth){
     bool pegou = false;
     if (temp[v] >  k) {
-        pegou = true;             
+        pegou = true;
+        mx = max(mx, depth);
     }
     for(auto u : graph[v]){
         if (u == p) continue;
