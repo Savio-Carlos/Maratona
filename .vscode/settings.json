@@ -65,6 +65,9 @@
     "vector": "cpp",
     "string_view": "cpp",
     "span": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "bitset": "cpp",
+    "chrono": "cpp",
+    "algorithm": "cpp"
   }
 }
