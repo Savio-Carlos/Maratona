@@ -1,49 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+const int MAX = 5e4+7;
+const int MOD = 998244353;
 
-static const int MOD = 998244353;
+//i e nosso limite inferior que podemos pegar para o J atual
+//por ex todos os numeros pegam do 1, todos pegam do 2 com excessao do 2
+//no final isso vai calculando o valor da dp[j] se ele consegue pegar o i atual
+//quando esse for o caso ele soma a quantidade de maneiras de chegar no i na dp[j]
+//vamos supor que nosso i = 3, quando j for 7, queremos adicionar todas as maneiras de chegar no 4 que temos atualmente, isso pq 4+3 = 7
+//ou seja i representa o valor sendo adicionado atualmente
+//dp[7] += (3)1111 (3)211 (3)22 (3)31 -> quando i = 3 adicionamos todas essas maneiras  
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int N, K;
-    cin >> N >> K;
-
-    // dp_prev[n] = number of partitions of n using parts in {1,2,...,p-1}
-    // dp[n]      = number of partitions of n using parts in {1,2,...,p}
-    vector<int> dp_prev(N+1, 0), dp(N+1, 0);
-    dp_prev[0] = 1;  // There is exactly one way to partition 0: the empty partition.
-
-    for (int p = 1; p <= N; ++p) {
-        fill(dp.begin(), dp.end(), 0);
-
-        if (p == K) {
-            // We are forbidden to use any part of size K,
-            // so DP[n][K] = DP[n][K-1] for all n.
-            for (int n = 0; n <= N; ++n) {
-                dp[n] = dp_prev[n];
-            }
-        } else {
-            // Standard partition-DP recurrence:
-            // DP[n][p] = DP[n][p-1] + (n >= p ? DP[n-p][p] : 0)
-            for (int n = 0; n <= N; ++n) {
-                // Count all partitions of n that do not use part p:
-                long long val = dp_prev[n];
-                if (n >= p) {
-                    // Count those that do use part p at least once:
-                    val += dp[n - p];
-                    if (val >= MOD) val -= MOD;
-                }
-                dp[n] = int(val);
+signed main(){
+    winton;
+    int n, k;
+    cin >> n >> k;
+    vector<int> dp(n+1,0);
+    dp[0] = 1;
+    for (int i = 1; i <= n; i++){
+        if (i == k)continue;
+        for (int j = 1; j <= n; j++){
+            if (j >= i){
+                dp[j] += dp[j-i];
+                dp[j]%=MOD;
             }
         }
-
-        // Move to the next p
-        dp_prev.swap(dp);
+            // for (int po = 0; po <= n; po++) cout << dp[po] << " ";
+            // cout << endl;
     }
-
-    // dp_prev[N] now holds DP[N][N] modulo 998244353
-    cout << dp_prev[N] << "\n";
-    return 0;
+    //for (int i = 0; i <= n; i++) cout << dp[i] << " ";
+    cout << dp[n] << endl;
 }
