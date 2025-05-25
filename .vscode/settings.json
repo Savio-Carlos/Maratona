@@ -68,6 +68,12 @@
     "iostream": "cpp",
     "bitset": "cpp",
     "chrono": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "initializer_list": "cpp",
+    "ranges": "cpp",
+    "regex": "cpp",
+    "utility": "cpp",
+    "random": "cpp",
+    "complex": "cpp"
   }
 }
