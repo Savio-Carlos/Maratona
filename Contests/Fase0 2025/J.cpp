@@ -1,63 +1,45 @@
 #include <bits/stdc++.h>
 using namespace std;
-using ll = long long;
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+const int MAX = 2e5+7;
+const int INF = INT_MAX;
 
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int N;
-    ll K;
-    cin >> N >> K;
-
-    vector<ll> A(N);
-    for (int i = 0; i < N; ++i) {
-        cin >> A[i];
+signed main(){
+    winton;
+    int n, k;
+    cin >> n >> k;
+    vector<int> arr(n);
+    for (auto &u : arr) cin >> u;
+    vector<int> deltas(2*n);
+    for (int i = 0; i < n; i++){
+        deltas[i] = arr[i] - (i+1)*k;
     }
-
-    // Construir C de tamanho 2N (1-based na teoria, mas vamos usar 0-based internamente)
-    // C_linear[0..2N-1] corresponderá a C[1..2N].
-    vector<ll> C_linear(2*N);
-    for (int i = 0; i < N; ++i) {
-        // i em [0..N-1] representa posição i+1
-        C_linear[i] = A[i] - ll(i+1) * K;
+    for (int i = 0; i < n; i++){
+        deltas[i+n] = arr[i] - (i+1+n)*k;
     }
-    for (int i = 0; i < N; ++i) {
-        // C[N + (i)] corresponde a posição (i+1)+N = i+N+1
-        // Alinhando ao raciocínio: C[i+N] = A[i] - (i+1+N)*K
-        C_linear[i + N] = A[i] - ll(i+1+N) * K;
-    }
-
-    // NS_linear[j] = índice (0-based) do próximo menor elemento de C_linear[j], ou -1 se não há.
-    vector<int> NS_linear(2*N, -1);
+    //for (auto y : deltas) cout << y << " ";
     stack<int> st;
-    for (int L = 2*N - 1; L >= 0; --L) {
-        while (!st.empty() && C_linear[st.top()] >= C_linear[L]) {
+    vector<int>temp(2*n);
+    for (int i = 2*n-1; i >= 0; i--){
+        while(!st.empty() && deltas[st.top()] >= deltas[i]){
             st.pop();
         }
-        NS_linear[L] = st.empty() ? -1 : st.top();
-        st.push(L);
+        temp[i] = st.empty()? -1 : st.top();
+        st.emplace(i);
     }
-
-    // Construir B[0..N-1], mas vamos imprimir em 1-based
-    vector<int> B(N, 1);
-    for (int i = 0; i < N; ++i) {
-        int nxt = NS_linear[i];
-        if (nxt == -1) {
-            // Caso teórico improvável (com K>0 e tido vetor 2N, sempre existe algum menor),
-            // mas podemos deixar que pare no próprio i:
-            B[i] = i + 1; // 1-based
-        } else {
-            // nxt está em [i+1 .. 2N-1]. Queremos o índice circular em [1..N]:
-            int filtro = (nxt % N) + 1; // modulo N, depois +1 para ficar em 1..N
-            B[i] = filtro;
+    vector<int> ans(n, 1);
+    for (int i = 0; i < n; ++i) {
+        if (temp[i] == -1){
+            ans[i] = i+1;
+        }
+        else{
+            ans[i] = (temp[i]%n)+1;
         }
     }
-
-    // Imprimir B[1..N]
-    for (int i = 0; i < N; ++i) {
-        cout << B[i] << (i+1 < N ? ' ' : '\n');
-    }
-
-    return 0;
+    for (auto u : ans) cout << u << " ";
 }
