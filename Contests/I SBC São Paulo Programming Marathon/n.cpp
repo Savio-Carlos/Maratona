@@ -1,65 +1,63 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
-#define fastio ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
-
-const int MAXN = 1e6+7;
-//contagem de quantos divisores acesos esse primo p tem
-int cnt[MAXN], spf[MAXN], visited[MAXN];
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+const int MAX = 1e6+7;
 
 /*
-we find the smallest prime factor for each guy 
-*/ 
+calcular os spf dos numeros
+para cada numero ver os fatores primos que dividem ele e adicionar +1 no contador
+quando ver o numero de novo eu retiro do contador desses primos
+pra cada numero tenho que ver quais dos fatores dele tem o contador mais alto
+ou se algum fator anterior e maior
+*/
 
-//menor fator primo
-void mfp(){
-    iota(spf, spf+MAXN, 0);
-    for(int i = 2; i*i < MAXN; i++){
-        if(spf[i] == i){
-            for(int j = i*i; j < MAXN; j += i){
-                if(spf[j] == j) spf[j] = i;
+int n, spf[MAX], cnt[MAX];
+bool visited[MAX];
+
+void build(){
+    for (int i = 2; i < MAX; i+=2) spf[i] = 2;
+    for (int i = 3; i < MAX; i+=2){
+        if (spf[i] == 0){
+            spf[i] = i;
+            for (int j = i; j*i <= MAX; j+=2){
+                if (spf[i*j] == 0) spf[i*j] = i;
             }
         }
     }
 }
 
 vector<int> factorize(int x){
-    vector<int> primos;
-    while(x > 1){
+    vector<int> primes;
+    while (x > 1){
         int p = spf[x];
-        primos.push_back(p);
-        while(!(x%p)) x/=p;
+        primes.push_back(p);
+        while(x%p == 0) x/=p;
     }
-    return primos;
+    return primes;
 }
 
-int main(){
-    fastio;
-    int n; cin >> n;
-    priority_queue<pair<int, int>> pq;
-    mfp();
-    for(int i = 0; i < n; i++){
-        int x; cin >> x;
-        vector<int> primos = factorize(x);
-        int toggle = 0;
-        if(visited[x]) toggle = -1;
-        else toggle = 1;
-        visited[x] = (1^visited[x]);
-        for(auto p : primos){
-            cnt[p] += toggle;
-            pq.push({cnt[p], p});
+signed main(){
+    winton;
+    cin >> n;
+    build();
+    multiset<int> ans;
+    for (int i = 0; i < MAX; i++) ans.insert(0);
+    for (int i = 0; i < n; i++){
+        int a;
+        cin >> a;
+        vector<int> primos = factorize(a); 
+        for (auto u : primos){
+            ans.erase(ans.find(cnt[u]));
+            if (!visited[a]) cnt[u]++;
+            else cnt[u]--;
+            ans.insert(cnt[u]);
         }
-
-        int cur = 0;
-        while(!pq.empty()){
-            auto [c, p] = pq.top();
-            if(cnt[p] == c){
-                cur = cnt[p];
-                break;
-            }
-            pq.pop();
-        }
-        cout << cur << endl;
+        visited[a] ^= 1; 
+        cout << *ans.rbegin() << endl;
     }
 }

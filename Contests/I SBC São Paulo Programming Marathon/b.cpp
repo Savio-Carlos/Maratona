@@ -1,42 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+#define ld long double
 #define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
-#define fastio ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+const int MAX = 2e5+7;
+const int INF = INT_MAX;
 
-const int INF = 1e18;
-const int MAXN = 1e5;
-vector<pair<int, int>> graph[MAXN];
-int dist[2][MAXN];
-int n;
-//fazer uma funcao check q calcula o dijkstra 
+int n, dist[MAX][2], visited[MAX];
+vector<vector<pair<int,int>>> graph;
 
-//v eh se eh o carlinhos ou nn
-//preciso enviar os caras com a distancia 0 se for k e -mid se for o carlinhos
-int check(int c, vector<pair<int, int>> caras){
-    fill(dist[c], dist[c] + n, INF);
-
-    //dist, v
-    priority_queue<pair<int, int>> pq;
-    for(auto u : caras){
-        dist[c][u.second] = (c == 1 ? u.first : -u.first);
-        pq.push({-dist[c][u.second], u.second});
+bool djikstraK(vector<pair<int,int>> &st, int id){
+    priority_queue<pair<int,int>> pq;
+    for (auto u : st){
+        pq.push({-u.first, u.second});
+        dist[u.second][id] = -u.first;
     }
 
     while(!pq.empty()){
-        auto [d, v] = pq.top(); pq.pop();
-        d = -d;
-        //cout << d << " " << v << endl;
-        if(dist[c][v] != d) continue;
-        for(auto p : graph[v]){
-            int u = p.first;
-            int w = p.second;
-            int nd = d + (c == 1? 2*w : w);
-            if(nd < dist[c][u]){
-                if(!c && nd > dist[1][u]) continue;
-                dist[c][u] = nd;
-                pq.push({-nd, u});           
+        auto [d, v] = pq.top();
+        pq.pop();
+        // cout << -d << " ENTRO " << v << endl;
+        // cout << dist[v][id] << endl;
+        if (dist[v][id] < -d) continue;
+        //cout << "distancia do K: " <<  dist[v][1] << " distancia atual: " << -d << " node: " << v << endl;
+        
+        for (auto [u,w] : graph[v]){
+            if (id == 1) w*=2;
+            int nd = -d+w;
+            if (id == 0 && (dist[u][1] < nd)) continue;
+            if (dist[u][id] > nd){
+                dist[u][id] = nd;
+                pq.push({-dist[u][id], u});
             }
         }
     }
