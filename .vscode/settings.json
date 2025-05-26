@@ -74,6 +74,9 @@
     "regex": "cpp",
     "utility": "cpp",
     "random": "cpp",
-    "complex": "cpp"
+    "complex": "cpp",
+    "forward_list": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp"
   }
 }
