@@ -57,7 +57,7 @@ signed main(){
     string pfx = s.substr(0, meio);
     string pos = palindrome(pfx,s.size());
     //cout << pos << endl;
-
+    //cout << pfx << endl;
     if (pos <= s) {
         cout << numero(pos) << endl;
         return 0;
