@@ -78,6 +78,8 @@
     "forward_list": "cpp",
     "unordered_map": "cpp",
     "unordered_set": "cpp",
-    "ostream": "cpp"
-  }
+    "ostream": "cpp",
+    "cmath": "cpp"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
 }

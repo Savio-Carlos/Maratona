@@ -34,7 +34,7 @@ int mst(int n, int m, vector<pair<int, pair<int,int>>> &caminho){
         v = caminho[i].second.second; 
         if (find(u) != find(v)){
             Union(u,v);
-            custo += c;
+            custo += c; 
         }
     }
     return custo;

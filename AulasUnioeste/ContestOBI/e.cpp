@@ -13,16 +13,21 @@ signed main(){
     winton;
     int n;
     cin >> n;
-    int x,y,ans = 0, tot = 0;
-    for (int i = 1; i <= (n*n); i++){
-        int a;
-        cin >> a;
-        ans+=a;
-        tot+=i;
-        if (!a){
-            x = (i+n-1)/n;
-            y = ((i-1)%n)+1;
+    int x,y,ans = 0;
+    int tot = 0;
+    for (int i = 1; i <= n; i++){
+        for (int j = 1; j <= n; j++){
+            int a;
+            cin >> a;
+            ans += a;
+            if (!a){
+                x=i;
+                y=j;
+            }
         }
     }
-    cout << tot-ans << endl << x << endl << y << endl;
+    for (int i = 1; i<= n*n; i++){
+        tot += i;
+    }
+    cout << tot - ans << endl << x << endl << y << endl;
 }

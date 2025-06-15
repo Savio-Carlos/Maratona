@@ -15,12 +15,12 @@ int main(){
     cin>>d>>t>>k>>v>>lamb;
 
     ld tempo = (d-k)/v;
-    v*=lamb;
-
+    
     if(tempo>t){
         cout<<fixed<<setprecision(10)<<t*v+k<<endl;
     }
     else {
+        v*=lamb;
         ll c=0;
         while(d/v+tempo<=t){
             //cout << tempo << endl;
@@ -29,7 +29,7 @@ int main(){
             v*=lamb;
             c++;
         }
-        cout << tempo << endl;
+        //cout << tempo << endl;
         if (c%2){
             cout<<fixed<<setprecision(10)<<(t-tempo)*v<<endl;
         }
