@@ -38,7 +38,6 @@ signed main(){
             continue;
         }
         s.erase(s.begin() + sub);
-
         int pos = -1;
         for (int i = 0; i < n-1; i++){
             if (s[i] > csub){
