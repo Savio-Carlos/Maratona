@@ -22,25 +22,32 @@ signed main(){
         cin >> n >> s;
         if (n == 1) {
             cout << s << endl;
-            return 0;
+            continue;
         }
-        int sub = 0;
+        int sub = -1;
         char csub;
         for (int i = 0; i < n-1; i++){
-            if (s[i+1] < s[i]){
+            if (s[i] > s[i+1]){
                 sub = i;
                 csub = s[i];
                 break;
             } 
         }
-        s.erase(s.begin() + sub);
-       // cout << s << endl;
-        int pos = max(sub-1,0LL);
-        while(pos < n-1 && csub <= s[pos]){
-            pos++;
+        if (sub == -1){
+            cout << s << endl;
+            continue;
         }
-        if (pos == n) s.push_back(s[pos]);
-        else s.insert(s.begin() + pos+1, csub);
+        s.erase(s.begin() + sub);
+
+        int pos = -1;
+        for (int i = 0; i < n-1; i++){
+            if (s[i] > csub){
+                pos = i;
+                break;
+            }
+        }
+        if (pos != -1) s.insert(s.begin() + pos, csub);
+        else s.push_back(csub);
         cout << s << endl;
     }
 }
