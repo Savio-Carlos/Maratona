@@ -7,6 +7,7 @@ using namespace std;
 #define endl '\n'
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
+#include <chrono>
 const int MAX = 2e5+7;
 const int INF = INT_MAX;
 
@@ -55,7 +56,11 @@ void solve(){
 
 signed main(){
     winton;
+    auto start = chrono::high_resolution_clock::now();
     int t;
     cin >> t;
     while(t--) solve();
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end - start;
+    cout << "Tempo de execução: " << elapsed.count() << " segundos." << endl;
 }
