@@ -34,7 +34,6 @@ void build(int node, int l, int r){
     build(node*2+1, m+1, r);
 }
 
-
 int get(int node, int l, int r, int i){
     if (l == r) return tree[node];
     int m = (l+r)/2;

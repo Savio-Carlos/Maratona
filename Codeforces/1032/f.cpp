@@ -8,7 +8,7 @@ using namespace std;
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
 const int MAX = 2e5+7;
-const int INF = INT_MAX;
+const int INF = 0x3f3f3f3f3f3f3f3f;
 
 /*
 so insiro no vetor de frequencias quando eu chegar num x, pois isso significa que entre 
