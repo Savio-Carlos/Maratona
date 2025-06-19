@@ -18,7 +18,7 @@ void solve(){
     if (a[n-1] == b[n-1]) {
         cout << n << endl;
         return;
-    }
+    }   
     int maxdir = -1;
     set<int> seen;
     for(int i = n-2; i >= 0; i--){
