@@ -28,9 +28,7 @@ signed main() {
             int target_mask = mask ^ (1 << k);
             ans += cnt[target_mask];
         }
-        debug(c);
         cnt[mask]++;
-        debug(ans);
     }
 
     cout << ans << endl;
