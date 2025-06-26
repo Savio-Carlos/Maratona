@@ -10,4 +10,3 @@ using namespace std;
 const int MAX = 1e5+7;
 const int INF = INT_MAX;
 
-s
