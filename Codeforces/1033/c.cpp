@@ -7,47 +7,37 @@ using namespace std;
 #define endl '\n'
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
-const int MAX = 5e5+7;
+const int MAX = 1e6+7;
 const int INF = LLONG_MAX;
+
+int visited[MAX];
 
 void solve(){
     int n, m;
     cin >> n >> m;
-    int minisum = n; //cadeia de ums
-    int maxsum = (n*(n+1))/2; //PA
-    if (m < minisum || m > maxsum){
-        cout << "-1" << endl;
+    int cnt = 0;
+    vector<int> tree;
+    for (int i = n; i >= 1; i--){
+        visited[i] = 0;
+        if (i + (n-cnt-1) <= m){
+            tree.push_back(i);
+            cnt++;
+            m-=i;
+            visited[i] = 1;
+        }
+    }
+    m -= (n-cnt);
+    if (m != 0){
+        cout << -1 << endl;
         return;
     }
-    int root = -1;
     for (int i = 1; i <= n; i++){
-        if (i + n-1 == m){
-            root = i;
-            break;
-        }
+        if (!visited[i]) tree.push_back(i);
     }
-    debug(root);
-    // if (root != -1){
-    //     cout << root << endl;
-    //     int prev = root;
-    //     for (int i = 1; i <= n; i++){
-    //         if (i == root) continue;
-    //         cout << prev << " " << i << endl;
-    //         prev = i;
-    //     }
-    //     return;
-    // }
-    for (int i = 1; i <= n; i++){
-        if (i*n-1 + ((i*(i+1))/2 - i) == m){
-            root = i;
-            break;
-        }
-        cout << i*n-1 + (((i*(i+1))/2) - i) << endl;
+    cout << tree[0] << endl;
+    for (int i = 1; i < n; i++){
+        cout << tree[i-1] << " " << tree[i] << endl;
     }
-    debug(root);
-    
-
-    
 }
 
 signed main(){
