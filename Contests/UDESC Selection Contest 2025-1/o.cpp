@@ -46,9 +46,7 @@ signed main(){
     for (int i = 0; i < n; i++) minw[i] = INF;
     djikstra();
     minw[0] = 0;
-    // for (int i = 0; i < n; i++){
-    //     cout << i << " minimo: " << minw[i] << endl;
-    // }
+
     int q;
     cin >> q;
     int ans = 0;
