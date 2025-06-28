@@ -148,5 +148,6 @@
     "spanstream": "cpp",
     "stdfloat": "cpp"
   },
-  "C_Cpp.errorSquiggles": "disabled"
+  "C_Cpp.errorSquiggles": "disabled",
+  "makefile.configureOnOpen": false
 }
