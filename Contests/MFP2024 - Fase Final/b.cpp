@@ -65,5 +65,4 @@ signed main(){
     }
     cout << res.size() << endl;
     for (auto &[u,v] : res) cout << u+1 << " " << v+1 << endl;
-
 }

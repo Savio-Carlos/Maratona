@@ -20,3 +20,108 @@ ostream &operator<<(ostream &os, const vector<vector<T>> &matrix) {
     }
     return os;
 }
+
+
+//-------------------------------------PAIR-------------------------------------//
+template<class A, class B> ostream& operator<<(ostream& os, const pair<A, B>& p) { 
+    os << "(" << p.first << "," << p.second << ")"; 
+    return os; 
+}
+//-------------------------------------VECTOR-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, const vector<T>& vec) {
+    os << "[ ";
+    for(const auto& elem : vec) {
+        os << elem << " ";
+    }
+    os << "]";
+    return os;
+}
+//-------------------------------------SET-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, const set<T>& s) {
+    os << "{ ";
+    for(const auto& elem : s) {
+        os << elem << " ";
+    }
+    os << "}";
+    return os;
+}
+//-------------------------------------MULTISET-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, const multiset<T>& s) {
+    os << "{ ";
+    for(const auto& elem : s) {
+        os << elem << " ";
+    }
+    os << "}";
+    return os;
+}
+//-------------------------------------QUEUE-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, queue<T> q) {
+    // Print each element in the queue
+    os << "{ ";
+    while (!q.empty()) {
+        os << q.front() << " ";
+        q.pop();
+    }
+    os << "}";
+    // Print a newline at the end
+    return os;
+}
+//-------------------------------------DEQUE-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, deque<T> q) {
+    // Print each element in the queue
+    os << "{ ";
+    while (!q.empty()) {
+        os << q.front() << " ";
+        q.pop_front();
+    }
+    os << "}";
+    // Print a newline at the end
+    return os;
+}
+//-------------------------------------STACK-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, stack<T> q) {
+    // Print each element in the queue
+    os << "{ ";
+    while (!q.empty()) {
+        os << q.top() << " ";
+        q.pop();
+    }
+    os << "}";
+    // Print a newline at the end
+    return os;
+}
+//-------------------------------------PRIORITY_QUEUE-------------------------------------//
+template<typename T> ostream& operator<<(ostream& os, priority_queue<T> q) {
+    // Print each element in the queue
+    os << "{ ";
+    while (!q.empty()) {
+        os << q.top() << " ";
+        q.pop();
+    }
+    os << "}";
+    // Print a newline at the end
+    return os;
+}
+//-------------------------------------MAP-------------------------------------//
+template<typename K, typename V> ostream& operator<<(ostream& os, const map<K, V>& m) {
+    os << "{ ";
+    for(const auto& pair : m) {
+        os << pair.first << " : " << pair.second << ", ";
+    }
+    os << "}";
+    return os;
+}
+ 
+template<typename T>
+using min_pq = priority_queue<T, vector<T>, greater<T>>;
+template<typename T> ostream& operator<<(ostream& os, min_pq<T> q) {
+    // Print each element in the queue
+    os << "{ ";
+    while (!q.empty()) {
+        os << q.top() << " ";
+        q.pop();
+    }
+    os << "}";
+    // Print a newline at the end
+    return os;
+}
