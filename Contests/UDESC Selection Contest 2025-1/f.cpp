@@ -7,6 +7,7 @@ using namespace std;
 #define endl '\n'
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
+#define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 2e5+7;
 const int INF = LLONG_MAX;
 /*
@@ -21,12 +22,11 @@ importante ter um vetor de visitados para garantir que nao vou rever o mesmo sub
 int visited[MAX];
 
 signed main(){
-    //winton; 
+    winton; 
     int n, f, s;
     cin >> n >> f >> s;
     vector<int> p(n), q(n);
     map<int,int> mpq, mpp;
-
     for (int i = 0; i < n; i++){
         cin >> p[i];
         mpp[p[i]] = i;
@@ -36,7 +36,6 @@ signed main(){
         mpq[q[i]] = i;
     }
     int ans = INF;
-
     for (int i = 1; i <= n; i++){
         if (visited[i]) continue;
         visited[i] = 1;
@@ -55,14 +54,6 @@ signed main(){
         int cfrodo = lbaixo*f + lcima*f;
         int csam = (n-rbaixo-1)*s + (n-rcima-1)*s;
         ans = min(ans, max(cfrodo, csam));
-        // debug(i);
-        // debug(lcima);
-        // debug(rcima);
-        // debug(lbaixo);
-        // debug(rbaixo);
-        // debug(csam);
-        // debug(cfrodo);
-        // cout  << "--------------------" << endl;
     }
     cout << ans << endl;
 

@@ -9,8 +9,7 @@ int main() {
         cin >> m;
         arr[m] = 1;
     }
-    
-       for (int i = 1; i <= n; i++){
+    for (int i = 1; i <= n; i++){
         if (arr[i]==0) cout << i;
     }
 }
