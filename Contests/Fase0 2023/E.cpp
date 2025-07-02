@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ld long double
-#define ll long long
+#define int long long
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
@@ -31,5 +31,16 @@ signed main(){
         }
         solutions.swap(next);
     }
-    for (auto u : solutions) { if (u <= 1e9) cout << u << endl;}
+    sort(all(b));
+    vector<int> ans;
+    for (auto u : solutions){
+        vector<int> comp;
+        for (int i = 0; i < n; i++){
+            comp.push_back(abs(u-a[i]));
+        }
+        sort(all(comp));
+        if (comp == b) ans.push_back(u);
+    }
+
+    for (auto u : ans) { if (u <= (int)1e9) cout << u << endl;}
 }   
