@@ -17,15 +17,22 @@ int visited[MAX][MAX][2];
 */
 
 void solve(){
-    int n, k;
+    int n, k, mx = -1;
     cin >> n >> k;
     vector<int> positions(n), delays(n);
-    for (int &u : positions) cin >> u;
+    for (int &u : positions){
+        cin >> u;
+        mx = max(mx,u);
+    } 
     for (int &u : delays) cin >> u;
     int q;
     cin >> q;
     while(q--){
         int x; cin >> x;
+        if (x > mx) {
+            cout << "YES" << endl;
+            continue;
+        }
         for (int i = 0; i < MAX; i++){
             for (int j = 0; j < MAX; j++){
                 visited[i][j][0] = visited[i][j][1] = 0;
@@ -50,7 +57,6 @@ void solve(){
 
             // debug(cur);
             // debug(nxt);
-
 
             if (nxt >= n || nxt < 0){
                 pos = true;
