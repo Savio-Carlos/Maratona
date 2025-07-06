@@ -67,7 +67,7 @@ zxx
 xzx
 
 onde x e o numero que vai ser igual na linha, e z e qualquer outro numero
-entao o total de combinacoes seria C(a,n)
+entao o total de combinacoes seria C(n,a)
 ja que sao a numeros iguais numa linha de tamanho n
 isso multiplicado por k pois qualquer um dos k valores pode ser o repetido
 entao m = C(a,n) * k * (b-1) + 1

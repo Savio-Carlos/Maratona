@@ -1,62 +1,39 @@
-#include <iostream>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+#define debug(x) cout << #x << " = " << x << "\n";
+#define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
+const int MAX = 1e5+7;
+const int INF = LLONG_MAX;
+const int MOD = 998244353;
 
-const long long MOD = 998244353;
-
-long long mod_pow(long long base, long long exp = MOD-2) {
-    long long result = 1;
-    base %= MOD;
-    while (exp > 0) {
-        if (exp & 1) 
-            result = (result * base) % MOD;
-        base = (base * base) % MOD;
-        exp >>= 1;
-    }
-    return result;
+int mod_mul(int x, int y) {
+    return (x % MOD) * (y % MOD) % MOD;
 }
 
-int main() {
-    long long a, b;
+signed main() {
+    int a, b;
     cin >> a >> b;
+    int n = a%MOD;
+    int m = b%MOD;
+    int linhas = ((n*(n+1))/2) % MOD; 
+    int colunas = ((m*(m+1))/2) % MOD; 
+    int retangulos = (linhas*colunas) % MOD;
+    int rects = mod_mul( mod_mul(n, (n+1)%MOD),mod_mul(m, (m+1)%MOD)) % MOD;
+    //debug(rects);
+    //debug(retangulos);
 
-    long long inv2 = mod_pow(2);
-    long long inv6 = mod_pow(6);
-
-    long long n = a % MOD;
-    long long m = b % MOD;
-    long long mn_val = min(a, b);
-    long long mn_mod = mn_val % MOD;
-
-    long long part1 = (n * (n+1)) % MOD;
-    part1 = part1 * inv2 % MOD;
-    long long part2 = (m * (m+1)) % MOD;
-    part2 = part2 * inv2 % MOD;
-    long long total_rect = part1 * part2 % MOD;
-
-    long long term1 = (mn_val + 1) % MOD;
-    term1 = term1 * n % MOD;
-    term1 = term1 * m % MOD;
-
-    long long term2 = mn_mod;
-    term2 = term2 * ((mn_val + 1) % MOD) % MOD;
-    term2 = term2 * ((2 * mn_val + 1) % MOD) % MOD;
-    term2 = term2 * inv6 % MOD;
-
-    long long temp = mn_mod;
-    temp = temp * ((mn_val + 1) % MOD) % MOD;
-    temp = temp * inv2 % MOD;
-
-    long long term3 = n * temp % MOD;
-    long long term4 = m * temp % MOD;
-
-    long long squares = (term1 + term2) % MOD;
-    squares = (squares - term3 + MOD) % MOD;
-    squares = (squares - term4 + MOD) % MOD;
-
-    long long ans = (total_rect - squares + MOD) % MOD;
-
-    cout << ans << endl;
-
-    return 0;
+    int mn = min(n, m) % MOD;
+    int t1 = (mn+1) * n * m;
+    int t2 = (mn * (mn+1) * (2*mn+1)) / 6;
+    int t3 = n * (mn * (mn+1)) / 2;
+    int t4 = m * (mn * (mn+1)) / 2;
+    int quadrados = t1 + t2 - t3 - t4;
+    //debug(quadrados);
+    cout << (retangulos-quadrados) % MOD << endl;
 }
