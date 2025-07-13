@@ -24,7 +24,7 @@ void solve(){
         else y = -INF;
         dp[i] = max(x, y);
     }
-    //vdebug(dp);
+    vdebug(dp);
     int s = accumulate(all(a),0LL);
     cout << (s + dp[0])/2 << endl;
 }
