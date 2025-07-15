@@ -1,6 +1,7 @@
-vector<bool> is_prime(MAX + 1, true);
 vector<int> primes;
+
 void sieve() {
+    vector<bool> is_prime(MAX + 1, true);
     is_prime[0] = false;
     is_prime[1] = false;
     for (int p = 2; p * p <= MAX; ++p) {

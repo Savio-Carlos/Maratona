@@ -13,11 +13,29 @@ const int MOD = 1e9+7;
 const int INF = LLONG_MAX;
 
 /*
-fatorar os pratos
-ver quantos pratos tem para cada fator primo
-depois fatorar cada cliente
-ver quantos ele n pode comer
-fazer fast expo
+pegar os fatores primos de cada prato
+guardar para cada primo a frequencia que os pratos divisiveis por ele aparecem
+para cada query ver os primos que fatoram ele
+seria facil se fosse so somar a frequencia desses primos mas pode ser que tenha dois primos que dividem o mesmo prato,
+entao esse contaria duas vezes
+para driblar isso aplicamos o principio de inclusao e exclusao de conjuntos
+se o numero de numeros nesse conjunto for impar somamos seu valor, se for par diminuimos
+um ex e o primeiro test case
+pratos = 1 2 3 4 5 6
+freq:
+2 = 3
+3 = 2
+4 = 1
+5 = 1
+6 = 1
+
+para a query 6, os fatores dele sao 2 e 3
+mas ambos contam o prato 6 na sua frequencia
+entao temos 3 conjuntos: (2) (3) (2,3)
+ans = 3 + 2 - 1 = 4 (correto)
+se ele tem alergia aos fatores 2 e 3 ele n pode comer 2,3,4,6, podendo comer so o 1,5
+
+depois disso e so fazer fast expo para calcular as combinacoes com os pratos restantes
 */
 
 
