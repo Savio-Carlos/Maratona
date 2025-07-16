@@ -1,17 +1,20 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define ll long long
+#define int long long
 
 vector<int> arr;
 
-void factor (ll n){
-    for (int i = 2; i < sqrt(n); i++){
-        while (n%i == 0){
-        n = n/i;
-        arr.push_back(i);//arr.push_back(i); aqui ele adiciona o mesmo numero mais de uma vez, fatoracao normal
-        cout << n << endl;
-        }
+vector<int> factorize(int x){
+    vector<int> primes;
+    int p = x;
+    for (p = 2; p*p <= n; p++){
+        while(x%p == 0){
+            x/=p;
+            primes.push_back(p);
+        } 
     }
+    if (x > 1)primes.push_back(p);
+    return primes;
 }
 
 int main() {
