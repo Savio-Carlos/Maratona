@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ld long double
-#define int long long
+#define ll long long
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
@@ -10,7 +10,6 @@ using namespace std;
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
 const int B = 460;
 
 void solve(){
@@ -21,70 +20,90 @@ void solve(){
 
     vector<vector<pair<int,int>>> graph(n);
     for(int i = 1; i < n; i++){
-        int a, b, c;
-        cin >> a >> b >> c;
-        graph[--a].push_back({--b,c});
-        graph[b].push_back({a,c});
+        int u, v; ll c;
+        cin >> u >> v >> c;
+        --u; --v;
+        graph[u].emplace_back(v, c);
+        graph[v].emplace_back(u, c);
     }
 
-    vector<bool> h(n,false), hNbr(n,false);
+    vector<int> heavy_id(n, -1);
     vector<int> hlist;
-    for(int i = 0; i < n; i++) {
-        if(graph[i].size() > B){
-            h[i] = true;
+    for(int i = 0; i < n; i++){
+        if((int)graph[i].size() > B){
+            heavy_id[i] = hlist.size();
             hlist.push_back(i);
         }
     }
+    int H = hlist.size();
 
-    vector<unordered_map<int,int>> somacor(n);
-    vector<vector<pair<int,int>>> hne(n);
-    for(int v: hlist){
-        for(auto [u,c]: graph[v]){
-            somacor[v][ colors[u] ] += c;
-            if(h[u]) hne[v].push_back({u,c});
+    vector<unordered_map<int,ll>> somacor(H);
+    vector<vector<pair<int,int>>> hne(H);
+    
+    for(int idx = 0; idx < H; idx++){
+        int v = hlist[idx];
+        somacor[idx].reserve(graph[v].size());
+        for(auto &e: graph[v]){
+            int u = e.first;
+            ll c = e.second;
+            somacor[idx][ colors[u] ] += c;
+            if(heavy_id[u] != -1){
+                hne[idx].emplace_back( heavy_id[u], c );
+            }
         }
     }
-
-    int tot = 0;
-    for(int i = 0; i < n; i++){
-        for(auto [v,c]: graph[i]){
-            if(i < v && colors[i] != colors[v]) tot += c;
+    ll tot = 0;
+    for(int u = 0; u < n; u++){
+        for(auto &e: graph[u]){
+            int v = e.first;
+            ll c = e.second;
+            if(u < v && colors[u] != colors[v]) tot += c;
         }
     }
     while(q--){
-        int v, cor;
-        cin >> v >> cor;
-        v--;
-        int old = colors[v];
-        if(old == cor){
-            cout << tot << endl;
+        int v, newc;
+        cin >> v >> newc;
+        --v;
+        int oldc = colors[v];
+        if(oldc == newc){
+            cout << tot << '\n';
             continue;
         }
-        int delta = 0;
-        if(!h[v]){
-            for(auto [u,c]: graph[v]){
-                bool change = (colors[u] != old);
-                bool now = (colors[u] != cor);
-                delta += (now - change) * c;
+
+        ll delta = 0;
+        int hid = heavy_id[v];
+        if(hid == -1){
+            for(auto &e: graph[v]){
+                int u = e.first;
+                ll c = e.second;
+                bool was = (colors[u] != oldc);
+                bool is_now = (colors[u] != newc);
+                delta += (is_now - was) * c;
             }
         } else {
-            delta = somacor[v][old] - somacor[v][cor];
+            delta = somacor[hid][oldc] - somacor[hid][newc];
         }
         tot += delta;
-        colors[v] = cor;
-        if(!h[v]){
-            for(auto [u,c]: graph[v]){
-                if(h[u]){
-                    somacor[u][old] -= c;
-                    somacor[u][cor] += c;
+        colors[v] = newc;
+        if(hid == -1){
+            for(auto &e: graph[v]){
+                int u = e.first;
+                ll c = e.second;
+                int uh = heavy_id[u];
+                if(uh != -1){
+                    somacor[uh][oldc] -= c;
+                    somacor[uh][newc] += c;
                 }
             }
         } else {
-            for(auto [u,c]: hne[v]){
-                somacor[u][old] -= c;
-                somacor[u][cor] += c;
+            for(auto &hc: hne[hid]){
+                int uh = hc.first;
+                ll c = hc.second;
+                somacor[uh][oldc] -= c;
+                somacor[uh][newc] += c;
             }
         }
+
         cout << tot << endl;
     }
 }

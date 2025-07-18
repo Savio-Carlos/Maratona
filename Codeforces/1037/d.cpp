@@ -28,8 +28,6 @@ void solve(){
     cout << k << endl;
 }
 
-
-
 signed main(){
     winton;
     int t;

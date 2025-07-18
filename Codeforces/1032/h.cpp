@@ -17,6 +17,9 @@ como seq[i] tem que ser entre l e r
 eu vejo se o novo r faz com que eu tenha que eliminar um elemento da sequencia
 ou seja se o novo r for menor que alguem da sequencia
 quando eu removo ele e insiro o novo l eu garanto que naquela posicao vai ter uma cara menor que r
+o set n representa a sequencia em si
+dentro do vetor eu preciso achar a maior subsequencia crescente
+nao nescessariamente ela comeca no a1
 */
 
 template<typename T> ostream& operator<<(ostream& os, const multiset<T>& s) {

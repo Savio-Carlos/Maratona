@@ -70,7 +70,7 @@ onde x e o numero que vai ser igual na linha, e z e qualquer outro numero
 entao o total de combinacoes seria C(n,a)
 ja que sao a numeros iguais numa linha de tamanho n
 isso multiplicado por k pois qualquer um dos k valores pode ser o repetido
-entao m = C(a,n) * k * (b-1) + 1
+entao m = C(n,a) * k * (b-1) + 1
 */
 int fastExpo(int base, int exp) {
     int res = 1;
@@ -85,23 +85,6 @@ int fastExpo(int base, int exp) {
 
 int modInverse(int n) {
     return fastExpo(n, MOD - 2);
-}
-
-long long combinations(int n, int k) {
-    if (k < 0 || k > n) {
-        return 0;
-    }
-    if (k == 0 || k == n) {
-        return 1;
-    }
-    if (k > n - k) {
-        k = n - k;
-    }
-    long long res = 1;
-    for (int i = 1; i <= k; ++i) {
-        res = res * (n - i + 1) / i;
-    }
-    return res;
 }
 
 int combinations_mod(int n, int k) {

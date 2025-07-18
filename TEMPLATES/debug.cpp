@@ -1,6 +1,14 @@
 #define debug(x) cout << #x << " = " << x << "\n";
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 
+#if defined(DEBUG)
+    #define _ (void)0
+    #define debug(x) cout << __LINE__ << ": " << #x << " = " << x << ln
+#else
+    #define _ ios_base::sync_with_stdio(false), cin.tie(NULL)
+    #define debug(x) (void)0
+#endif
+
 // Generic printer for vector<T>
 template <typename T>
 ostream &operator<<(ostream &os, const vector<T> &v) {
