@@ -12,40 +12,27 @@ const int MAX = 2e5+7;
 const int MOD = 1e9+7;
 const int INF = LLONG_MAX;
 
-struct casino{
-    int l, r, real;
-    bool operator<(const casino &A) { return l < A.l; }
-};
-
 void solve(){
-	int n, k; 
+    int n, k;
     cin >> n >> k;
-    vector<casino> a(n);
-    for (auto &[l,r,real] : a) cin >> l >> r >> real;
-    sort(all(a));
-    priority_queue<int> pq;
-    int idx = 0;
-    int coins = k;
-    while(1){
-        while(idx < n && a[idx].l <= coins){
-            pq.push(a[idx].real);
-            idx++;
-        }
-        while(!pq.empty() && pq.top() <= coins){
-            pq.pop();
-        }
-        if(pq.empty()) break;
-        coins = pq.top();
-        pq.pop();
-        //debug(coins);
+    vector<tuple<int,int,int>> a(n);
+    for (auto &[l,r,real] : a){
+        cin >> l >> r >> real;
     }
-    cout << coins << endl; 
+    sort(all(a));
+    for (auto &[l,r,real] : a){
+        if (k >= l && k <= r && real >= k){
+            k = real;
+        }
+    }
+    cout << k << endl;
 }
 
+
+
 signed main(){
-	winton;
-	int t; cin >> t;
-	while(t--){
-		solve();
-	}
+    winton;
+    int t;
+    cin >> t;
+    while(t--)solve();
 }
