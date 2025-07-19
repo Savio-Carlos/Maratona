@@ -33,18 +33,27 @@ signed main(){
     ld ans = 0;
     for (int i = 0; i < n; i++){   
         auto [x, y, r] = cs[i]; 
+        // vetor de P1 até o centro do círculo
         ld wx = x - x1;
         ld wy = y - y1;
+
+        // parâmetro t da projeção ortogonal de (x,y) sobre o segmento
         ld t = (wx * A + wy * B) / C;
-        ld um = 1.0;
-        ld zero = 0.0;
-        t = max(zero, min(um, t));
+
+        // restringe t dentro de [0,1] para ficar no segmento e não na reta infinita
+        t = max((ld)0.0, min((ld)1.0, t));
+
+        // ponto projetado no segmento
         ld px = x1 + t * A;
         ld py = y1 + t * B;
+
+        // distância entre o centro e esse ponto projetado
         ld dx = x - px;
         ld dy = y - py;
         ld dist = sqrt(dx*dx + dy*dy);
-        if (dist <= r){
+
+        // se o segmento cruza (ou passa dentro de) o círculo, soma (r − dist)
+        if (dist <= r) {
             ans += r - dist;
         }
     }

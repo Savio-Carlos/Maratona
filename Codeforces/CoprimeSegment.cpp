@@ -16,7 +16,7 @@ int gcd(int a, int b) {
     return b == 0 ? a : gcd(b, a % b);
 }
 
-int mmc(int a, int b) {
+int lcm(int a, int b) {
     return a / gcd(a, b) * b;
 }
 
@@ -27,17 +27,21 @@ signed main(){
     vector<int> a(n);
     for (int &i : a){
         cin >> i;
+        
     }
     int g = 0;
+    int mmc = 1;
     int l = 0;
     int ans = INF;
     for (int i = 0; i < n; i++){
+        mmc = lcm(mmc,a[i]);
         g = gcd(a[i],g);
         while(l < i && g == 1 ) {
             ans = min(ans, i-l+1);
+            g = mmc/a[l];
             l++;
-            g = lcm(g,a[l]);
         }
     }
-    cout << ans << endl;
+    if (ans == INF) cout << -1 << endl;
+    else cout << ans << endl;
 }

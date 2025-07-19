@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 #define ld long double
-#define ll long long
+#define int long long
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
@@ -10,107 +10,68 @@ using namespace std;
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
-const int B = 460;
+const int INF = LLONG_MAX;
+
+vector<vector<pair<int,int>>> graph;
+vector<map<int,int>> mp(MAX);
+vector<pair<int,int>> ancestor;
+int ans = 0, colors[MAX];
+
+void dfs(int v, int p){
+    for (auto &[u,c] : graph[v]){
+        if (u==p) continue;
+        ancestor[u] = {v,c};
+        mp[v][colors[u]] += c;
+        dfs(u,v);
+    }
+    ans += mp[v][colors[v]];
+}
 
 void solve(){
     int n, q;
     cin >> n >> q;
-    vector<int> colors(n);
-    for(int i = 0; i < n; i++) cin >> colors[i];
-
-    vector<vector<pair<int,int>>> graph(n);
-    for(int i = 1; i < n; i++){
-        int u, v; ll c;
-        cin >> u >> v >> c;
-        --u; --v;
-        graph[u].emplace_back(v, c);
-        graph[v].emplace_back(u, c);
+    ans = 0;
+    int sum = 0;
+    graph.resize(n);
+    ancestor.resize(n);
+    for (int i = 0; i < n; i++){
+        graph[i].clear();
+        mp[i].clear();
+        ancestor[i] = {-1,0};
+        colors[i] = 0;
     }
-
-    vector<int> heavy_id(n, -1);
-    vector<int> hlist;
-    for(int i = 0; i < n; i++){
-        if((int)graph[i].size() > B){
-            heavy_id[i] = hlist.size();
-            hlist.push_back(i);
-        }
+    for (int i = 0; i < n; i++) cin >> colors[i];
+    for (int i = 0; i < n-1; i++){
+        int a, b, c;
+        cin >> a >> b >> c;
+        sum += c;
+        graph[--a].push_back({--b,c});
+        graph[b].push_back({a,c});
     }
-    int H = hlist.size();
-
-    vector<unordered_map<int,ll>> somacor(H);
-    vector<vector<pair<int,int>>> hne(H);
-    
-    for(int idx = 0; idx < H; idx++){
-        int v = hlist[idx];
-        somacor[idx].reserve(graph[v].size());
-        for(auto &e: graph[v]){
-            int u = e.first;
-            ll c = e.second;
-            somacor[idx][ colors[u] ] += c;
-            if(heavy_id[u] != -1){
-                hne[idx].emplace_back( heavy_id[u], c );
-            }
-        }
-    }
-    ll tot = 0;
-    for(int u = 0; u < n; u++){
-        for(auto &e: graph[u]){
-            int v = e.first;
-            ll c = e.second;
-            if(u < v && colors[u] != colors[v]) tot += c;
-        }
-    }
+    dfs(0,0);
+    //debug(sum);
     while(q--){
-        int v, newc;
-        cin >> v >> newc;
-        --v;
-        int oldc = colors[v];
-        if(oldc == newc){
-            cout << tot << '\n';
-            continue;
+        int v, cor;
+        cin >> v >> cor;
+        v--;
+        if (v != 0){
+            auto &[pai,c] = ancestor[v]; //pego a conexao do meu pai comigo
+            ans -= mp[pai][colors[pai]]; // tiro da resposta a soma de todas as conexoes do meu pai com caras com a mesma cor que ele
+            mp[pai][colors[v]] -= c; //tiro da soma de todas as conexoes do meu pai com caras com a mesma cor que ele o custo de ir para a aresta v
+            mp[pai][cor] += c; // adiciono na soma das conexoes do meu pai com caras com a mesma nova cor o custo de ir para v (ja que v agora e dessa cor)
+            ans += mp[pai][colors[pai]]; // adiciono na resposta a soma das conexoes do meu pai com caras da mesma cor que ele (agora atualizado)
         }
-
-        ll delta = 0;
-        int hid = heavy_id[v];
-        if(hid == -1){
-            for(auto &e: graph[v]){
-                int u = e.first;
-                ll c = e.second;
-                bool was = (colors[u] != oldc);
-                bool is_now = (colors[u] != newc);
-                delta += (is_now - was) * c;
-            }
-        } else {
-            delta = somacor[hid][oldc] - somacor[hid][newc];
-        }
-        tot += delta;
-        colors[v] = newc;
-        if(hid == -1){
-            for(auto &e: graph[v]){
-                int u = e.first;
-                ll c = e.second;
-                int uh = heavy_id[u];
-                if(uh != -1){
-                    somacor[uh][oldc] -= c;
-                    somacor[uh][newc] += c;
-                }
-            }
-        } else {
-            for(auto &hc: hne[hid]){
-                int uh = hc.first;
-                ll c = hc.second;
-                somacor[uh][oldc] -= c;
-                somacor[uh][newc] += c;
-            }
-        }
-
-        cout << tot << endl;
+        ans -= mp[v][colors[v]];//tiro da resposta a soma das minhas conexoes com minha cor
+        ans += mp[v][cor]; // adiciono na resposta a soma das minhas conexoes com a nova cor
+        colors[v] = cor;
+        cout << sum - ans << endl;
     }
+    
 }
 
-signed main(){
+signed main() {
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while (t--) solve();
 }
