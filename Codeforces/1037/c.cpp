@@ -36,7 +36,6 @@ void solve(){
     for (int i = start; i < n-1; i++){
         // debug(water);
         if (a[i] == mx) break;
-
         int cost = (a[i+1] - a[i]);
         water += cost;
         if (water > a[i]){
