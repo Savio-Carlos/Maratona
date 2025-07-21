@@ -15,7 +15,7 @@ const int INF = LLONG_MAX;
 vector<vector<pair<int,int>>> graph;
 vector<map<int,int>> mp(MAX);
 vector<pair<int,int>> ancestor;
-int ans = 0, colors[MAX];
+int same = 0, colors[MAX];
 
 void dfs(int v, int p){
     for (auto &[u,c] : graph[v]){
@@ -24,13 +24,13 @@ void dfs(int v, int p){
         mp[v][colors[u]] += c;
         dfs(u,v);
     }
-    ans += mp[v][colors[v]];
+    same += mp[v][colors[v]];
 }
 
 void solve(){
     int n, q;
     cin >> n >> q;
-    ans = 0;
+    same = 0;
     int sum = 0;
     graph.resize(n);
     ancestor.resize(n);
@@ -56,15 +56,15 @@ void solve(){
         v--;
         if (v != 0){
             auto &[pai,c] = ancestor[v]; //pego a conexao do meu pai comigo
-            ans -= mp[pai][colors[pai]]; // tiro da resposta a soma de todas as conexoes do meu pai com caras com a mesma cor que ele
+            same -= mp[pai][colors[pai]]; // tiro da resposta a soma de todas as conexoes do meu pai com caras com a mesma cor que ele
             mp[pai][colors[v]] -= c; //tiro da soma de todas as conexoes do meu pai com caras com a mesma cor que ele o custo de ir para a aresta v
             mp[pai][cor] += c; // adiciono na soma das conexoes do meu pai com caras com a mesma nova cor o custo de ir para v (ja que v agora e dessa cor)
-            ans += mp[pai][colors[pai]]; // adiciono na resposta a soma das conexoes do meu pai com caras da mesma cor que ele (agora atualizado)
+            same += mp[pai][colors[pai]]; // adiciono na resposta a soma das conexoes do meu pai com caras da mesma cor que ele (agora atualizado)
         }
-        ans -= mp[v][colors[v]];//tiro da resposta a soma das minhas conexoes com minha cor
-        ans += mp[v][cor]; // adiciono na resposta a soma das minhas conexoes com a nova cor
+        same -= mp[v][colors[v]];//tiro da resposta a soma das minhas conexoes com minha cor
+        same += mp[v][cor]; // adiciono na resposta a soma das minhas conexoes com a nova cor
         colors[v] = cor;
-        cout << sum - ans << endl;
+        cout << sum - same << endl;
     }
     
 }

@@ -12,30 +12,39 @@ const int MAX = 1e5+7;
 const int INF = LLONG_MAX;
 const int MOD = 998244353;
 
-const int M = 998244353;
-const int INV2 = 499122177;
-const int INV6 = 166374059;
-
 int mod_mul(int x, int y) {
-    return (x % M) * (y % M) % M;
+    return (x % MOD) * (y % MOD) % MOD;
+}
+
+int mod_pow(int x, int e = MOD-2) {
+    int r = 1;
+    while (e) {
+        if (e & 1) r = (r * x) % MOD;
+        x = (x * x) % MOD;
+        e >>= 1;
+    }
+    return r;
 }
 
 signed main() {
     winton;
     int a, b;
     cin >> a >> b;
-    int A = a % M, B = b % M;
-    int rects = mod_mul( mod_mul(A, (A+1)%M) * INV2 % M,mod_mul(B, (B+1)%M) * INV2 % M );
-    debug(rects);
-    int t = min(a,b) % M;
-    int S1 = mod_mul( mod_mul(t, (t-1+M)%M), INV2 );
-    debug(S1);
-    int S2 = mod_mul( mod_mul(mod_mul(t, (t-1+M)%M), ((2*t-1+M)%M)), INV6 );
-    debug(S2);
-    int squares = ((mod_mul(t, mod_mul(A,B))- mod_mul((A+B)%M, S1)+ S2) % M + M) % M;
-    debug(squares);
 
-    int ans = (rects - squares + M) % M;
-    cout << ans << "\n";
-    return 0;
+    int n = a % MOD;
+    int m = b % MOD;
+    const int inv2 = mod_pow(2);
+    const int inv6 = mod_pow(6);
+
+    int linhas   = mod_mul(mod_mul(n, (n+1) % MOD), inv2);
+    int colunas  = mod_mul(mod_mul(m, (m+1) % MOD), inv2);
+    int retangulos = mod_mul(linhas, colunas);
+    int mn = min(n, m);
+    int t1 = mod_mul(mn + 1, mod_mul(n, m));
+    int t2 = mod_mul(mod_mul(mod_mul(mn, mn+1), (2*mn+1) % MOD), inv6);
+    int t3 = mod_mul(n, mod_mul(mod_mul(mn, mn+1), inv2));
+    int t4 = mod_mul(m, mod_mul(mod_mul(mn, mn+1), inv2));
+    int quadrados = ((t1 + t2) % MOD - (t3 + t4) % MOD + MOD) % MOD;
+    int resposta = (retangulos - quadrados + MOD) % MOD;
+    cout << resposta << endl;
 }
