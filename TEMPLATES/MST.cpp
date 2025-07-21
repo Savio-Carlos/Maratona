@@ -10,7 +10,7 @@ struct DSU {
 		return comp[u] = find(comp[u]);
 	}
 
-	void merge(int a, int b) {
+	bool merge(int a, int b) {
 		a = find(a), b = find(b);
 		if (a == b) return false;
 		sz[a] += sz[b];

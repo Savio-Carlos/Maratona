@@ -10,7 +10,8 @@ using namespace std;
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
+const ld LINF = 1e18;
+
 
 struct ponto{
     int x, y;
@@ -40,7 +41,7 @@ bool intersect(linha r, linha s){
     int o3 = orientation(s.p, s.q, r.p);
     int o4 = orientation(s.p, s.q, r.q);
 
-    if (o1 != 0 && o2 != 0 && o3 != 0 && o4 != 0 && o1 != o2 && o3 != o4) return true;
+    if (o1 != o2 && o3 != o4) return true;
 
     if (o1 == 0 && on_segment(r.p, s.p, r.q)) return true;
     if (o2 == 0 && on_segment(r.p, s.q, r.q)) return true;
@@ -50,37 +51,71 @@ bool intersect(linha r, linha s){
     return false;
 }
 
-
 signed main() {
     winton;
     int n, m, s;
     cin >> n >> m;
-    vector<bool> super(n);
+    vector<int> super;
     vector<ponto> computers(n);
     vector<linha> walls(m);
-    vector<vector<pair<int,ld>>> graph(n);
+    vector<vector<pair<int,ld>>> graph (n); 
+
     for (auto &[xi,yi] : computers) cin >> xi >> yi; 
     for (auto &[p,q] : walls) cin >> p.x >> p.y >> q.x >> q.y;
     cin >> s;
     for (int i = 0; i < s; i++){
         int x; cin >> x;
-        super[x-1] = true;
+        super.push_back(x-1);
     } 
     for (int i = 0; i < n; i++){
-        for (int j = 0; j < n; j++){
+        for (int j = i+1; j < n; j++){
             if (i == j) continue;
+            bool conect = true;
             for (auto r: walls){
-                linha s;
-                s.p = computers[i];
-                s.q = computers[j];
-                if (!intersect(r,s)){
-                    ponto p1 = computers[i];
-                    ponto p2 = computers[j];
-                    ld dist = sqrt(((p1.x - p2.x) * (p1.x - p2.x)) + ((p1.y - p2.y) * (p1.y - p2.y)));
-                    graph[i].push_back({j,dist});
-                    graph[j].push_back({i,dist});
-                }
+                linha t;
+                t.p = computers[i];
+                t.q = computers[j];
+                if (intersect(r,t))conect = false;
+            }
+            if (conect){
+                ponto p1 = computers[i];
+                ponto p2 = computers[j];
+                ld dist = sqrt(((p1.x - p2.x) * (p1.x - p2.x)) + ((p1.y - p2.y) * (p1.y - p2.y)));
+                graph[i].push_back({j,dist});
+                graph[j].push_back({i,dist});
             }
         }
     }
+
+    int k = super.size();
+    vector<vector<ld>> d((1<<k), vector<ld> (n));
+
+	for (int mask = 0; mask < (1 << k); mask++) for(int v = 0; v < n; v++) d[mask][v] = LINF;
+    for (int i = 0; i < k; ++i) d[1 << i][super[i]] = 0;
+	for (int mask = 1; mask < (1 << k); mask++) {
+		for (int a = (mask - 1) & mask; a; a = (a - 1) & mask) {
+			int b = mask ^ a;
+			if (b > a) break;
+			for (int v = 0; v < n; v++) d[mask][v] = min(d[mask][v], d[a][v] + d[b][v]);
+		}
+		priority_queue<pair<ld, int>> pq;
+		for (int v = 0; v < n; v++) {
+			if (d[mask][v] == LINF) continue;
+			pq.emplace(-d[mask][v], v);
+		}
+		while (pq.size()) {
+			auto [ndist, u] = pq.top(); pq.pop();
+			if (-ndist > d[mask][u]) continue;
+			for (auto [idx, w] : graph[u]) if (d[mask][idx] > d[mask][u] + w) {
+				d[mask][idx] = d[mask][u] + w;
+				pq.emplace(-d[mask][idx], idx);
+			}
+		}
+	}
+	ld cost = LINF;
+    for (int i = 0; i < n; i++){
+        cost = min(cost, d[(1 << k) - 1][i]);
+    }
+    if (cost == LINF) cout << "impossivel" << endl;
+    else cout << fixed << setprecision(3) << cost << endl;
 }
