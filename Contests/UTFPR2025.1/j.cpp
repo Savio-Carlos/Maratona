@@ -23,7 +23,8 @@ vector<int> manacher_odd(string s) {
             p[i]++;
         }
         if(i + p[i] > r) {
-            l = i - p[i], r = i + p[i];
+            l = i - p[i];
+            r = i + p[i];
         }
     }
     return vector<int>(begin(p) + 1, end(p) - 1);
@@ -35,14 +36,55 @@ vector<int> manacher(string s) {
         t += string("#") + c;
     }
     auto res = manacher_odd(t + "#");
-    return vector<int>(begin(res) + 1, end(res) - 1);
+    return res;
 }
 
 signed main() {
     winton;
     string s;
     cin >> s;
-    vector<int> ans = manacher(s);
-    for (auto u : ans) cout << u << " ";
+    vector<int> mnc = manacher(s);
+    //for (auto u : mnc) cout << u << " ";
+    vector<pair<int,int>> palindromes;
+    for (int i = 0; i < mnc.size(); i++){
+        if (mnc[i]-1 > 0){
+            palindromes.push_back({mnc[i]-1,i});
+        }
+    }
+    sort(rall(palindromes));
+    string best = "-1";
+    map<string,int> cnt;
+    for (auto &[size, centro] : palindromes){
+        if (size < best.size() && best != "-1") break;
+        // debug(centro);
+        // debug(size);
+        string pos;
+        int st = ((centro - size)/2);
+        pos = s.substr(st, size);
+        // debug(pos);
 
+        bool repete = false;
+        int pos_before = s.find(pos, 0);
+        if (pos_before != string::npos && pos_before + size <= st) {
+            repete = true;
+        }
+
+        if (!repete) {
+            int pos_after = s.find(pos, st + size);
+            if (pos_after != string::npos) {
+                repete = true;
+            }
+        }
+
+        if (repete) {
+            if (pos.size() > best.size()) {
+                best = pos;
+            } else if (pos.size() == best.size() || best == "-1") {
+                if (pos < best || best == "-1") {
+                    best = pos;
+                }
+            }
+        }
+    }
+    cout << best << endl;
 }
