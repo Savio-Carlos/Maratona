@@ -91,7 +91,9 @@ signed main() {
     vector<vector<ld>> d((1<<k), vector<ld> (n));
 
 	for (int mask = 0; mask < (1 << k); mask++) for(int v = 0; v < n; v++) d[mask][v] = LINF;
+    
     for (int i = 0; i < k; ++i) d[1 << i][super[i]] = 0;
+
 	for (int mask = 1; mask < (1 << k); mask++) {
 		for (int a = (mask - 1) & mask; a; a = (a - 1) & mask) {
 			int b = mask ^ a;
