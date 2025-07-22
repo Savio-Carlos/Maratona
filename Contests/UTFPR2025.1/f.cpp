@@ -12,7 +12,6 @@ const int MAX = 2e5+7;
 const int MOD = 1e9+7;
 const ld LINF = 1e18;
 
-
 struct ponto{
     int x, y;
 };
