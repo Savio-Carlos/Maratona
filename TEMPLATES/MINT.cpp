@@ -1,6 +1,3 @@
-
- 
- 
 template<int p> struct mod_int {
 	int expo(int b, int e) {
 		int ret = 1;

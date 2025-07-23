@@ -22,47 +22,36 @@ int fastExpo(int base, int exp) {
     return r;
 }
 
-int modInverse(int n) {
+int modinverse(int n) {
     return fastExpo(n, MOD - 2);
 }
 
 int modiv(int a, int b){
-    
+    return (a * modinverse(b))%MOD;
 }
 
 signed main(){
     winton;
     int n, m;
     cin >> n >> m;
-    vector<vector<int>> seg(m+1);
-    vector<int> notprob(n), prob(n);
+    vector<vector<pair<int,int>>> segs(m+1);
+    int totn = 1;
     for(int i = 0; i < n; i++){
         int l, r, p, q;
         cin >> l >> r >> p >> q;
-
-        int invq = modInverse(q);
-        int pi = (p * invq) % MOD;
-        int chance = (((q - p) % MOD + MOD) % MOD * invq) % MOD;
-        prob[i] = chance;
-        notprob[i] = (pi * modInverse(chance)) % MOD;
-        seg[r].push_back(i);
-        seg[r].back() = (i<<20) | l;
+        int pr = modiv(p,(q-p));
+        segs[r].push_back({l,pr});
+        totn = (totn * modiv(q-p,q)) % MOD;
     }
 
     vector<int> dp(m+1);
     dp[0] = 1;
 
-    for(int i = 1; i <= m; i++){
-        int sum = 0;
-        for(int u : seg[i]){
-            int c = u >> 20;
-            int l = u & ((1<<20)-1);
-            sum = (sum + dp[l-1] * notprob[c]) % MOD;
+    for (int r = 1; r <= m; r++){
+        for (auto [l, pr]: segs[r]){
+            dp[r] += dp[l-1] * pr;
+            dp[r] %= MOD;
         }
-        dp[i] = sum;
     }
-    int prod = 1;
-    for(int chance : prob) prod = (prod * chance) % MOD;
-    int ans = (prod * dp[m]) % MOD;
-    cout << ans << endl;
+    cout << (totn * dp[m]) % MOD << endl;
 }
