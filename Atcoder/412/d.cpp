@@ -20,54 +20,56 @@ signed main(){
     for (int i = 0; i < m; i++){
         int a, b;
         cin >> a >> b;
-        grid[--a][--b] = 1;
+        --a, --b;
+        grid[a][b] = 1;
         grid[b][a] = 1;
-        conexoes[a]++;
-        conexoes[b]++;
     }
+    vector<int> p(n);
+    for (int i = 0; i < n; i++) p[i] = i;
+    
+    do {
+        //vdebug(p);
+        //1 ciclo
+        vector<vector<int>> cur(n, vector<int> (n));
+        for (int i = 0; i < n; i++){
+            cur[p[i]][p[(i+1)%n]] = 1;
+            cur[p[(i+1)%n]][p[i]] = 1;
+        }
 
-    bool early = true;
-    for (int j = 0; j < n; j++){
-        if (conexoes[j] != 2) early = false;
-    }
-    if (early) {
-        cout << 0 << endl;
-        return 0;
-    }
-
-    for (int mask = 0;mask < (1<<n);mask++){
-        //remover
-        int cnt = 0;
-        vector<int> con = conexoes;
-        vector<vector<int>> grid2 = grid;
-        vector<bool> pos(n,0);
-        
-        for (int i = 0; i < n; i++) if (mask&(1<<i)) pos[i] = 1;
-        vdebug(pos)
-        for (int j = 0; j < n-1; j++){
-            for (int k = j+1; k < n; k++){
-                if ((grid2[j][k] || grid2[k][j]) && (pos[j] && pos[k])){
-                    // debug(j);
-                    // debug(k);
-                    grid2[j][k] = 0;
-                    grid2[k][j] = 0;
-                    con[k]--;
-                    con[j]--;
-                    cnt++;
-                } 
+        int cnt1 = 0;
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < n; j++){
+                if (grid[i][j] != cur[i][j]) cnt1++;
             }
         }
-        //vdebug(con);
-        cout << endl;
-        bool res = true;
-        for (int j = 0; j < n; j++){
-            if (con[j] != 2) res = false;
-        }
-        if (res) ans = min (ans,cnt);
-    }
+        ans = min (ans,cnt1/2);
 
+
+        //2ciclos
+        for (int d = 3; d <= n-3; d++){
+            vector<vector<int>> cur2(n, vector<int> (n));
+            for (int i = 0; i < d; i++){
+                cur2[p[i]][p[(i+1)%d]] = 1;
+                cur2[p[(i+1)%d]][p[i]] = 1;
+            }
+            for (int i = 0; i < n-d; i++){
+                cur2[p[i+d]][p[(i + 1) % (n - d) + d]] = 1;
+                cur2[p[(i + 1) % (n - d) + d]][p[i+d]] = 1;
+            }
+            int cnt2 = 0;
+            for (int i = 0; i < n; i++){
+                for (int j = 0; j < n; j++){
+                    if (grid[i][j] != cur2[i][j]) cnt2++;
+                }
+            }
+            ans = min (ans,cnt2/2);
+        }
+
+    } while(next_permutation(all(p)));
 
     cout << ans << endl;
+
+
 }
 
 
