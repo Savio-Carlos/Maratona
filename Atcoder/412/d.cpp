@@ -9,61 +9,64 @@ using namespace std;
 #define debug(x) cout << #x << " = " << x << "\n";
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 30+7;
-const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
-
-map<int, pair<int,int>> con;
 
 signed main(){
     winton;
     int n, m;
     cin >> n >> m;
-    vector<pair<int,int>> edges;
-    int cnt = 0;
-    map<pair<int, int>, int> edge_to_idx;
-    for (int i = 0; i < n; i++){
-        for (int j = i+1; j < n; j++){
-            edges.push_back({i,j});
-            edge_to_idx[{i,j}] = cnt++;
-        }    
-    }
-    int e = edges.size();
-    int startmask = 0;
+    vector<int> conexoes(n,0);
+    int ans = 100;
+    vector<vector<int>> grid(n, vector<int> (n));
     for (int i = 0; i < m; i++){
         int a, b;
         cin >> a >> b;
-        --a; --b;
-        if(a > b) swap(a,b);
-        if (edge_to_idx.count({a,b})) {
-            startmask |= (1 << edge_to_idx[{a,b}]);
-        }
+        grid[--a][--b] = 1;
+        grid[b][a] = 1;
+        conexoes[a]++;
+        conexoes[b]++;
     }
-    int ans = INF;
-    for (int i = 0; i < (1<<e); i++){
-        vector<int> deg(n,0);
-        bool pos = true;
-        for (int j = 0; j < e; j++){
-            int idx = (1<<j);
-            if (i & idx){
-                auto [u,v] = edges[j];
-                if (++deg[u] > 2 || ++deg[v] > 2){
-                    pos = false;
-                    break;
-                }
+
+    bool early = true;
+    for (int j = 0; j < n; j++){
+        if (conexoes[j] != 2) early = false;
+    }
+    if (early) {
+        cout << 0 << endl;
+        return 0;
+    }
+
+    for (int mask = 0;mask < (1<<n);mask++){
+        //remover
+        int cnt = 0;
+        vector<int> con = conexoes;
+        vector<vector<int>> grid2 = grid;
+        vector<bool> pos(n,0);
+        
+        for (int i = 0; i < n; i++) if (mask&(1<<i)) pos[i] = 1;
+        vdebug(pos)
+        for (int j = 0; j < n-1; j++){
+            for (int k = j+1; k < n; k++){
+                if ((grid2[j][k] || grid2[k][j]) && (pos[j] && pos[k])){
+                    // debug(j);
+                    // debug(k);
+                    grid2[j][k] = 0;
+                    grid2[k][j] = 0;
+                    con[k]--;
+                    con[j]--;
+                    cnt++;
+                } 
             }
         }
-        for (int i = 0; i < n; i++){
-            if (deg[i]!=2) pos = false;
+        //vdebug(con);
+        cout << endl;
+        bool res = true;
+        for (int j = 0; j < n; j++){
+            if (con[j] != 2) res = false;
         }
-
-        if (pos){
-            int diff = startmask^i;
-            int cnt = __builtin_popcount(diff);
-            ans = min(ans,cnt);
-            //debug(startmask);
-            //debug(i);
-        }
+        if (res) ans = min (ans,cnt);
     }
+
+
     cout << ans << endl;
 }
 
