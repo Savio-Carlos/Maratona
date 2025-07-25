@@ -17,11 +17,3 @@ vector<int> factorize(int x){
     return primes;
 }
 
-int main() {
-    ll n;
-    cin >> n;
-    factor(n);
-    for (int i = 0; i < arr.size(); i++){
-        cout << arr[i] << " "; 
-    }
-}
