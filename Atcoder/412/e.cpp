@@ -10,23 +10,16 @@ using namespace std;
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 1e7+7;
 
-bool visited[MAX];
-
-
 /*
 F(4) = lcm(1,2,3,4) = 12
-
 ate 4 temos 2 primos (2,3)
-
 ate 12 temos 5 (2,3,5,7,11)
-
 o lcm vai mudar sempre que encontrarmos um novo primo mas n so isso
 como calcular quantos numeros distintos aparecem fazendo F(n)?
 D(4) = 1 2 6 12 = 4
 D(12) =  1 2 6 12 60 420 840 2520 27720 = 9
 
 a resposta seria D(r) - D(l-1) = 9 - 3 = 6
-
 
 D(12) 
 1
@@ -117,9 +110,6 @@ signed main(){
 
     vector<int> primes = sieve(sqrt(r));
     for (auto p : primes){
-        if (visited[p]) continue;
-
-        visited[p] = true;
         int x = p;
         while (x * p <= r){
             if (x*p > l) ans++;
@@ -129,10 +119,10 @@ signed main(){
 
     cout << ans << endl;
 
-    int mmc = 1;
-    for (int i = 1; i <= l; i++){
-        cout << i << ": ";
-        mmc = lcm(i,mmc);
-        cout << mmc << endl;
-    }
+    // int mmc = 1;
+    // for (int i = 1; i <= l; i++){
+    //     cout << i << ": ";
+    //     mmc = lcm(i,mmc);
+    //     cout << mmc << endl;
+    // }
 }
