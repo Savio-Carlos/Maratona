@@ -68,8 +68,6 @@ signed main(){
     } while(next_permutation(all(p)));
 
     cout << ans << endl;
-
-
 }
 
 
