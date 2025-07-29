@@ -1,3 +1,16 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+#define debug(x) cout << #x << " = " << x << "\n";
+#define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
+const int MAX = 1e6+7;
+const int MOD = 1e9+7;
+
 template<int p> struct mod_int {
 	int expo(int b, int e) {
 		int ret = 1;
@@ -28,7 +41,7 @@ template<int p> struct mod_int {
 		return *this;
 	}
 	m& operator *=(const m& a) {
-		v = v * int(a.v) % p;//tirar o int quando for usar define int long long
+		v = v * (a.v) % p;
 		return *this;
 	}
 	m& operator /=(const m& a) {
@@ -66,3 +79,23 @@ template<int p> struct mod_int {
 };
  
 typedef mod_int<(int)MOD> mint;
+
+mint pa(mint n, mint a1){
+    return ((n-a1+1)*(a1+n))/2;
+}
+
+signed main(){
+    winton;
+    int n;
+    cin >> n;
+    mint ans = 0;
+    for (int i = 1; i*i <= n; i++){
+        ans += (n/i * i);
+    }
+    for (int i = 1; i*i+i <= n; i++){
+        mint x = pa(n/i, n/(i+1)+1);
+        ans += x * i;
+    }
+    cout << ans << endl;
+
+}
