@@ -8,7 +8,7 @@ using namespace std;
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
-const int MAX = 2e7+7;
+const int MAX = 1e6+7;
 const int MOD = 1e9+7;
 
 /*
@@ -45,43 +45,9 @@ entao lcm(a,b) = x*y*gcd(a,b)
 x = c*x*y*g - d*g
 x = g((c*x*y) - d)
 x/g = c*x*y - d
-
-goal = AB
-
-fatorar o goal e ver os fatores primos, para cada fator primo, a e b podem optar por receber ou nao ele
-todos os fatores primos precisam ser usados, ou em a ou em b
-entao temos como resposta a adicao de todas as combinacoes de k (qtd de fatores primos) em a,b
 */
 
-<<<<<<< HEAD
-vector<int> getdiv(int  x){
-=======
-
-int spf[MAX], factors[MAX];
-
-void build(){
-    spf[1] = 1;
-    for (int i = 2; i < MAX; i+=2) spf[i] = 2;
-    for (int i = 3; i < MAX; i+=2){
-        if (spf[i] == 0){
-            spf[i] = i;
-            for (int j = i; j*i < MAX; j+=2){
-                if (spf[i*j] == 0) spf[i*j] = i;
-            }
-        }
-    }
-}
-
-void buildfactors(){
-    //factors[1] = 1;
-    for (int i = 2; i < MAX; i++){
-        factors[i] = factors[i/spf[i]];
-        if (spf[i/spf[i]] != spf[i]) factors[i]++;
-    } 
-}
-
 vector<int> getdiv(int x){
->>>>>>> c3af86a0502074868871e1589138b4b5e6f509eb
     vector<int> d;
     for (int i = 1; i * i <= x; i++) {
         if (x % i == 0){ 
@@ -93,6 +59,14 @@ vector<int> getdiv(int x){
     return d;
 }
 
+int gcd(int a, int b) {
+    return b == 0 ? a : gcd(b, a % b);
+}
+
+int mmc(int a, int b) {
+    return a / gcd(a, b) * b;
+}
+
 void solve(){
     int c, d, x;
     cin >> c >> d >> x;
@@ -101,17 +75,31 @@ void solve(){
     for (auto gc : divisors){
         if (((x/gc)+d) % c != 0) continue;
         int goal = (x/gc + d) / c;
-        int k = factors[goal];
-        //debug(k);
-        ans += (1<<k);   
+        //debug (goal); //goal significa que eu quero achar dois caras que multiplicados sejam goal, e o gcd deles seja 1
+        //nisso eu vou descobrir a2 e b2, para achar a e b eu multiplico pelo u (gcd(a,b)) e calculo o lcm e depois testo os pares n sei como ainda
+        //aqui eu acho o lcm e consigo descobrir o gcd de a e b
+        // no caso o gcd ja eh meu divisor
+        // ai basta achar as combinacoes validas de a e b
+        int lm = gc*goal;
+        // debug(lm); 
+        // debug(gc); 
+        vector<int> asbs = getdiv(lm*gc);
+        for (int i = 0; i < asbs.size(); i++){
+            int a = asbs[i];
+            int b = asbs[asbs.size()-i-1];
+            int f = (c*lcm(a,b) - d*gcd(a,b));
+            if (f == x){
+                debug(a);
+                debug(b);
+                ans++; 
+            } 
+        }
     }
     cout << ans << endl;
 }
 
 signed main(){
     winton;
-    build();
-    buildfactors();
     int t;
     cin >> t;
     while(t--)solve();
