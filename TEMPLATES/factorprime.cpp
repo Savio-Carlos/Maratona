@@ -1,9 +1,3 @@
-#include <bits/stdc++.h>
-using namespace std;
-#define int long long
-
-vector<int> arr;
-
 vector<int> factorize(int x){
     vector<int> primes;
     int p = x;
