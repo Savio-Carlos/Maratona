@@ -44,8 +44,21 @@ entao lcm(a,b) = x*y*gcd(a,b)
 
 x = c*x*y*g - d*g
 x = g((c*x*y) - d)
-
+x/g = c*x*y - d
 */
+
+vector<int> getdiv(int x){
+    vector<int> d;
+    for (int i = 1; i * i <= x; i++) {
+        if (x % i == 0){ 
+            d.push_back(i);
+            if (i*i!=x) d.push_back(x/i);
+        }
+    }
+    sort(all(d));
+    return d;
+}
+
 int gcd(int a, int b) {
     return b == 0 ? a : gcd(b, a % b);
 }
@@ -58,6 +71,15 @@ signed main(){
     winton;
     int c, d, x;
     cin >> c >> d >> x;
+    vector<int> divisors = getdiv(x);
 
+    for (auto u : divisors){
+        if (((x/u)+d) % c != 0) continue;
+        debug(u);
+        int goal = (x/u + d) / c;
+        debug (goal); //goal significa que eu quero achar dois caras que multiplicados sejam goal, e o gcd deles seja 1
+        //nisso eu vou descobrir a2 e b2, para achar a e b eu multiplico pelo u (gcd(a,b)) e calculo o lcm e depois testo os pares n sei como ainda
+
+    }
 
 }
