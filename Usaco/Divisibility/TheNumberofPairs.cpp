@@ -45,6 +45,12 @@ entao lcm(a,b) = x*y*gcd(a,b)
 x = c*x*y*g - d*g
 x = g((c*x*y) - d)
 x/g = c*x*y - d
+
+goal = AB
+
+fatorar o goal e ver os fatores primos, para cada fator primo, a e b podem optar por receber ou nao ele
+todos os fatores primos precisam ser usados, ou em a ou em b
+entao temos como resposta a adicao de todas as combinacoes de k (qtd de fatores primos) em a,b
 */
 
 
@@ -91,20 +97,6 @@ void solve(){
     for (auto gc : divisors){
         if (((x/gc)+d) % c != 0) continue;
         int goal = (x/gc + d) / c;
-        //debug (goal); 
-        //goal significa que eu quero achar dois caras que multiplicados sejam goal, e o gcd deles seja 1
-        //nisso eu vou descobrir a2 e b2, para achar a e b eu multiplico pelo u (gcd(a,b)) e calculo o lcm e depois testo os pares n sei como ainda
-        //aqui eu acho o lcm e consigo descobrir o gcd de a e b
-        // no caso o gcd ja eh meu divisor
-        // ai basta achar as combinacoes validas de a e b
-        // fatorar o goal e ver os fatores primos, para cada fator primo, a e b podem optar por receber ou nao ele
-        // todos os fatores primos precisam ser usados, ou em a ou em b
-        // entao temos como resposta a adicao de todas as combinacoes de k (qtd de fatores primos) em a,b
-        // ans += 1<<k
-        // debug(lm); 
-        // debug(gc); 
-        //debug(goal);
-        // debug(ab/(gc*gc));
         int k = factors[goal];
         //debug(k);
         ans += (1<<k);   
