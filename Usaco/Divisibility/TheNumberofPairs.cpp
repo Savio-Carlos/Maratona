@@ -47,7 +47,7 @@ x = g((c*x*y) - d)
 x/g = c*x*y - d
 */
 
-vector<int> getdiv(int x){
+vector<int> getdiv(int  x){
     vector<int> d;
     for (int i = 1; i * i <= x; i++) {
         if (x % i == 0){ 
