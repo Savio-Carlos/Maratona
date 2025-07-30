@@ -1,4 +1,4 @@
- #include <bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 #define ld long double
 #define int long long
@@ -11,20 +11,21 @@ using namespace std;
 const int MAX = 2e7+7;
 const int MOD = 1e9+7;
 
-int fastExpo(int base, int exp) {
+int fastExpo(int base, int exp, int m) {
     int res = 1;
     while(exp) {
-        if (exp & 1) res = res * base % MOD;
-        base = base * base % MOD;
+        if (exp & 1) res = res * base % m;
+        base = base * base % m;
         exp >>= 1;
     }
-    return res%MOD;
+    return res%m;
 }
 
 void solve(){
-    int a, b;
-    cin >> a >> b;
-    cout << fastExpo(a,b) << endl;
+    int a, b, c;
+    cin >> a >> b >> c;
+    int bc = fastExpo(b,c,MOD-1);
+    cout << (fastExpo(a,bc,MOD)) << endl;
 }
 
 signed main(){
@@ -33,3 +34,5 @@ signed main(){
     cin >> t;
     while(t--) solve();
 }
+
+
