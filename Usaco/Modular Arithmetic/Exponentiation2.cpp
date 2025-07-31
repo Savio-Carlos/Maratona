@@ -11,6 +11,13 @@ using namespace std;
 const int MAX = 2e7+7;
 const int MOD = 1e9+7;
 
+/*
+exponentiation (when evaluating x^n mod m, you can't store n as n mod m. 
+If n turns out to be really huge, you need to calculate it modulo φ(m) instead,
+ where φ stands for Euler's totient function. If m is prime, φ(m)=m−1.
+ Note that this new modulus will then usually not be prime, thus "division" in it will not be reliable
+*/
+
 int fastExpo(int base, int exp, int m) {
     int res = 1;
     while(exp) {
