@@ -9,7 +9,7 @@ using namespace std;
 #define debug(x) cout << #x << " = " << x << "\n";
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
 const int MAX = 1e6+7;
-const int MOD = 1e9+7;
+const int MOD = 998244353;
 
 int fastExpo(int base, int exp) {
     int r = 1;
@@ -34,7 +34,7 @@ signed main(){
     int n;
     cin >> n;
     vector<int> prob(MAX, 0);
-    vector<int> freq(n);
+    vector<int> freq(MAX,0);
     vector<vector<int>> kids(n);
     for (int i = 0; i < n; i++){
         int k;
@@ -43,16 +43,16 @@ signed main(){
             int a;
             cin >> a;
             kids[i].push_back(a);
-            prob[a] += modiv(modiv(1,n), modiv(1,k));//chance desse presente ser escolhido no total
+            prob[a] = (prob[a] + (modiv(1,n)%MOD) * (modiv(1,k))%MOD)%MOD;//chance desse presente ser escolhido no total
             freq[a]++;
         }
     }
-    int ans = 1;
+    int ans = 0;
     for (int i = 1; i < MAX; i++){
         if (!prob[i])continue;
-        debug(prob[i]);
-        debug(freq[i]);
-        ans *= (modiv(freq[i],n)*prob[i]) % MOD;
+        // debug(prob[i]);
+        // debug(freq[i]);
+        ans = (ans + ((modiv(freq[i],n))%MOD)*prob[i]%MOD) % MOD;//chance desse presente ser escolhido * chance de escolher uma crianca que quer esse presente = chance de ser valido
     }
     cout << ans%MOD << endl;
 }
