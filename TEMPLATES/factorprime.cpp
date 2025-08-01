@@ -1,13 +1,14 @@
-vector<int> factorize(int x){
+vector<int> factor(int n) {
     vector<int> primes;
-    int p = x;
-    for (p = 2; p*p <= n; p++){
-        while(x%p == 0){
-            x/=p;
+    for (int p = 2; p * p <= n; ++p) {
+        while (n % p == 0) {
             primes.push_back(p);
-        } 
+            n /= p;
+        }
     }
-    if (x > 1)primes.push_back(p);
+    if (n > 1) 
+        primes.push_back(n);
     return primes;
 }
+
 
