@@ -45,8 +45,8 @@ vector<int> factor(int n) {
 
 signed main(){
     winton;
-    ifstream cin("sumdiv.in");
-    ofstream cout("sumdiv.out");
+    // ifstream cin("sumdiv.in");
+    // ofstream cout("sumdiv.out");
     int a, b;
     cin >> a >> b;
     if (!b){
