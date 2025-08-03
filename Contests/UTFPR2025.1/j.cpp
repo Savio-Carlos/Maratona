@@ -15,6 +15,7 @@ const int INF = LLONG_MAX;
 vector<int> manacher_odd(string s) {
     int n = s.size();
     s = "$" + s + "^";
+    debug(s);
     vector<int> p(n + 2);
     int l = 0, r = 1;
     for(int i = 1; i <= n; i++) {
@@ -44,7 +45,7 @@ signed main() {
     string s;
     cin >> s;
     vector<int> mnc = manacher(s);
-    //for (auto u : mnc) cout << u << " ";
+    vdebug(mnc);
     vector<pair<int,int>> palindromes;
     for (int i = 0; i < mnc.size(); i++){
         if (mnc[i]-1 > 0){
