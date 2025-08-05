@@ -11,6 +11,7 @@ using namespace std;
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
 const int INF = 0x3f3f3f3f3f3f3f3fLL;
+
 /*
 sempre somo n na resposta
 como max(ai,ai+1) > ai+2 eu sei que minha lds aumenta a cada 2 caras no maximo

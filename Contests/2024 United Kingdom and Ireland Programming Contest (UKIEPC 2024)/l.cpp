@@ -12,8 +12,6 @@ const int MAX = 2e5+7;
 const int MOD = 1e9+7;
 const int INF = 0x3f3f3f3f3f3f3f3fLL;
 
-
-
 signed main(){
     winton; 
     int n;

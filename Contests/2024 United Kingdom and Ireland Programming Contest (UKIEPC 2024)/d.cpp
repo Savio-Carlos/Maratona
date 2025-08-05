@@ -1,58 +1,64 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define ld long double
+#define int long long
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
+#define debug(x) cout << #x << " = " << x << "\n";
+#define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
+const int MAX = 2e5+7;
+const int MOD = 1e9+7;
+const int INF = 0x3f3f3f3f3f3f3f3fLL;
+/*
+n(s) = r + s
+e(s) = (y+p-r)/2 - s
+w(s) = (y-p-r)/2 - s
+s(s) = s
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+n(s) = a + s
+e(s) = b - s
+w(s) = c - s
+s(s) = s
 
+M = max{(|a+s|), (|b-s|), (|c-s|), (|s|)}
+
+|a+s| <= M    ->     -M-a <= s <= M-a
+|b-s| <= M    ->     -M+b <= s <= M+b
+|c-s| <= M    ->     -M+c <= s <= M+c
+|s|   <= M    ->     -M   <= s <= M
+
+achar o minimo e maximo do intervalo de s
+
+smin(M) = max{−M−a,c−M,−M,b−M},
+smax(M) = min{M−a,c+M,M,b+M},
+​
+como todos tem -M ou M podemos cortar
+
+smin = max(-a,b,c,0)
+smax = min(-a,b,c,0)
+*/
+signed main(){
+    winton;
     int q;
     cin >> q;
-    cout << fixed << setprecision(9);
-
     while(q--){
-        double p, r, y;
+        ld p, r, y;
         cin >> p >> r >> y;
+        ld a = r;
+        ld b = (y+p-r)/2;
+        ld c = (y-p-r)/2;
 
-        // C = n + e
-        double C = (p + r + y) * 0.5;
+        ld smin = max({-a,b,c,(ld)0.0});
+        ld smax = min({-a,b,c,(ld)0.0});
 
-        // Binary search T
-        double lo = 0, hi = fabs(C) + fabs(p) + fabs(r) + 5;
-        for(int it = 0; it < 80; it++){
-            double T = 0.5*(lo + hi);
-            // build intervals for n and e
-            double n_lo = max(-T, r - T);
-            double n_hi = min( T, r + T);
-            double e_lo = max(-T, p - T);
-            double e_hi = min( T, p + T);
-            // from n+e=C => n in [C-e_hi, C-e_lo]
-            double req_lo = C - e_hi;
-            double req_hi = C - e_lo;
-            // intersect with n-range
-            if(max(n_lo, req_lo) <= min(n_hi, req_hi))
-                hi = T;
-            else
-                lo = T;
-        }
+        ld s = (smin+smax)/2;
 
-        double T = hi;
-        // final intervals
-        double n_lo = max(-T, r - T);
-        double n_hi = min( T, r + T);
-        double e_lo = max(-T, p - T);
-        double e_hi = min( T, p + T);
-        double req_lo = C - e_hi;
-        double req_hi = C - e_lo;
-        // pick n = leftmost feasible
-        double n = max(n_lo, req_lo);
-        double e = C - n;
-        double s = n - r;
-        double w = e - p;
+        ld n = r+s;
+        ld e = b-s;
+        ld w = c-s;
 
-        cout << n << " "
-             << e << " "
-             << s << " "
-             << w << "\n";
+        cout << fixed << setprecision(7) << n << ' ' << e << ' ' << s << ' ' << w << ' ' << endl;
     }
-    return 0;
 }
