@@ -49,7 +49,7 @@ void solve(){
             }
         }
     }
-    //vdebug(v);
+    vdebug(v);
     cout << ans << endl;
 }
 
