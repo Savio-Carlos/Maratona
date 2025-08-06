@@ -29,55 +29,50 @@ void solve(){
         mx = max(u,mx);
         sum += u;
     } 
-    vector<int> pfx(n);
-    vector<int> sfx(n);
-    
-    pfx[0] = a[0];
-    sfx[n-1] = a[n-1];
-    for (int i = 1; i < n; i++) pfx[i] = pfx[i-1] + a[i];
-    for (int i = n-2; i >= 0; i--) sfx[i] = sfx[i+1] + a[i];
-
     if (sum&1 || (sum < mx*2)){
         cout << -1 << endl;
         return;
     }
-
-    // vdebug(pfx);
-    // vdebug(sfx);
     int half = sum/2;
-    int idx =  lower_bound(pfx.begin(), pfx.end(), half) - pfx.begin();
-    int diff = abs(pfx[idx] - sfx[idx+1]);
-    debug(idx);
-    debug(diff);
+    int idx = 0, cur = 0;
+    for(; idx < n; idx++){
+        if(cur + a[idx] > half) {
+            idx--;
+            break;
+        }
+        cur += a[idx];
+    }
+    int diff = abs(sum - cur*2);
+    // debug(idx);
+    // debug(diff);
     if (!diff){
         cout << 1 << endl;
         for (auto u : a) cout << u << " ";
         cout << endl;
         return;
     }
-    vector<int> dim = a;
-    dim[idx+1] -= (diff/2);
-    diff/=2;
-
-    for(int i = n - 1; i > idx+1 && diff; i--) {
+    vector<int> dim (n);
+    dim[idx+1] = diff/2;
+    a[idx+1] -= dim[idx + 1];
+    diff /= 2;
+    for(int i = n - 1; i > idx + 1 && diff; i--) {
         if(a[i] >= diff) {
             dim[i] = diff;
+            a[i] -= diff;
             diff = 0;
         } else {
             dim[i] = a[i];
             diff -= a[i];
+            a[i] = 0;
         }
     }
 
     cout << 2 << endl;
-    // vdebug(dim);
-    for(auto u : dim) cout << u << " ";
-    cout << endl;
-    for (int i = 0; i < n; i++){
-        a[i] -= dim[i];
-    }
     // vdebug(a);
     for(auto u : a) cout << u << " ";
+    cout << endl;
+    // vdebug(dim);
+    for(auto u : dim) cout << u << " ";
     cout << endl;
 }
 
