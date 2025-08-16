@@ -16,30 +16,12 @@ const int INF = LLONG_MAX;
 todo caminho que tiver tamanho maior que 2 da raiz eu vou querer adicionar na resposta
 */
 
-int n, ans = INF, leaves[MAX], leaf = 0;
-vector<vector<int>> graph;
-
-void dfs(int v, int p, int dist){
-    if (graph[v].size() == 1){
-        leaf++;
-        if (v != 0)leaves[p]++;
-    }
-    for (auto u : graph[v]){
-        if (u == p) continue;
-        dfs(u, v, dist+1);
-    }
-}
-
 void solve(){
+    int n;
     cin >> n;
-    graph.resize(n);
+    vector<vector<int>> graph(n);
     vector<int> conn(n);
-    ans = INF; leaf = 0;
-    for (int i = 0; i < n; i++){
-        graph[i].clear();
-        leaves[i] = 0;
-    }
-    int best = 0, mx = 0;
+
     for (int i = 1; i < n; i++){
         int a, b;
         cin >> a >> b;
@@ -54,13 +36,16 @@ void solve(){
             return;
         }
     }
-    dfs(0,-1, 0);
-    //debug(leaf);
+    int ans = INF, leaves = 0;
     for (int i = 0; i < n; i++){
-        ans = min(ans, leaf - leaves[i]);
+        if (conn[i] == 1) leaves++;
+    }
+    for (int i = 0; i < n; i++) {
+        int cnt = 0;
+        for (int u : graph[i]) if (conn[u] == 1) cnt++;
+        ans = min(ans, leaves-cnt);
     }
     cout << ans << endl;
-
 }
 
 signed main(){
