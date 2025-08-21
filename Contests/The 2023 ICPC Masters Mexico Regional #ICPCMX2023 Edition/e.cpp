@@ -8,67 +8,70 @@ using namespace std;
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 #define debug(x) cout << #x << " = " << x << "\n";
 #define vdebug(a) cout << #a << " = "; for(auto x: a) cout << x << " "; cout << "\n";
-const int MAX = 100+7;
-const int MOD = 1e9+7;
+const int MAXN = 100+7;
+const int MAXM = 1e4+7;
 const int INF = 1e18;
 
-int n, m;
-int d[MAX], visited[MAX];
-vector<pair<int, int>> ar;
-vector<vector<int>> graph;
-vector<int> w;             
+int n, m, s, t, ciclo;
+int d[MAXN], w[MAXM], p[MAXN], visited[MAXN]; 
+pair<int, int> arestas[MAXM];
+vector<int> graph[MAXN];
+
+bool bellmanford(int st){
+    for(int i = 0; i < MAXN; i++) d[i] = INF;
+    d[st] = 0;
+    for(int i = 0; i <= n; i++){
+        for(int j = 0; j < m; j++){
+            auto &[a, b] = arestas[j];
+            if(!visited[b]) continue;
+            if(d[b] > d[a] + w[j]){
+                if(i == n){
+                    ciclo = a;
+                    return 1;
+                }
+                d[b] = d[a] + w[j];
+            }
+        }
+    }
+    return 0;
+}
 
 void dfs(int v){
     visited[v] = 1;
     for(auto u : graph[v]){
-        if (visited[u]) continue;
-        dfs(u);
+        if(!visited[u]){
+            dfs(u);
+        }
     }
-}
-
-bool bellman_ford(int a) {
-	for (int i = 0; i < n; i++) d[i] = INF;
-	d[a] = 0;
-	for (int i = 0; i <= n; i++)
-		for (int j = 0; j < m; j++) {
-            if (!visited[ar[j].second]) continue;
-			if (d[ar[j].second] > d[ar[j].first] + w[j]) {
-				if (i == n) return 1;
-				d[ar[j].second] = d[ar[j].first] + w[j];
-			}
-		}
-	return 0;
 }
 
 signed main(){
     winton;
-    int s, t;
-    cin >> n >> m >> s >> t;
-    s--;
-    ar.resize(m);
-    w.resize(m);
-    graph.resize(n);
-    for (int i = 0; i < m; i++){
-        cin >> ar[i].first >> ar[i].second >> w[i];
-        ar[i].first--;
-        ar[i].second--;
-        graph[ar[i].first].push_back(ar[i].second);
+    cin >> n >> m >> s >> t; 
+    for(int i = 0; i < m; i++){
+        int a, b, cost; cin >> a >> b >> cost;
+        a--, b--;
+        w[i] = cost;
+        arestas[i] = {a, b};
+        graph[a].push_back(b);
     }
-    vector<int> gain(n);
-    for (int i = 0; i < n; i++){
-        cin >> gain[i];
+
+    for(int i = 0; i < n; i++) cin >> p[i];
+    
+    for(int i = 0; i < m; i++){
+        auto [a, b] = arestas[i];
+        w[i] -= p[b];
     }
-    for (int i = 0; i < m; i++){
-        auto &[u,v] = ar[i];
-        w[i] -= gain[v];
-    }
-    // for (int i = 0; i < m; i++){
-    //     auto [u,v] = ar[i];
-    //     cout << u << " -> " << v << " w: " << w[i] << endl;
-    // }
+
+    s--, t--;
     dfs(s);
-    bool c = bellman_ford(s);
-    if (c && d[t-1] != INF) cout << "Money hack!" << endl;
-    else if (d[t-1] == INF) cout << "Bad trip" << endl;
-    else cout << -d[t-1] << endl;
+    if(bellmanford(s)){ 
+        memset(visited, 0LL, sizeof(visited));
+        dfs(ciclo);
+        if(visited[t]) cout << "Money hack!\n";
+        else if(d[t] != INF) cout << -d[t] << "\n";
+        else cout << "Bad trip\n";
+    }else if(d[t] != INF){
+        cout << -d[t] << "\n";
+    }else cout << "Bad trip\n";
 }
