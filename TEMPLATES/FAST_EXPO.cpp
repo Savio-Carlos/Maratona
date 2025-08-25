@@ -8,6 +8,16 @@ int fastExpo(int base, int exp) {
     return res%MOD;
 }
 
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base;
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}
+
 int fastExpo(int base, int exp, int m) {
     int res = 1;
     base %= m;
