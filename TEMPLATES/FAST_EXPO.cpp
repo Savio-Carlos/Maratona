@@ -28,3 +28,13 @@ int fastExpo(int base, int exp, int m) {
     }
     return res%m;
 }
+
+ld fastExpo(ld base, int exp) {
+    ld res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base;
+        base = base * base;
+        exp >>= 1;
+    }
+    return res;
+}

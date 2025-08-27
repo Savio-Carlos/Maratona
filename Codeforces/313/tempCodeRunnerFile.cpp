@@ -55,7 +55,7 @@ using namespace dbg;
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
 const int INF = LLONG_MAX;
-const int K = 60;
+const int K = 70;
 /*
 EV (sum of lengths) = sum of EV of lenghts
 */
@@ -93,8 +93,8 @@ signed main(){
     if (n < K) nn = fastExpo(2.0, n) - 1.0 - n - ((ld)n * (n - 1) / 2.0);
 
     for (int k = 1; k < n && k < K; k++){
-        ld sum = 0;
-        ld g = 0;
+        int sum = 0;
+        int g = 0;
         for (int i = 0; i < n; i++){
             pt a = points[i];
             pt b = points[(i+k)%n];
