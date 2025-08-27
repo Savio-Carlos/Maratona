@@ -58,11 +58,4 @@ const int INF = LLONG_MAX;
 
 signed main(){
     winton;
-    map<int, string> mp;
-    mp[1] = "carlos";
-    mp[2] = "amos";
-    mp[3] = "nikolas";
-    pair<int,int> p = {3,2};
-    set<int> s = {2,5,6,4,7,8};
-    debug(mp, s, p);
 }
