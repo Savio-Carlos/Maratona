@@ -8,11 +8,9 @@ void dbg_out(H h, T... t) { cerr << ' ' << h; dbg_out(t...); }
 #if defined(DEBUG)
     #define winton (void)0
     #define debug(...) cerr << #__VA_ARGS__ << ':'; dbg_out(__VA_ARGS__);
-    #define vdebug(a) cerr << #a << " = ["; for(auto it = (a).begin(); it != (a).end(); ++it) cerr << *it << (std::next(it) == (a).end() ? "" : ", "); cerr << "]" << endl;
 #else
     #define winton ios_base::sync_with_stdio(false), cin.tie(NULL)
     #define debug(...) (void)0
-    #define vdebug(x) (void)0
 #endif
 //=============================================================================================================================================//
 
