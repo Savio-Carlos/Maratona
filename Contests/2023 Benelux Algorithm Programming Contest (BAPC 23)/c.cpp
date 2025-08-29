@@ -42,7 +42,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,69 +52,71 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 1e5+7;
-const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
+const int MAX = 1e6+7;
+const int INF = 1e18;
 
-int n, com;
-vector<int> g[MAX];
-vector<int> gi[MAX];
-int vis[MAX];
-stack<int> S;
-int comp[MAX], indeg[MAX];
+vector<int> graph[MAX];
+int n, cost[MAX];
+map<string, int> cnt;
+map<int, string> pref;
 
-void dfs(int k) {
-	vis[k] = 1;
-	for (int i = 0; i < (int) g[k].size(); i++)
-		if (!vis[g[k][i]]) dfs(g[k][i]);
-
-	S.push(k);
-}
-
-void scc(int k, int c) {
-	vis[k] = 1;
-	comp[k] = c;
-	for (int i = 0; i < (int) gi[k].size(); i++)
-		if (!vis[gi[k][i]]) scc(gi[k][i], c);
-}
-
-void kosaraju() {
-	for (int i = 0; i < n; i++) vis[i] = 0;
-	for (int i = 0; i < n; i++) if (!vis[i]) dfs(i);
-
-	for (int i = 0; i < n; i++) vis[i] = 0;
-	while (S.size()) {
-		int u = S.top();
-		S.pop();
-		if (!vis[u]) {
-            com++;
-            scc(u, com);
-        }
+void dfs(int v){
+    for (auto &u : graph[v]){
+        cost[u] = cost[v] + n-2*cnt[pref[u]];
+        dfs(u);
     }
 }
 
 signed main(){
     winton;
-    int m;
-    cin >> n >> m;
-    for (int i = 0; i < m; i++){
-        int a, b;
-        cin >> a >> b;
-        a--, b--;
-        g[a].push_back(b);
-        gi[b].push_back(a);
-    }
-    kosaraju();
+    cin >> n;
+    map<string, int> mp;
+    int node = 0, tot = 0;
+    mp["/"] = 0;
     for (int i = 0; i < n; i++){
-        for (auto u : g[i]){
-            if (comp[i] == comp[u]) continue;
-            indeg[comp[u]]++;
+        int prev = 0;
+        string s;
+        cin >> s;
+        s += '/';
+        string cur = "", pfx = "";
+        int depth = 1;
+        for (int c = 1; c < sz(s); c++){
+            if (s[c] != '/'){
+                cur += s[c];
+                continue;
+            }
+            tot++;
+            cur += pfx;
+            pfx += cur;
+            cnt[pfx]++;
+            
+            if (mp.find(cur) != mp.end()){//ja tenho esse caminho no map
+                prev = mp[cur];
+                cur = "";
+                continue;
+            } 
+            else {
+                graph[prev].push_back(++node);
+                pref[node] = pfx;
+            }
+            // debug(cur);
+            // debug(mp);
+            mp[cur] = node;
+            prev = mp[cur];
+            cur = "";
         }
     }
-    debug(com);
-    int ans = 0;
-    for (int i = 1; i <= com; i++){
-        if (indeg[i] == 0) ans++;
+    debug(mp);
+    debug(cnt);
+    for (int i = 0; i <= node; i++){debug(i, graph[i]);}
+    cost[0] = tot; 
+    dfs(0);
+    int ans = INF;
+    for (int i = 0; i <= node; i++){
+        if (sz(graph[i]) > 0){
+            ans = min(cost[i], ans);
+            debug(cost[i]);
+        }
     }
     cout << ans << endl;
 }

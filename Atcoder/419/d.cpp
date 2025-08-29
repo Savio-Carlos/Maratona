@@ -52,69 +52,34 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 1e5+7;
-const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
-
-int n, com;
-vector<int> g[MAX];
-vector<int> gi[MAX];
-int vis[MAX];
-stack<int> S;
-int comp[MAX], indeg[MAX];
-
-void dfs(int k) {
-	vis[k] = 1;
-	for (int i = 0; i < (int) g[k].size(); i++)
-		if (!vis[g[k][i]]) dfs(g[k][i]);
-
-	S.push(k);
-}
-
-void scc(int k, int c) {
-	vis[k] = 1;
-	comp[k] = c;
-	for (int i = 0; i < (int) gi[k].size(); i++)
-		if (!vis[gi[k][i]]) scc(gi[k][i], c);
-}
-
-void kosaraju() {
-	for (int i = 0; i < n; i++) vis[i] = 0;
-	for (int i = 0; i < n; i++) if (!vis[i]) dfs(i);
-
-	for (int i = 0; i < n; i++) vis[i] = 0;
-	while (S.size()) {
-		int u = S.top();
-		S.pop();
-		if (!vis[u]) {
-            com++;
-            scc(u, com);
-        }
-    }
-}
+const int MAX = 1e6+7;
+const int INF = 1e18;
 
 signed main(){
     winton;
-    int m;
-    cin >> n >> m;
-    for (int i = 0; i < m; i++){
-        int a, b;
-        cin >> a >> b;
-        a--, b--;
-        g[a].push_back(b);
-        gi[b].push_back(a);
+    int n, m;
+    string s, t;
+    cin >> n >> m >> s >> t;
+    vector<int> change(n+1);
+    while (m--){
+        int l, r;
+        cin >> l >> r;
+        l--;
+        change[l]++;
+        change[r]++;
     }
-    kosaraju();
+    
+    vector<bool> pfx(n+1);
     for (int i = 0; i < n; i++){
-        for (auto u : g[i]){
-            if (comp[i] == comp[u]) continue;
-            indeg[comp[u]]++;
-        }
+        if (i) change[i] += change[i-1];
+        pfx[i] = change[i]%2;
     }
-    debug(com);
-    int ans = 0;
-    for (int i = 1; i <= com; i++){
-        if (indeg[i] == 0) ans++;
+    debug(change);
+    debug(pfx);
+    for (int i = 0; i < n; i++){
+        bool which = pfx[i];
+        if (which) cout << t[i];
+        else cout << s[i];
     }
-    cout << ans << endl;
+    cout << endl;
 }
