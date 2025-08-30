@@ -2,13 +2,13 @@
 Acha as bridges do grafo e monta a bridge tree
 */
 
-int t, c, low[MAX], rec[MAX], visited[MAX], comp[MAX];
+int t, c, low[MAX], pre[MAX], visited[MAX], comp[MAX];
 stack<int> st;
 vector<int> graph[MAX], compgraph[MAX];
 
 void dfs(int v, int p){
     visited[v] = 1;
-    low[v] = rec[v] = ++t;
+    low[v] = pre[v] = ++t;
     st.emplace(v);
     for (auto u : graph[v]){
         if (!visited[u]){

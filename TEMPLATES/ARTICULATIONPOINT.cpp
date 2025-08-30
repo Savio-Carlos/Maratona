@@ -2,12 +2,12 @@
 Acha os articulation points do grafo
 */
 
-int t, c, low[MAX], rec[MAX], visited[MAX];
+int t, c, low[MAX], pre[MAX], visited[MAX];
 vector<int> graph[MAX], ans;
 
 void dfs(int v, int p){
     visited[v] = 1;
-    low[v] = rec[v] = ++t;
+    low[v] = pre[v] = ++t;
     bool art = false;
     int filhos = 0;
     for (auto u : graph[v]){

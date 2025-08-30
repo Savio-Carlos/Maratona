@@ -1,4 +1,4 @@
-int n;
+int n, com;
 vector<int> g[MAX];
 vector<int> gi[MAX];
 int vis[MAX];
@@ -31,7 +31,7 @@ void kosaraju() {
 		S.pop();
 		if (!vis[u]) {
             com++;
-            scc(u, u);
+            scc(u, com);
         }
     }
 }

@@ -1,22 +1,22 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+ 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define sz(a) ((int)a.size())
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
-
+ 
 namespace dbg {
     const char* const RESET     = "\033[0m";
     const char* const BOLD_BLUE = "\033[1;34m";
     const char* const YELLOW    = "\033[33m";
     const char* const BOLD_WHITE= "\033[1;37m";
-
+ 
     template<typename T1, typename T2>
     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
+ 
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
         os << '{';
@@ -24,7 +24,7 @@ namespace dbg {
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
         return os << '}';
     }
-
+ 
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
     void debug_out(string_view s, H h, T... t) {
@@ -41,9 +41,9 @@ namespace dbg {
     }
 } 
 using namespace dbg;
-
+ 
 // #define DEBUG
-
+ 
 #if defined(DEBUG)
     #define winton (void)0
     #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
@@ -51,70 +51,49 @@ using namespace dbg;
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
+ 
+const int MAX = 1e5+7;
+ 
+vector<vector<int>> graph;
 
-const int MAX = 1e6+7;
-const int INF = 1e9;
+int n;
 
-vector<int> graph[MAX];
-int n, cost[MAX], cnt[MAX];
-map<int, string> pref;
-
-void dfs(int v){
-    for (auto &u : graph[v]){
-        cost[u] = cost[v] + n-2*cnt[u];
-        dfs(u);
+multiset<int> dfs(int v){
+    multiset<int> cur;
+    for (auto u : graph[v]){
+        multiset<int> filho = dfs(u);
+        if (sz(filho) > sz(cur))swap(cur,filho);
+        cur.insert(all(filho));
     }
+    if (!cur.empty()){
+        auto it = cur.end();
+        int x = *(--it);
+        x++;
+        cur.erase(it);
+        cur.insert(x);
+    }
+    else cur.insert(1);
+    debug(v, cur);
+    return cur;
 }
-
+ 
 signed main(){
     winton;
-    cin >> n;
-    map<string, int> mp;
-    int node = 0, tot = 0;
-    mp["/"] = 0;
-    for (int i = 0; i < n; i++){
-        int prev = 0;
-        string s;
-        cin >> s;
-        s += '/';
-        string cur = "", pfx = "";
-        int depth = 1;
-        for (int c = 1; c <= sz(s); c++){
-            if (s[c] != '/'){
-                cur += s[c];
-                continue;
-            }
-            tot++;
-            pfx += cur;
-            cnt[prev]++;
-            if (mp.find(pfx) != mp.end()){//ja tenho esse caminho no map
-                prev = mp[pfx];
-                cur = "";
-                continue;
-            } 
-            else {
-                graph[prev].push_back(++node);
-                pref[node] = pfx;
-            }
-            debug(cur);
-            debug(pfx);
-            // debug(mp);
-            mp[pfx] = node;
-            prev = mp[pfx];
-            cur = "";
-        }
+    int k;
+    cin >> n >> k;
+    debug(n, k);
+    graph.resize(n+1);
+    for (int i = 1; i < n; i++){
+        int x;
+        cin >> x;
+        graph[--x].push_back(i);
     }
-    // debug(mp);
-
-    // for (int i = 0; i <= node; i++){debug(i, graph[i]);}
-    cost[0] = tot; 
-    dfs(0);
-    int ans = INF;
-    for (int i = 0; i <= node; i++){
-        if (sz(graph[i]) > 0){
-            ans = min(cost[i], ans);
-            debug(cost[i]);
-        }
+    multiset<int> ans = dfs(0);
+    int cnt = 0;
+    auto it = ans.end();
+    it--;
+    for (int i = 0; i < k; i++){
+        cnt += *(it)--; 
     }
-    cout << ans << endl;
+    cout << cnt << endl;
 }

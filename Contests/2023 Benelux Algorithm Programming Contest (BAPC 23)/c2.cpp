@@ -42,7 +42,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -56,13 +56,15 @@ const int MAX = 1e6+7;
 const int INF = 1e9;
 
 vector<int> graph[MAX];
-int n, cost[MAX], cnt[MAX];
+int n, cost[MAX];
+map<string, int> cnt;
 map<int, string> pref;
 
 void dfs(int v){
     for (auto &u : graph[v]){
-        cost[u] = cost[v] + n-2*cnt[u];
+        cost[u] = cost[v] + n-2*cnt[pref[u]];
         dfs(u);
+        debug(cnt[pref[u]]);
     }
 }
 
@@ -86,7 +88,8 @@ signed main(){
             }
             tot++;
             pfx += cur;
-            cnt[prev]++;
+            cnt[pfx]++;
+            
             if (mp.find(pfx) != mp.end()){//ja tenho esse caminho no map
                 prev = mp[pfx];
                 cur = "";
@@ -104,9 +107,9 @@ signed main(){
             cur = "";
         }
     }
-    // debug(mp);
-
-    // for (int i = 0; i <= node; i++){debug(i, graph[i]);}
+    debug(mp);
+    debug(cnt);
+    for (int i = 0; i <= node; i++){debug(i, graph[i]);}
     cost[0] = tot; 
     dfs(0);
     int ans = INF;
