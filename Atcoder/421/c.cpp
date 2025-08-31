@@ -5,7 +5,7 @@ using namespace std;
 #define rall(x) x.rbegin(), x.rend()
 #define sz(a) ((int)a.size())
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
 
 namespace dbg {
@@ -52,72 +52,65 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 1e6+7;
-const int INF = 1e9;
-
-vector<int> graph[MAX];
-int n, cost[MAX];
-map<string, int> cnt;
-map<int, string> pref;
-
-void dfs(int v){
-    for (auto &u : graph[v]){
-        cost[u] = cost[v] + n-2*cnt[pref[u]];
-        dfs(u);
-        debug(cnt[pref[u]]);
-    }
-}
-
 signed main(){
     winton;
-    cin >> n;
-    map<string, int> mp;
-    int node = 0, tot = 0;
-    mp["/"] = 0;
+    int n;
+    string s;
+    cin >> n >> s;
+    n*=2;
+    vector<int> as, bs;
+    string a = "", b = "", t = s;
     for (int i = 0; i < n; i++){
-        int prev = 0;
-        string s;
-        cin >> s;
-        s += '/';
-        string cur = "", pfx = "";
-        int depth = 1;
-        for (int c = 1; c <= sz(s); c++){
-            if (s[c] != '/'){
-                cur += s[c];
-                continue;
-            }
-            tot++;
-            pfx += cur;
-            cnt[pfx]++;
-            
-            if (mp.find(pfx) != mp.end()){//ja tenho esse caminho no map
-                prev = mp[pfx];
-                cur = "";
-                continue;
-            } 
-            else {
-                graph[prev].push_back(++node);
-                pref[node] = pfx;
-            }
-            debug(cur);
-            debug(pfx);
-            // debug(mp);
-            mp[pfx] = node;
-            prev = mp[pfx];
-            cur = "";
+        if (s[i] == 'A') as.push_back(i);
+        if (s[i] == 'B')  bs.push_back(i);
+        if (i&1){
+            a+= "B";
+            b+= "A";
+        } 
+        else {
+            a+= "A";
+            b+= "B";
         }
     }
-    debug(mp);
-    debug(cnt);
-    for (int i = 0; i <= node; i++){debug(i, graph[i]);}
-    cost[0] = tot; 
-    dfs(0);
-    int ans = INF;
-    for (int i = 0; i <= node; i++){
-        if (sz(graph[i]) > 0){
-            ans = min(cost[i], ans);
-            debug(cost[i]);
+    debug(a);
+    debug(b);
+    int ans1 = 0, ans2 = 0, ai = 0, bi = 0;;
+    for (int i = 0; i < n; i++){
+        if (s[i] != a[i]){
+            if (s[i] == 'A'){
+                while (bi < sz(bs) && bs[bi] < i) bi++;
+                swap(s[i], s[bs[bi]]);
+                ans1 += bs[bi] - i;
+                bi++;
+            }
+            else{
+                while (ai < sz(as) && as[ai] < i) ai++;
+                swap(s[i], s[as[ai]]);
+                ans1 += as[ai] - i;
+                ai++;
+            }
+            debug(s);
         }
     }
-    cout << ans << endl;
+    ai = 0, bi = 0;
+    for (int i = 0; i < n; i++){
+            if (t[i] != b[i]){
+            if (t[i] == 'A'){
+                while (bi < sz(bs) && bs[bi] < i) bi++;
+                swap(t[i], t[bs[bi]]);
+                ans2 += bs[bi] - i;
+                bi++;
+            }
+            else{
+                while (ai < sz(as) && as[ai] < i) ai++;
+                swap(t[i], t[as[ai]]);
+                ans2 += as[ai] - i;
+                ai++;
+            }
+            debug(t);
+        }
+    }
+    
+
+    cout << min(ans1, ans2) << endl;
 }

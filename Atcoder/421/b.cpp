@@ -5,7 +5,7 @@ using namespace std;
 #define rall(x) x.rbegin(), x.rend()
 #define sz(a) ((int)a.size())
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
 
 namespace dbg {
@@ -42,7 +42,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,70 +52,24 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 1e6+7;
-const int INF = 1e9;
-
-vector<int> graph[MAX];
-map<string,int> gs[MAX];
-int n, cost[MAX], cnt[MAX];
-
-void dfs(int v){
-    for (auto u : graph[v]){
-        cost[u] = cost[v] + n-2*cnt[u];
-        dfs(u);
-        debug(u, cnt[u]);
-    }
+string calc(string s, string t){
+    int a = stoll(s);
+    int b = stoll(t);
+    return to_string(a+b);
 }
 
 signed main(){
     winton;
-    cin >> n;
-
-    int node = 0, tot = 0;
-
-    for (int i = 0; i < n; i++){
-        int prev = 0;
-        string s;
-        cin >> s;
-        s += '/';
-        string cur = "";
-
-        for (int c = 1; c <= sz(s); c++){
-            if (s[c] != '/'){
-                cur += s[c];
-                continue;
-            }
-            tot++;
-
-            if (gs[prev].find(cur) != gs[prev].end()){//ja tenho esse caminho no map
-                auto it = gs[prev].find(cur);
-                debug(*it);
-                prev = gs[prev][cur];
-                cnt[prev]++;
-                cur = "";
-                continue;
-            } 
-            graph[prev].push_back(++node);
-            gs[prev][cur] = node;
-            cnt[node]++;
-            
-            debug(cur);
-            // debug(mp);
-            prev = node;
-            cur = "";
-        }
+    int x, y;
+    cin >> x >> y;
+    vector<string> fib(10);
+    fib[0] = to_string(x);
+    fib[1] = to_string(y);
+    for (int i = 2; i < 10; i++){
+        string c = calc(fib[i-1], fib[i-2]);
+        reverse(all(c));
+        fib[i] = c;
     }
-    // debug(mp);
-
-    // for (int i = 0; i <= node; i++){debug(i, graph[i]);}
-    cost[0] = tot; 
-    dfs(0);
-    int ans = INF;
-    for (int i = 0; i <= node; i++){
-        if (sz(graph[i]) > 0){
-            ans = min(cost[i], ans);
-            debug(cost[i]);
-        }
-    }
-    cout << ans << endl;
+    debug(fib);
+    cout << stoll(fib[9]) << endl;
 }
