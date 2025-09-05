@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,34 +51,34 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const ld DINF = 1e18;
-const ld pi = acos(-1.0);
-const ld eps = 1e-9;
+const int MAX = 1e5+7;
 
-template<typename T>
+
 struct point {
-    T x, y;
-    point(T x_ = 0, T y_ = 0) : x(x_), y(y_) {}
+    int x, y;
+    point(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+    bool operator == (const point p) const {
+		return x == p.x and y == p.y;
+	}
+	point operator + (const point p) const { return point(x+p.x, y+p.y); }
+	point operator - (const point p) const { return point(x-p.x, y-p.y); }
+	point operator * (const int c) const { return point(x*c, y*c); }
+	int operator * (const point p) const { return x*(int)p.x + y*(int)p.y; }
+	int operator ^ (const point p) const { return x*(int)p.y - y*(int)p.x; }
+    
+    friend istream& operator >> (istream& in, point& p) {
+		return in >> p.x >> p.y;
+	}
 
-    template<typename U>
-    explicit point(const point<U>& p): x(p.x), y(p.y) {}
-
-    point<T> operator + (const point<T>& p) const { return point<T>(x + p.x, y + p.y); }
-    point<T> operator - (const point<T>& p) const { return point<T>(x - p.x, y - p.y); }
-    template<typename U>
-    point<T> operator * (const U c) const { return point<T>(x * c, y * c); }
-    auto operator * (const point<T>& p) const { return (int)x * p.x + (int)y * p.y; }
-    auto operator ^ (const point<T>& p) const { return (int)x * p.y - (int)y * p.x; }
-
-    friend istream& operator >> (istream& in, point<T>& p) { return in >> p.x >> p.y; }
-    friend ostream& operator << (ostream& os, const point<T>& p) { return os << "(" << p.x << ", " << p.y << ")"; }
+    friend ostream& operator << (ostream& os, point& p) {
+		return os << "(" << p.x << ", " << p.y << ")"; 
+	}
 };
-using pt = point<int>;
 
 struct line {
-	pt p, q;
+	point p, q;
 	line() {}
-	line(pt p_, pt q_) : p(p_), q(q_) {}
+	line(point p_, point q_) : p(p_), q(q_) {}
     
     friend istream& operator >> (istream& in, line& r) {
 		return in >> r.p >> r.q;
@@ -89,70 +89,70 @@ struct line {
 	}
 };
 
-int sq(pt p){
+int sq(point p){
     return p.x*p.x + p.y*p.y;
 }
 
-double abs(pt p){
+double abs(point p){
     return sqrt(sq(p));
 }
 
 //checa se dois vetores sao perpendiculares
-bool perpendicular(pt v, pt w){
+bool perpendicular(point v, point w){
     return (v*w == 0);
 }
 
 //ccw, 0 colineares, -1 r a direita, 1 r a esquerda
-int orientation(pt p, pt q, pt r){
+int orientation(point p, point q, point r){
     int val = ((q-p) ^ (r-p));
     if (!val) return 0;
     return (val > 0) ? 1 : -1;
 }
 
 //checa se um ponto esta contido no angulo do segmento pq e pr
-bool onAngle (pt p, pt q, pt r, pt g){
+bool onAngle (point p, point q, point r, point g){
     if (!orientation(p,q,r)) return false;
     if (orientation(p,q,r) > 0) swap(q,r);
     return orientation(p,q,g) >= 0 && orientation(p,r,g) <= 0; 
 }
 
 // quadrante de um ponto
-int quad(pt p) { 
+int quad(point p) { 
 	return (p.x<0)^3*(p.y<0);
 }
 
 //dist quadrada de dois pontos
-int dist2(pt p, pt q){
+int dist2(point p, point q){
     return sq(p.x - q.x) + sq(p.y - q.y);
 }
 
 //dist double de dois pontos
-double dist(pt p, pt q){
+double dist(point p, point q){
     return sqrt(sq(p.x - q.x) + sq(p.y - q.y));
 }
 
 //dist entre uma linha e um ponto
-double linedist(line s, pt r){
-    pt p = s.p;
-    pt q = s.q;
+double linedist(line s, point r){
+    point p = s.p;
+    point q = s.q;
     return ((p-r) ^ (q-r))/dist(p,q);
 }
 
 // 2 * area com sinal
-int sarea2(pt p, pt q, pt r) { 
+int sarea2(point p, point q, point r) { 
 	return (q-p)^(r-q);
 }
 
 // 2 * area do poligono
-int polarea2(vector<pt> v) { 
+int polarea2(vector<point> v) { 
 	int ret = 0;
 	for (int i = 0; i < v.size(); i++)
-		ret += sarea2(pt(0, 0), v[i], v[(i + 1) % v.size()]);
+		ret += sarea2(point(0, 0), v[i], v[(i + 1) % v.size()]);
 	return abs(ret);
 }
 
 //checa se o poligono e convexo
-bool isConvex(vector<pt> p) {
+bool isConvex(vector<point> p) {
     bool hasPos = false, hasNeg = false;
     for (int i = 0, n = p.size(); i < n; i++) {
         int o = orientation(p[i], p[(i+1)%n], p[(i+2)%n]);
@@ -163,32 +163,31 @@ bool isConvex(vector<pt> p) {
 }
 
 
-bool half(pt p) { // true if in blue half
+bool half(point p) { // true if in blue half
     assert(p.x != 0 || p.y != 0); // the argument of (0,0) isundefined
     return p.y > 0 || (p.y == 0 && p.x < 0);
 }
 
 //ordena os pontos de acordo com o angulo
-void polarSort(vector<pt> &v) {
-    sort(v.begin(), v.end(), [](pt v, pt w) { 
+void polarSort(vector<point> &v) {
+    sort(v.begin(), v.end(), [](point v, point w) { 
         return make_tuple(half(v), 0, sq(v)) < 
         make_tuple(half(w), (v^w), sq(w));
     });
 }
 
 //rotaciona o vetor 90 graus
-pt rotate90(pt p) {
-	return pt(-p.y, p.x);
+point rotate90(point p) {
+	return point(-p.y, p.x);
 }
 
 //retorna uma linha perpendicular a linha s que passa pelo ponto p
-line perpthrough(line s, pt p){
+line perpthrough(line s, point p){
     return {p, p + (rotate90(s.p - s.q))};//pode alterar a ordem
 }
 
-// se p pertence ao seg de r
-bool isinseg (line r, pt p) { 
-	pt a = r.p - p, b = r.q - p;
+bool isinseg(point p, line r) { // se p pertence ao seg de r
+	point a = r.p - p, b = r.q - p;
 	return (a ^ b) == 0 and (a * b) <= 0;
 }
 
@@ -200,51 +199,24 @@ bool intersect(line r, line s){
 
     if (o1 != o2 && o3 != o4) return true;
 
-    if (o1 == 0 && isinseg(r, s.p)) return true;
-    if (o2 == 0 && isinseg(r, s.q)) return true;
-    if (o3 == 0 && isinseg(s, r.p)) return true;
-    if (o4 == 0 && isinseg(s, r.q)) return true;
+    if (o1 == 0 && isinseg(s.p, r)) return true;
+    if (o2 == 0 && isinseg(s.q, r)) return true;
+    if (o3 == 0 && isinseg(r.p, s)) return true;
+    if (o4 == 0 && isinseg(r.q, s)) return true;
 
     return false;
 }
 
-// numero de pontos inteiros no segmento
-int segpts(line r) { 
-	return 1 + gcd(abs(r.p.x - r.q.x), abs(r.p.y - r.q.y));
-}
-
-// retorna t tal que t*v pertence a reta r
-double get_t(pt a, line r) { 
-	return (r.p^r.q) / (double) ((r.p-r.q)^a);
-}
-
-//The orthogonal projection of a pt P on a line R is the pt on R that is closest to P 
-point<double> proj(line r, pt p) {
-    pt v = r.q - r.p;
-    pt u = p - r.p;
-    double k = (double)(u * v) / (double)sq(v);
-    return point<double>(r.p) + (point<double>(v) * k);
-}
-
 signed main(){
     winton;
-    // p = 1,1
-    // q = 4,2
-    // r = 2,3
-    // d = 3,0
-    pt p, q, r, d;
-    cin >> p >> q >> r >> d;
-    line s(p,q);
-    line t(r,d);
-    debug(dist(p,q));
-    debug(linedist(s,r));
-    debug(abs(q));
-    debug(sq(q));
-    debug(orientation(p,q,r));
-    debug(orientation(p,r,q));
-    debug(quad(p));
-    debug(perpthrough(s, r));
-    debug(intersect(s,t));
-    debug(proj(s, r));
-
+    int t;
+    cin >> t;
+    while(t--){
+        point p, q, r;
+        cin >> p >> q >> r;
+        int o = orientation(p,q,r);
+        if (!o) cout << "TOUCH" << endl;
+        else if (o > 0) cout << "LEFT" << endl;
+        else if (o < 0) cout << "RIGHT" << endl;
+    }
 }
