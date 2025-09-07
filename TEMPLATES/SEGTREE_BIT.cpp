@@ -1,7 +1,7 @@
 /*
 si = vetor se diz se aquela posicao esta valida/funcionanando
 on = arvore que conta quantos estao ligados
-valid = arvore que conta quantos sao validos naquele intervalo
+valid = arvore que conta quantos sao validos naquele intervalo (exclusivo de um problema la)
 toda operacao ele calcula os ligados com base em quantos tem valido naquele intervalo - os desligados, ja que ta sempre invertendo
 */
 int n, tree[4*MAX], on[4*MAX], valid[4*MAX], si[MAX];

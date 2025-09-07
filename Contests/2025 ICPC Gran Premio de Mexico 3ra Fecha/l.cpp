@@ -42,7 +42,7 @@ namespace dbg {
 
 using namespace dbg;
 
-    // #define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define minecraft (void)0
@@ -52,8 +52,7 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 2e5+7;
-const int LOG = 20;
+const int MAX = 1e5+7;
 const int MOD = 1e9+7;
 
 /*
@@ -62,10 +61,10 @@ guardar na seg a soma do caminho da raiz ate o no i
 update em range da subarvore inteira 
 update da soma no lca dos dois nos e update de menos em cada um das subarvores dos nos
 mas isso da errado no caso em que o lca e a raiz
- 
+nesses casos da pra eu      
 */
 
-int n, timer = 0, tin[MAX], tout[MAX], depth[MAX], dist[MAX], tree[4*MAX];
+int n, timer = 0, tin[MAX], depth[MAX], dist[MAX];
 vector<int> et;
 pair<int,int> sp[MAX*2][LOG+1];
 vector<vector<pair<int,int>>> graph; //0 indexado
@@ -100,9 +99,10 @@ pair<int,int> query (int a, int b){
     return min(sp[a][lg], sp[b - (1<<lg) + 1][lg]);
 }
 
-int lca(int a, int b){
-    if (tin[a] > tin[b]) swap(a,b);
-    return query(tin[a], tin[b]).second;
+    int lca(int a, int b){
+        if (pos[a] < pos[b]) swap(a,b);
+        return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
+    }
 }
 
 
@@ -136,25 +136,22 @@ void add(int node, int l, int r, int a, int b, int x){
     add(2*node+1, m+1, r, a, b, x);
 }
 
-signed main() {
+signed main(){
     minecraft;
-    int q;
+    int n, q;
     cin >> n >> q;
-    graph.resize(n);
-    for (int i = 0; i < n-1; i++){
+    for (int i = 1; i < n; i++){
         int a, b, c;
         cin >> a >> b >> c;
-        graph[--a].push_back({--b, c});
-        graph[b].push_back({a, c});
+        HLD::graph[--a].push_back({--b, c});
+        HLD::graph[b].push_back({a, c});
     }
-    dfs(0,0);
-    buildtable();
+    HLD::build();
     while(q--){
-        int a, b, x;
-        cin >> a >> b >> x;
-        a--;b--;
-        int mac = lca(a,b);
-        debug(dist[a], dist[b], a, b, dist[mac]);
-        cout << (((((dist[a] + dist[b]) % MOD) - ((2*dist[mac]) % MOD)) % MOD ) * x) % MOD << endl;
+        int u, v, x;
+        cin >> u >> v >> x;
+        u--; v--;
+        HLD::update_path(u,v,x);
+        cout << HLD::query_path(u,v) % MOD << endl;
     }
 }
