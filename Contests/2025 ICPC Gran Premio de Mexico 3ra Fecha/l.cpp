@@ -43,7 +43,7 @@ namespace dbg {
 
 using namespace dbg;
 
-    // #define DEBUG
+    #define DEBUG
 
 #if defined(DEBUG)
     #define minecraft (void)0
@@ -101,9 +101,10 @@ namespace SegTree {
 namespace HLD {
     vector<pair<int,int>> graph[MAX];
     int timer, pos[MAX], sz[MAX], sobe[MAX], ancestor[MAX], h[MAX], v[MAX]; 
-
+    
     void build_hld(int node, int p = -1, int f = 1){
         v[pos[node] = timer++] = sobe[node];
+        debug(node, pos[node], f);
         sz[node] = 1;
         for (auto &i : graph[node]){
             auto [u, w] = i;
@@ -118,7 +119,7 @@ namespace HLD {
                 swap(i, graph[node][0]);//guarda a maior subarvore (heavy)
             }
         }
-        if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);//mais um componente conexo eu acho
+        if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);
     }
 
     void build(int root = 0){
@@ -128,6 +129,7 @@ namespace HLD {
     }
 
     int query_path(int a, int b){
+        debug(a, b, h[a], h[b], pos[a], pos[b]);
         if (a == b) return 0;
         if (pos[a] < pos[b]) swap(a,b);
         if (h[a] == h[b]) return SegTree::query(pos[b] + 1, pos[a]);
@@ -160,6 +162,18 @@ signed main(){
         HLD::graph[b].push_back({a, c});
     }
     HLD::build();
+    for (int i = 0; i < n; i++){
+        cout << HLD::pos[i] << " ";
+    }cout << endl;
+    for (int i = 0; i < n; i++){
+        cout << HLD::v[i] << " ";
+    }cout << endl;
+    for (int i = 0; i < n; i++){
+        cout << HLD::h[i] << " ";
+    }cout << endl;
+        for (int i = 0; i < n; i++){
+        cout << HLD::sz[i] << " ";
+    }cout << endl;
     while(q--){
         int u, v, x;
         cin >> u >> v >> x;

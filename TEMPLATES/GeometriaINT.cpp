@@ -1,60 +1,3 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-#define all(x) x.begin(), x.end()
-#define rall(x) x.rbegin(), x.rend()
-#define endl '\n'
-#define int long long
-#define ld long double
-
-namespace dbg {
-    const char* const RESET     = "\033[0m";
-    const char* const BOLD_BLUE = "\033[1;34m";
-    const char* const YELLOW    = "\033[33m";
-    const char* const BOLD_WHITE= "\033[1;37m";
-
-    template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
-    template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
-    ostream& operator<<(ostream& os, const T_container& v) {
-        os << '{';
-        bool first = true;
-        for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
-        return os << '}';
-    }
-
-    void debug_out(string_view) { cerr << endl; }
-    template<typename H, typename... T>
-    void debug_out(string_view s, H h, T... t) {
-        auto cpos = s.find(',');
-        cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
-        cerr << BOLD_WHITE << h << RESET;
-        if constexpr (sizeof...(t) > 0) {
-            cerr << ", ";
-            auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
-            debug_out(s.substr(nx), t...);
-        } else {
-            cerr << endl;
-        }
-    }
-} 
-using namespace dbg;
-
-#define DEBUG
-
-#if defined(DEBUG)
-    #define winton (void)0
-    #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
-#else
-    #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
-    #define debug(...) (void)0
-#endif
-
-const ld DINF = 1e18;
-const ld pi = acos(-1.0);
-const ld eps = 1e-9;
-
 struct point {
     int x, y;
     point(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
@@ -121,18 +64,6 @@ int dist2(point p, point q){
     return sq(p.x - q.x) + sq(p.y - q.y);
 }
 
-//dist double de dois pontos
-double dist(point p, point q){
-    return sqrt(sq(p.x - q.x) + sq(p.y - q.y));
-}
-
-//dist entre uma linha e um ponto
-double linedist(line s, point r){
-    point p = s.p;
-    point q = s.q;
-    return ((p-r) ^ (q-r))/dist(p,q);
-}
-
 // 2 * area com sinal
 int sarea2(point p, point q, point r) { 
 	return (q-p)^(r-q);
@@ -177,7 +108,7 @@ point rotate90(point p) {
 }
 
 //retorna uma linha perpendicular a linha s que passa pelo ponto p
-line perpthrough(line s, point p){
+line perpointhrough(line s, point p){
     return {p, p + (rotate90(s.p - s.q))};//pode alterar a ordem
 }
 
@@ -208,38 +139,3 @@ int segpoints(line r) {
 	return 1 + gcd(abs(r.p.x - r.q.x), abs(r.p.y - r.q.y));
 }
 
-// retorna t tal que t*v pertence a reta r
-double get_t(point a, line r) { 
-	return (r.p^r.q) / (double) ((r.p-r.q)^a);
-}
-
-//The orthogonal projection of a point P on a line R is the point on R that is closest to P 
-point<double> proj(line r, point p) {
-    point v = r.q - r.p;
-    point u = p - r.p;
-    double k = (double)(u * v) / (double)sq(v);
-    return point<double>(r.p) + (point<double>(v) * k);
-}
-
-signed main(){
-    winton;
-    // p = 1,1
-    // q = 4,2
-    // r = 2,3
-    // d = 3,0
-    point p, q, r, d;
-    cin >> p >> q >> r >> d;
-    line s(p,q);
-    line t(r,d);
-    debug(dist(p,q));
-    debug(linedist(s,r));
-    debug(abs(q));
-    debug(sq(q));
-    debug(orientation(p,q,r));
-    debug(orientation(p,r,q));
-    debug(quad(p));
-    debug(perpthrough(s, r));
-    debug(intersect(s,t));
-    debug(proj(s, r));
-
-}

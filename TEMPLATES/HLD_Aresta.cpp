@@ -22,17 +22,17 @@ namespace HLD {
         for (auto &i : graph[node]){
             auto [u, w] = i;
             if (u == p) continue;
-            sobe[u] = w;//sobe guarda o peso da que sove pro pai
+            sobe[u] = w;
             ancestor[u] = node;
-            h[u] = (i == graph[node][0] ? h[node] : u); //heavy do filho = heavy do pai se for o primeiro filho explorado, ou ele mesmo se nao for
+            h[u] = (i == graph[node][0] ? h[node] : u); 
             build_hld(u, node, f);
             sz[node] += sz[u];
 
             if (sz[u] > sz[graph[node][0].first] || graph[node][0].first == p){
-                swap(i, graph[node][0]);//guarda a maior subarvore (heavy)
+                swap(i, graph[node][0]);
             }
         }
-        if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);//mais um componente conexo eu acho
+        if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);
     }
 
     void build(int root = 0){
