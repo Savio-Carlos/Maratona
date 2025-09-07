@@ -4,6 +4,7 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define int long long
+
 #define endl "\n"
 #define ld long double
 
@@ -42,7 +43,7 @@ namespace dbg {
 
 using namespace dbg;
 
-// #define DEBUG
+    // #define DEBUG
 
 #if defined(DEBUG)
     #define minecraft (void)0
@@ -55,85 +56,97 @@ using namespace dbg;
 const int MAX = 1e5+7;
 const int MOD = 1e9+7;
 
-/*
-euler tour com segtree e lca
-guardar na seg a soma do caminho da raiz ate o no i
-update em range da subarvore inteira 
-update da soma no lca dos dois nos e update de menos em cada um das subarvores dos nos
-mas isso da errado no caso em que o lca e a raiz
-nesses casos da pra eu      
-*/
+namespace SegTree {
+	int tree[4*MAX], lazy[4*MAX];
+	int n, *v;
 
-int n, timer = 0, tin[MAX], depth[MAX], dist[MAX];
-vector<int> et;
-pair<int,int> sp[MAX*2][LOG+1];
-vector<vector<pair<int,int>>> graph; //0 indexado
+	int build(int node=1, int l=0, int r=n-1) {
+		lazy[node] = 1;
+		if (l == r) return tree[node] = v[l];
+		int m = (l+r)/2;
+		return tree[node] = (build(2*node, l, m) + build(2*node+1, m+1, r)) % MOD;
+	}
+	void build(int n2, int* v2) {
+		n = n2, v = v2;
+		build();
+	}
+	void prop(int node, int l, int r) {
+		tree[node] = (tree[node] * lazy[node]) % MOD;
+		if (l != r){
+            lazy[2*node] = (lazy[2*node] * lazy[node]) % MOD; 
+            lazy[2*node+1] = (lazy[2*node+1] * lazy[node]) % MOD; 
+        } 
+		lazy[node] = 1;
+	}
+	int query(int a, int b, int node=1, int l=0, int r=n-1) {
+		prop(node, l, r);
+		if (a <= l and r <= b) return tree[node];
+		if (b < l or r < a) return 0;
+		int m = (l+r)/2;
+		return (query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r)) % MOD;
+	}
+	int update(int a, int b, int x, int node=1, int l=0, int r=n-1) {
+		prop(node, l, r);
+		if (a <= l and r <= b) {
+			lazy[node] = (lazy[node] * x) % MOD;
+			prop(node, l, r);
+			return tree[node];
+		}
+		if (b < l or r < a) return tree[node];
+		int m = (l+r)/2;
+		return tree[node] = (update(a, b, x, 2*node, l, m) + update(a, b, x, 2*node+1, m+1, r)) % MOD;
+	}
+}
 
-void dfs(int v, int p){
-    tin[v] = et.size();
-    et.push_back(v);
-    for (auto [u, c] : graph[v]){
-        if (u!=p){
-            depth[u] = depth[v]+1;
-            dist[u] = (dist[v] + c) % MOD;
-            dfs(u,v);
-            et.push_back(v);
+namespace HLD {
+    vector<pair<int,int>> graph[MAX];
+    int timer, pos[MAX], sz[MAX], sobe[MAX], ancestor[MAX], h[MAX], v[MAX]; 
+
+    void build_hld(int node, int p = -1, int f = 1){
+        v[pos[node] = timer++] = sobe[node];
+        sz[node] = 1;
+        for (auto &i : graph[node]){
+            auto [u, w] = i;
+            if (u == p) continue;
+            sobe[u] = w;//sobe guarda o peso da aresta que sobe pro pai
+            ancestor[u] = node;
+            h[u] = (i == graph[node][0] ? h[node] : u); //heavy do filho = heavy do pai se for o primeiro filho explorado, ou ele mesmo se nao for
+            build_hld(u, node, f);
+            sz[node] += sz[u];
+
+            if (sz[u] > sz[graph[node][0].first] || graph[node][0].first == p){
+                swap(i, graph[node][0]);//guarda a maior subarvore (heavy)
+            }
         }
+        if (p*f == -1)build_hld(h[node] = node, -1, timer = 0);//mais um componente conexo eu acho
     }
-}
 
-void buildtable(){
-    for (int i = 0; i < (int)et.size(); i++){
-        sp[i][0] = {depth[et[i]], et[i]};
+    void build(int root = 0){
+        timer = 0;
+        build_hld(root);
+        SegTree::build(timer, v);
     }
-    for (int j = 1; j <= LOG; j++){
-        for (int i = 0; i + (1<<(j-1)) < (int)et.size(); i++){
-            sp[i][j] = min (sp[i][j-1], sp[i+(1<<(j-1))][j-1]);
-        }
-    }
-}
 
-pair<int,int> query (int a, int b){
-    int len =  b - a + 1;
-    int lg = 31 - __builtin_clz(len);
-    return min(sp[a][lg], sp[b - (1<<lg) + 1][lg]);
-}
+    int query_path(int a, int b){
+        if (a == b) return 0;
+        if (pos[a] < pos[b]) swap(a,b);
+        if (h[a] == h[b]) return SegTree::query(pos[b] + 1, pos[a]);
+        return SegTree::query(pos[h[a]], pos[a]) + query_path(ancestor[h[a]], b);
+    }
+
+    void update_path(int a, int b, int x){
+        if (a == b) return;
+        if (pos[a] < pos[b]) swap(a,b);
+
+        if (h[a] == h[b]) return (void)SegTree::update(pos[b]+1, pos[a], x);
+        SegTree::update(pos[h[a]], pos[a], x);
+        update_path(ancestor[h[a]], b, x);
+    }
 
     int lca(int a, int b){
         if (pos[a] < pos[b]) swap(a,b);
         return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
     }
-}
-
-
-void build(int node, int l, int r){
-    if (l == r){
-        tree[node] = 0;//alguma coisa
-        return;
-    }
-    int m = (l+r)/2;
-    build(node*2, l, m);
-    build(node*2+1, m+1, r);
-}
-
-int get(int node, int l, int r, int i){
-    if (l == r) return tree[node];
-    int m = (l+r)/2;
-    int res;
-    if (i > m) res = get(node*2+1, m+1, r, i);
-    else res = get(node*2, l, m, i); 
-    return res + tree[node];
-}
-
-void add(int node, int l, int r, int a, int b, int x){
-    if(b < l or r < a) return;
-    if(a <= l && r <= b){
-        tree[node] += x;
-        return;
-    }
-    int m = (l+r)/2;
-    add(2*node, l, m, a, b, x);
-    add(2*node+1, m+1, r, a, b, x);
 }
 
 signed main(){
