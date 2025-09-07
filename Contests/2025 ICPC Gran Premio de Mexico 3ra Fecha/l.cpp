@@ -4,7 +4,6 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define int long long
-
 #define endl "\n"
 #define ld long double
 
@@ -63,10 +62,10 @@ guardar na seg a soma do caminho da raiz ate o no i
 update em range da subarvore inteira 
 update da soma no lca dos dois nos e update de menos em cada um das subarvores dos nos
 mas isso da errado no caso em que o lca e a raiz
-nesses casos da pra eu      
+ 
 */
 
-int n, timer = 0, tin[MAX], depth[MAX], dist[MAX];
+int n, timer = 0, tin[MAX], tout[MAX], depth[MAX], dist[MAX], tree[4*MAX];
 vector<int> et;
 pair<int,int> sp[MAX*2][LOG+1];
 vector<vector<pair<int,int>>> graph; //0 indexado
@@ -104,6 +103,37 @@ pair<int,int> query (int a, int b){
 int lca(int a, int b){
     if (tin[a] > tin[b]) swap(a,b);
     return query(tin[a], tin[b]).second;
+}
+
+
+void build(int node, int l, int r){
+    if (l == r){
+        tree[node] = 0;//alguma coisa
+        return;
+    }
+    int m = (l+r)/2;
+    build(node*2, l, m);
+    build(node*2+1, m+1, r);
+}
+
+int get(int node, int l, int r, int i){
+    if (l == r) return tree[node];
+    int m = (l+r)/2;
+    int res;
+    if (i > m) res = get(node*2+1, m+1, r, i);
+    else res = get(node*2, l, m, i); 
+    return res + tree[node];
+}
+
+void add(int node, int l, int r, int a, int b, int x){
+    if(b < l or r < a) return;
+    if(a <= l && r <= b){
+        tree[node] += x;
+        return;
+    }
+    int m = (l+r)/2;
+    add(2*node, l, m, a, b, x);
+    add(2*node+1, m+1, r, a, b, x);
 }
 
 signed main() {
