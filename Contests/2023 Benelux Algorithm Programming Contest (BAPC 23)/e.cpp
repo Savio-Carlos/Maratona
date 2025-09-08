@@ -3,10 +3,8 @@ using namespace std;
 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
-#define sz(a) ((int)a.size())
 #define endl '\n'
 #define int long long
-#define ld long double
 
 namespace dbg {
     const char* const RESET     = "\033[0m";
@@ -52,21 +50,46 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 1e6+7;
-const int INF = 1e18;
-
-struct exam{
-    int s, p, e, a;
-};
-
 /*para eu passar num exame eu preciso ter tido tempo pra estudar
-tempo estudo = tempo total - tempo exame - tempo estudo(outros exames)
-da pra ir adicionando o tempo que sobra conforme eu vou estudando pra um exame
+se eu escolho estudar para um exame, eu gasto o tempo de estudo + o tempo de passar
+se eu escolho nao estudar, eu gasto o tempo de nao passar
+nao importa o quais exames eu estudei/passei, so o tempo disponivel no momento atual
+
 */
 
 signed main(){
     winton;
     int n;
     cin >> n;
+    vector<int> st(n), pass(n), fail(n), study(n);
+    for (int i = 0; i < n; i++){
+        cin >> st[i] >> pass[i] >> fail[i] >> study[i];
+    }
 
+    vector<vector<int>> dp(n+1, vector<int>(n+1, -1));
+    dp[0][0] = 0;
+
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j <= i; j++){
+            if (dp[i][j] == -1) continue;
+
+            int x = i > 0 ? fail[i-1] : 0;
+            dp[i+1][j] = max(dp[i+1][j], dp[i][j] + (st[i] - x));
+            debug(dp[i+1][j]);
+            
+            if ((dp[i][j] + (st[i] - x)) >= study[i]) {
+                debug(dp[i][j] + (st[i] - x));
+                dp[i+1][j+1] = max(dp[i+1][j+1], dp[i][j] + (st[i] - x) - study[i] + (fail[i] - pass[i]));
+            }
+            debug(dp[i+1][j+1]);
+        }
+    }
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        debug(i, dp[i]);
+    }
+    for (int i = 0; i <= n; i++){
+        if (dp[n][i] >= 0) ans = i;
+    }
+    cout << ans << endl;
 }

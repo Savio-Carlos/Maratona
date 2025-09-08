@@ -139,3 +139,30 @@ int segpoints(line r) {
 	return 1 + gcd(abs(r.p.x - r.q.x), abs(r.p.y - r.q.y));
 }
 
+int polarea2(vector<point> v){ // 2 * area do poligono
+	int ret = 0;
+	for (int i = 0; i < v.size(); i++){
+		ret += sarea2(point(0, 0), v[i], v[(i + 1) % v.size()]);
+    }
+    return abs(ret);
+}
+
+// se o ponto ta dentro do poligono: retorna 0 se ta fora,
+// 1 se ta no interior e 2 se ta na borda
+int inpol(vector<point>& v, point p){ // O(n)
+	int qt = 0;
+	for (int i = 0; i < v.size(); i++) {
+		if (p == v[i]) return 2;
+		int j = (i+1)%v.size();
+		if (p.y == v[i].y and p.y == v[j].y) {
+			if ((v[i]-p)*(v[j]-p) <= 0) return 2;
+			continue;
+		}
+		bool baixo = v[i].y < p.y;
+		if (baixo == (v[j].y < p.y)) continue;
+		auto t = (p-v[i])^(v[j]-v[i]);
+		if (!t) return 2;
+		if (baixo == (t > 0)) qt += baixo ? 1 : -1;
+	}
+	return qt != 0;
+}

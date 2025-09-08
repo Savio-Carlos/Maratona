@@ -3,10 +3,9 @@ using namespace std;
 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
-#define sz(a) ((int)a.size())
 #define endl '\n'
 #define int long long
-#define ld long double
+#define ld double
 
 namespace dbg {
     const char* const RESET     = "\033[0m";
@@ -42,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -54,7 +53,7 @@ using namespace dbg;
 
 const int MAX = 2e5+7;
 const int MOD = 1e9+7;
-const int INF = LLONG_MAX;
+const int INF = 1e18;
 
 signed main(){
     winton;
