@@ -1,4 +1,4 @@
- tree[4*MAX];
+tree[4*MAX];
 
 void build(int node, int l, int r){
     if (l == r){

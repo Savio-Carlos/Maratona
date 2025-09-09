@@ -175,3 +175,15 @@ int inpol(vector<point>& v, point p){ // O(n)
 	}
 	return qt != 0;
 }
+
+int paralelos(vector<pair<int,int>> &pontos){
+    int qnt = 0;
+    pair<int,int> e0 = reta(pontos[0], pontos[1]);
+    pair<int,int> e1 = reta(pontos[1], pontos[2]);
+    pair<int,int> e2 = reta(pontos[2], pontos[3]);
+    pair<int,int> e3 = reta(pontos[3], pontos[0]);
+    if (cross(e0, e2) == 0) ++qnt;
+    if (cross(e1, e3) == 0) ++qnt;
+    return qnt;
+}
+ 

@@ -1,14 +1,3 @@
-#include <bits/stdc++.h>
-using namespace std;
-#define ld long double
-#define int long long
-#define all(x) x.begin(), x.end()
-#define rall(x) x.rbegin(), x.rend()
-#define endl '\n'
-#define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
-const int MAX = 2e5+7;
-const int LOG = 20;
-
 /*
 Fazer um euler tour na arvore e inserir todas as vezes que visitamos um no
 Junto disso inserir a depth desse no em outro vetor

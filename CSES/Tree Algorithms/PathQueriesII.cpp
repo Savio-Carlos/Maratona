@@ -86,13 +86,14 @@ namespace SegTree {
 
 namespace HLD{
     vector<int> graph[MAX];
-    int timer, h[MAX], ancestor[MAX], sz[MAX], pos[MAX], base[MAX], peso[MAX];
+    int timer, h[MAX], ancestor[MAX], sz[MAX], pos[MAX], base[MAX], peso[MAX], depth[MAX];
     
     void build_hld(int v, int p = -1, int f = 1) {
 		base[pos[v] = timer++] = peso[v]; 
         sz[v] = 1;
 		for (auto &i : graph[v]) if (i != p) {
 			ancestor[i] = v;
+            depth[i] = depth[v]+1;
 			h[i] = (i == graph[v][0] ? h[v] : i);
 			build_hld(i, v, f); sz[v] += sz[i];
 
@@ -107,12 +108,20 @@ namespace HLD{
 		SegTree::build(timer, base);
 	}
 
-	int query_path(int a, int b) {
-		if (pos[a] < pos[b]) swap(a, b);
-        debug(a,b);
-		if (h[a] == h[b]) return SegTree::query(pos[b], pos[a]);
-		return max(SegTree::query(pos[h[a]], pos[a]), query_path(ancestor[h[a]], b));
-	}
+    int query_path(int a, int b) {
+        int res = LLONG_MIN;
+        while (h[a] != h[b]) {
+            if (depth[h[a]] < depth[h[b]]) swap(a, b); // comparar profundidade da head, NÃO pos
+            // head[a] é mais profunda
+            res = max(res, SegTree::query(pos[h[a]], pos[a]));
+            a = ancestor[h[a]]; // sobe para o pai da head
+        }
+        // agora mesma head
+        if (depth[a] < depth[b]) swap(a, b);
+        res = max(res, SegTree::query(pos[b], pos[a]));
+        return res;
+    }
+
 
 	void update_node(int i, int x) {
         peso[i] = x;
@@ -151,7 +160,6 @@ signed main(){
             cin >> a >> b;
             a--; b--;
             cout << HLD::query_path(a,b) << endl;
-
         }
     }
 }

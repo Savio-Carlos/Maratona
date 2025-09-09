@@ -1,4 +1,3 @@
-
 int indeg[MAX];
 
 vector<int> order;
