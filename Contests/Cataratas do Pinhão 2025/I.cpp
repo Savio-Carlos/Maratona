@@ -119,7 +119,7 @@ signed main(){
                 if (((1 << j) & mask)) continue;//se essa posicao e 1, eu ja visitei esse ponto entao n tem como ir pra ele dnv
                 int target_mask = mask | (1 << j);//mask atual + ponto que quero ir
                 dp[target_mask][j] = min(dp[target_mask][j], dp[mask][i] + dist[i+1][j+1] + t[j]);
-                //dp [onde vou][ponto da onde vim] = min(todos os possiveis pontos de partida j que posso ter saido da mask e ido para target mask)
+                //dp [onde vou][ponto que cheguei] = min(todos os possiveis pontos de partida i que posso ter saido da mask e ido para target mask no ponto j)
             }
         }
     }

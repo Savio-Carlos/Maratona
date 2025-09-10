@@ -1,5 +1,6 @@
 //Toposort
-
+//
+// Fazer dfs pra pegar o indeg se necessario
 int indeg[MAX];
 
 vector<int> order;

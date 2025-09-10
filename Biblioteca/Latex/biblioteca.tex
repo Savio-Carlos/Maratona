@@ -226,58 +226,169 @@ ee4     int m = (l+r)/2;
 
 \subsection{SegTree Bits}
 \begin{lstlisting}
-f20 si = vetor se diz se aquela posicao esta valida/funcionanando
-483 on = arvore que conta quantos estao ligados
-b7d valid = arvore que conta quantos sao validos naquele intervalo (exclusivo de um problema la)
-007 toda operacao ele calcula os ligados com base em quantos tem valido naquele intervalo - os desligados, ja que ta sempre invertendo
-c4c */
-99a int n, tree[4*MAX], on[4*MAX], valid[4*MAX], si[MAX];
-1d3 bool lazy[4*MAX];
+// v[i] = -1 => posicao invalida (nao conta)
+// v[i] = 0  => desligado
+// v[i] = 1  => ligado
+//
+// build(n2, v2)
+// query(a,b)        -> 1's em [a,b]
+// update(a,b)       -> flip em [a,b]
+// range_set(a,b,x)  -> seta intervalo [a,b] para x (0/1)
+// point_set(i, x)   -> seta posicao i para -1/0/1
 
-037 void build(int node, int l, int r){
-48c     lazy[node] = false;
-893     if (l == r){
-811         if (si[l] == -1){
-809             on[node] = 0;
-600             valid[node] = 0;
-771         }
-4e6         else{
-a5b             valid[node] = 1;
-342             on[node] = si[l];
-4f9         }
-505         return;
-370     }
-ee4     int m = (l+r)/2;
-435     build(node*2, l, m);
-4c9     build(node*2+1, m+1, r);
-931     valid[node] = valid[node*2] + valid[node*2+1];
-be9     on[node] = on[node*2] + on[node*2+1];
-0f7 }
-885 void flip(int node){
-890     on[node] = valid[node] - on[node];
-006     lazy[node] = !lazy[node];
-c10 }
+fd2 namespace SegTreeBits {
+34a     int tree[4*MAX];       // 1's no intervalo
+692     int valid[4*MAX];      // posicoes validas no intervalo
+7b3     int lazy_set[4*MAX];   // -1 = nenhum, 0 ou 1 = set pendente
+882     int lazy_flip[4*MAX];  // 0/1: flip pendente
+052     int n, *v;
+    
+34c     int build(int node = 1, int l = 0, int r = n-1) {
+a7d         lazy_set[node] = -1;
+8f7         lazy_flip[node] = 0;
+893         if (l == r) {
+edb             if (v[l] == -1) {
+600                 valid[node] = 0;
+c91                 tree[node] = 0;
+af5             } else {
+a5b                 valid[node] = 1;
+efa                 tree[node] = v[l];
+11d             }
+14d             return tree[node];
+d51         }
+ee4         int m = (l + r)/2;
+d58         build(2*node, l, m);
+537         build(2*node+1, m+1, r);
+d5f         valid[node] = valid[2*node] + valid[2*node+1];
+b00         return tree[node] = tree[2*node] + tree[2*node+1];
+1dc     }
+    
+0d8     void build(int n2, int* v2) {
+b77         n = n2; v = v2;
+6f2         build();
+b56     }
+    
+95b     inline void apply_set(int node, int l, int r, int x) {
+c81         tree[node] = valid[node] * x;
+219         lazy_set[node] = x;
+8f7         lazy_flip[node] = 0;
+242     }
+    
+fa1     inline void apply_flip(int node, int l, int r) {
+06b         tree[node] = valid[node] - tree[node];
+c30         if (lazy_set[node] != -1) {
+d5b             lazy_set[node] ^= 1;
+6f5         } else {
+e4d             lazy_flip[node] ^= 1;
+0af         }
+1b7     }
+    
+dd7     void prop(int node, int l, int r) {
+8ce         if (l == r) return;
+ee4         int m = (l + r)/2;
+c30         if (lazy_set[node] != -1) {
+d22             apply_set(2*node, l, m, lazy_set[node]);
+43a             apply_set(2*node+1, m+1, r, lazy_set[node]);
+a7d             lazy_set[node] = -1;
+15e         }
+533         if (lazy_flip[node]) {
+fb9             apply_flip(2*node, l, m);
+d12             apply_flip(2*node+1, m+1, r);
+8f7             lazy_flip[node] = 0;
+9b9         }
+e8b     }
+    
+a2c     int query(int a, int b, int node = 1, int l = 0, int r = n-1) {
+d5e         if (b < l || r < a) return 0;
+675         if (a <= l && r <= b) return tree[node];
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+1db         return query(a, b, 2*node, l, m) + query(a, b, 2*node+1, m+1, r);
+05e     }
+    
+2be     int update(int a, int b, int node = 1, int l = 0, int r = n-1) {
+199         if (b < l || r < a) return tree[node];
+02b         if (a <= l && r <= b) {
+fd1             apply_flip(node, l, r);
+14d             return tree[node];
+694         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+2e4         return tree[node] = update(a, b, 2*node, l, m) + update(a, b, 2*node+1, m+1, r);
+4dd     }
+    
+1fd     int range_set(int a, int b, int x, int node = 1, int l = 0, int r = n-1) {
+199         if (b < l || r < a) return tree[node];
+02b         if (a <= l && r <= b) {
+98a             apply_set(node, l, r, x);
+14d             return tree[node];
+8dc         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+376         return tree[node] = range_set(a, b, x, 2*node, l, m) + range_set(a, b, x, 2*node+1, m+1, r);
+ea9     }
+    
+22d     int point_set(int idx, int val, int node = 1, int l = 0, int r = n-1) {
+893         if (l == r) {
+a7d             lazy_set[node] = -1;
+8f7             lazy_flip[node] = 0;
+08c             if (val == -1) {
+600                 valid[node] = 0;
+c91                 tree[node] = 0;
+3ca             } else {
+a5b                 valid[node] = 1;
+a24                 tree[node] = val;
+d3e             }
+14d             return tree[node];
+718         }
+020         prop(node, l, r);
+ee4         int m = (l + r)/2;
+dbc         if (idx <= m) point_set(idx, val, 2*node, l, m);
+cac         else point_set(idx, val, 2*node+1, m+1, r);
+d5f         valid[node] = valid[2*node] + valid[2*node+1];
+b00         return tree[node] = tree[2*node] + tree[2*node+1];
+63c     }
+b96 }
+\end{lstlisting}
 
-7ec void prop(int node){
-996     if (lazy[node]){
-1c2         flip(node*2);
-f5e         flip(node*2+1);
-48c         lazy[node] = false;
-a99     }
-e8d }
-
-938 void update(int node, int l, int r, int a, int b){
-1dd     if(b < l or r < a) return;
-02b     if(a <= l && r <= b){
-f7b         flip(node);
-505         return;
-b4b     }
-dcf     prop(node);
-ee4     int m = (l+r)/2;
-325     update(2*node, l, m, a, b);
-cf4     update(2*node+1, m+1, r, a, b);
-be9     on[node] = on[node*2] + on[node*2+1];
-031 }
+\subsection{SegTree Iterativa}
+\begin{lstlisting}
+fb1 namespace SegTree {
+1a8     int n;
+8f8     int pot2;
+562     vector<int> tree;
+    
+0d8     void build(int n2, int* v2) {
+1e3         n = n2;
+fa5         pot2 = 1;
+2c6         while (pot2 < n) pot2 <<= 1;
+26a         tree.assign(2 * pot2, 0);
+4e2         for (int i = 0; i < n; ++i) tree[pot2 + i] = v2[i];
+813         for (int i = pot2 - 1; i >= 1; --i) tree[i] = max(tree[2*i], tree[2*i+1]);
+641     }
+    
+4ea     int query(int a, int b) {
+026         if (a > b) return 0;
+238         a += pot2; b += pot2;
+11e         int res = 0;
+cce         while (a <= b) {
+16c             if (a & 1) res = max(res, tree[a++]);
+410             if (!(b & 1)) res = max(res, tree[b--]);
+691             a >>= 1; b >>= 1;
+80e         }
+b50         return res;
+d03     }
+    
+cf6     void update(int i, int x) {
+1a7         int p = i + pot2;
+3bc         tree[p] = x;
+8b8         p >>= 1;
+f77         while (p >= 1) {
+280             tree[p] = max(tree[2*p], tree[2*p+1]);
+8b8             p >>= 1;
+6f4         }
+4ad     }
+092 }
 \end{lstlisting}
 
 \subsection{SegTree Lazy}
@@ -1330,126 +1441,116 @@ af8 }
 2b7 #include <bits/stdc++.h>
 ca4 using namespace std;
  
-c4d using int64 = long long;
-f26 const int MAXN = 200000 + 5;
-c58 const int64 NEG_INF = LLONG_MIN / 4;
- 
-3b9 int n, q;
-ea6 vector<int> adj[MAXN];
-be6 int64 val[MAXN];
- 
-1a0 int parentArr[MAXN], depthArr[MAXN], heavy[MAXN], head[MAXN], pos[MAXN], szArr[MAXN];
-2b0 int curPos;
-2e5 vector<int64> baseArr;
- 
-383 struct SegTree {
-060     int N;
-5e1     vector<int64> st;
-940     void init(int n) {
-7b2         N = 1;
-ca2         while (N < n) N <<= 1;
-9f7         st.assign(2*N, NEG_INF);
-b1d     }
-242     void build(const vector<int64>& a) {
-b3b         init((int)a.size());
-d50         for (int i = 0; i < (int)a.size(); ++i) st[N+i] = a[i];
-d0b         for (int i = N-1; i >= 1; --i) st[i] = max(st[2*i], st[2*i+1]);
-b88     }
-5b5     void update(int idx, int64 value) {
-c94         int p = N + idx;
-f6b         st[p] = value;
-8b8         p >>= 1;
-d08         while (p) {
-629             st[p] = max(st[2*p], st[2*p+1]);
-8b8             p >>= 1;
-f03         }
-007     }
-889     int64 queryRange(int l, int r) { // inclusive l,r
-4df         if (l > r) return NEG_INF;
-a29         l += N; r += N;
-cc5         int64 res = NEG_INF;
-3d5         while (l <= r) {
-762             if (l & 1) res = max(res, st[l++]);
-059             if (!(r & 1)) res = max(res, st[r--]);
-f69             l >>= 1; r >>= 1;
-7a7         }
+b63 const int MAX = 2e5+7;
+
+fb1 namespace SegTree {
+1a8     int n;
+8f8     int pot2;
+562     vector<int> tree;
+    
+0d8     void build(int n2, int* v2) {
+1e3         n = n2;
+fa5         pot2 = 1;
+2c6         while (pot2 < n) pot2 <<= 1;
+26a         tree.assign(2 * pot2, 0);
+4e2         for (int i = 0; i < n; ++i) tree[pot2 + i] = v2[i];
+813         for (int i = pot2 - 1; i >= 1; --i) tree[i] = max(tree[2*i], tree[2*i+1]);
+641     }
+    
+4ea     int query(int a, int b) {
+026         if (a > b) return 0;
+238         a += pot2; b += pot2;
+11e         int res = 0;
+cce         while (a <= b) {
+16c             if (a & 1) res = max(res, tree[a++]);
+410             if (!(b & 1)) res = max(res, tree[b--]);
+691             a >>= 1; b >>= 1;
+80e         }
 b50         return res;
-500     }
-974 } seg;
- 
-// first dfs: compute sizes and heavy child
-a5b int dfs(int u, int p) {
-81a     parentArr[u] = p;
-d21     depthArr[u] = (p == -1 ? 0 : depthArr[p] + 1);
-650     szArr[u] = 1;
-8b7     int maxSub = 0;
-032     heavy[u] = -1;
-914     for (int v : adj[u]) if (v != p) {
-c7d         int sub = dfs(v, u);
-442         if (sub > maxSub) {
-431             maxSub = sub;
-3ac             heavy[u] = v;
-1ab         }
-a11         szArr[u] += sub;
-ae1     }
-0b6     return szArr[u];
-64c }
- 
-// decompose: assign head and positions, fill baseArr
-c88 void decompose(int u, int h) {
-36a     head[u] = h;
-19f     pos[u] = curPos++;
-b8b     baseArr[pos[u]] = val[u];
-eee     if (heavy[u] != -1) decompose(heavy[u], h);
-876     for (int v : adj[u]) if (v != parentArr[u] && v != heavy[u]) {
-e27         decompose(v, v);
-0b4     }
-950 }
- 
-249 int64 query_path(int a, int b) {
-cc5     int64 res = NEG_INF;
-2da     while (head[a] != head[b]) {
-6d0         if (depthArr[head[a]] < depthArr[head[b]]) swap(a,b);
-64e         int ha = head[a];
-611         res = max(res, seg.queryRange(pos[ha], pos[a]));
-0af         a = parentArr[ha];
-77b     }
-bb0     if (depthArr[a] < depthArr[b]) swap(a,b);
-424     res = max(res, seg.queryRange(pos[b], pos[a]));
-b50     return res;
-ac9 }
- 
-e8d int main() {
+d03     }
+    
+cf6     void update(int i, int x) {
+1a7         int p = i + pot2;
+3bc         tree[p] = x;
+8b8         p >>= 1;
+f77         while (p >= 1) {
+280             tree[p] = max(tree[2*p], tree[2*p+1]);
+8b8             p >>= 1;
+6f4         }
+4ad     }
+092 }
+
+a70 namespace HLD{
+b24     vector<int> graph[MAX];
+80f     int timer, h[MAX], ancestor[MAX], sz[MAX], pos[MAX], base[MAX], peso[MAX];
+        
+696     void build_hld(int v, int p = -1, int f = 1) {
+c06         base[pos[v] = timer++] = peso[v]; 
+588         sz[v] = 1;
+504         for (auto &i : graph[v]) if (i != p) {
+983             ancestor[i] = v;
+71b             h[i] = (i == graph[v][0] ? h[v] : i);
+e76             build_hld(i, v, f); sz[v] += sz[i];
+    
+c51             if (sz[i] > sz[graph[v][0]] or graph[v][0] == p) swap(i, graph[v][0]);
+4e8         }
+fd6         if (p*f == -1) build_hld(h[v] = v, -1, timer = 0);
+bb3     }
+    
+1f8     void build(int root = 0) {
+451         timer = 0;
+295         build_hld(root);
+160         SegTree::build(timer, base);
+e95     }
+    
+f04     int query_path(int a, int b) {
+11e         int res = 0;
+9a1         while (h[a] != h[b]) {
+aa1             if (pos[a] < pos[b]) swap(a, b);
+30d             res = max(res, SegTree::query(pos[h[a]], pos[a]));
+78b             a = ancestor[h[a]];
+f86         }
+9bc         if (pos[a] > pos[b]) swap(a, b);
+bb7         res = max(res, SegTree::query(pos[a], pos[b]));
+b50         return res;
+852     }
+        
+081     void update_node(int i, int x) {
+6e7         peso[i] = x;
+2dc         SegTree::update(pos[i], x);
+b94     }
+95d }
+
+
+0dd signed main(){
+3b9     int n, q;
 55a     cin >> n >> q;
-bae     for (int i = 0; i < n; ++i) {
-c12         cin >> val[i];
-b1d         adj[i].clear();
-4c8     }
-96b     for (int i = 0; i < n-1; ++i) {
-417         int a,b; cin >> a >> b; --a; --b;
-fab         adj[a].push_back(b);
-c87         adj[b].push_back(a);
-1b6     }
-c91     dfs(0, -1);
-5ad     curPos = 0;
-6ea     baseArr.assign(n, NEG_INF);
-70b     decompose(0, 0);
-56c     seg.build(baseArr);
-     
-1f4     while (q--) {
-452         int type; cin >> type;
-821         if (type == 1) {
-54a             int s; int64 x; cin >> s >> x; --s;
-aa9             val[s] = x;
-95e             seg.update(pos[s], x);
-10a         } else {
-417             int a,b; cin >> a >> b; --a; --b;
-949             int64 ans = query_path(a,b);
-cb9             cout << ans << '\n';
-192         }
-21b     }
-bb3     return 0;
-033 }
+04b     for (int i = 0; i < n; i++) cin >> HLD::peso[i];
+6f5     for (int i = 1; i < n; i++){
+ba2         int a, b;
+0a8         cin >> a >> b;
+e67         --a; --b;
+770         HLD::graph[a].push_back(b);
+ddb         HLD::graph[b].push_back(a);
+364     }
+b9a     HLD::build();
+1f4     while(q--){
+961         int type;
+7b9         cin >> type;
+821         if (type == 1){
+8d2             int s, x;
+f3c             cin >> s >> x;
+351             s--;
+847             HLD::update_node(s,x);
+8e7         }
+4e6         else {
+ba2             int a, b;
+0a8             cin >> a >> b;
+450             a--; b--;
+0ef             cout << HLD::query_path(a,b) << endl;
+0ac         }
+0a4     }
+fba }
 \end{lstlisting}
 
 \subsection{Steiner Tree}
@@ -2165,6 +2266,48 @@ b1e         }
 382 }
 \end{lstlisting}
 
+\subsection{LCA Binary Lifting}
+\begin{lstlisting}
+039 int n, ancestor[MAXN][LOG+1], depth[MAXN], visited[MAXN];
+309 vector<vector<int>> graph;
+
+955 void dfs(int v, int p){
+cda     visited[v] = 1;
+d38     ancestor[v][0] = p;
+    
+c64     for (int i = 1; i <= LOG; i++){
+d14         ancestor[v][i] = ancestor[ancestor[v][i-1]][i-1];
+a6e     }
+    
+284     for (auto u : graph[v]){
+264         if (!visited[u]){
+cf4             depth[u] = depth[v]+1;
+412             dfs(u, v);
+813         }
+2a4     }
+f1b }
+
+c5d int lca(int v, int u){
+6ed     if (depth[v] < depth[u]) swap(v,u);
+    
+4f1     for (int i = LOG-1; i >=  0; i--){
+01e         if ((depth[v] - (1<<i)) >= depth[u]){
+ed6             v = ancestor[v][i];
+cc6         } 
+830     }
+    
+d77     if (u == v) return v;
+    
+4f1     for (int i = LOG-1; i >= 0; i--){
+c47         if (ancestor[v][i] != ancestor[u][i]){
+ed6             v = ancestor[v][i];
+fb0             u = ancestor[u][i];
+329         }
+921     }
+6c2     return ancestor[v][0];
+40e }
+\end{lstlisting}
+
 \subsection{LCA Sparse Table}
 \begin{lstlisting}
 /*
@@ -2322,6 +2465,7 @@ ca1     if (v == 1 && filhos >= 2) ans.push_back(v);
 
 \subsection{Toposort}
 \begin{lstlisting}
+// Fazer dfs pra pegar o indeg se necessario
 0ad int indeg[MAX];
 
 55b vector<int> order;

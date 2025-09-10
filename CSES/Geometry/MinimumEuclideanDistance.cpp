@@ -222,42 +222,58 @@ int inpol(vector<point>& v, point p){ // O(n)
 	return qt != 0;
 }
 
+// Closest pair of points
+//
+// O(nlogn)
+int closest_pair_of_points(vector<point> v) {
+	int n = v.size();
+	sort(v.begin(), v.end());//sort nos pontos pelo x
+    debug(v);
+	for (int i = 1; i < n; i++) if (v[i] == v[i-1]) return 0;
+	auto cmp_y = [&](const point &l, const point &r) {
+		if (l.y != r.y) return l.y < r.y;
+		return l.x < r.x;
+	};
+	set<point, decltype(cmp_y)> s(cmp_y); //set que ordena pelo y
+	int l = 0, r = -1;//range do vetor atualmente no set
+	int d2_min = numeric_limits<int>::max();
+	point pl, pr;
+    const int magic = 5;
+    //por prova matematica, so precisa checar no maximo 5/6 vizinhos para encontrar um par com distancia melhor que d2min
+	while (r+1 < n) {
+		auto it = s.insert(v[++r]).first;//insere os pontos por ordem do x
+		int cnt = magic/2;
+		while (cnt-- and it != s.begin()) it--;//vai no maximo 2 pra esquerda dentro do set
+		cnt = 0;
+		while (cnt++ < magic and it != s.end()) {//vai no maximo 5 (a partir da esquerda) pra direita dentro do set
+			if (!((*it) == v[r])) {
+				int d2 = dist2(*it, v[r]);//compara todos os 5 pontos com o ultimo ponto inserido
+				if (d2_min > d2) {
+					d2_min = d2;
+					pl = *it;
+					pr = v[r];
+				}
+			}
+			it++;
+		}
+		while (l < r and sq(v[l].x-v[r].x) > d2_min) s.erase(v[l++]);
+        //se o dx entre p.r e p.l for maior que a dist minima ja encontrada, entao remove do set
+        //pq e garantido q a distancia entre os proximos r a serem inseridos terao uma distancia maior
+        debug(s);
+	}
+	return d2_min;
+}
+
+//
+
 signed main(){
     winton;
     int n;
     cin >> n;
     vector<point> a(n);
-    point p0(0,0);
-    map<int, vector<point>> mp;   
     for (auto &u : a){
         cin >> u;
-        int d = dist2(p0, u);
-        mp[d].push_back(u);
     } 
-    int ans = 1e18;
-    for (int i = 0; i < n; i++){
-        point p = a[i];
-
-        auto it = mp.find(dist2(p0,p));
-        debug((*it));
-        
-        //for (auto u : mp[(*it).first]) cout << u << endl;
-        auto next = it; next++;
-        auto prev = it; prev--;
-
-        if (next != mp.end()){
-            debug(*next);
-            for (auto u : mp[(*(next)).first]) ans = min(ans, dist2(u,p));
-        }
-        if (it != mp.begin()){
-            debug(*prev);
-            for (auto u : mp[(*(prev)).first]) ans = min(ans, dist2(u,p));
-        }
-        for (auto u : mp[(*it).first]){
-            if (u == p) continue;
-            ans = min(ans, dist2(u,p));
-        }
-        debug(i, ans);
-    }
+    int ans = closest_pair_of_points(a);
     cout << ans << endl;
 }

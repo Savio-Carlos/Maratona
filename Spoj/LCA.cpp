@@ -7,16 +7,16 @@ using namespace std;
 #define endl '\n'
 #define winton ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(NULL)
 const int MAXN = 1e5+7;
-const int MAXL = 20;
+const int LOG = 20;
 
-int n, ancestor[MAXN][MAXL+1], depth[MAXN], visited[MAXN];
+int n, ancestor[MAXN][LOG+1], depth[MAXN], visited[MAXN];
 vector<vector<int>> graph;
 
 void dfs(int v, int p){
     visited[v] = 1;
     ancestor[v][0] = p;
 
-    for (int i = 1; i <= MAXL; i++){
+    for (int i = 1; i <= LOG; i++){
         ancestor[v][i] = ancestor[ancestor[v][i-1]][i-1];
     }
 
@@ -31,7 +31,7 @@ void dfs(int v, int p){
 int lca(int v, int u){
     if (depth[v] < depth[u]) swap(v,u);
 
-    for (int i = MAXL-1; i >=  0; i--){
+    for (int i = LOG-1; i >=  0; i--){
         if ((depth[v] - (1<<i)) >= depth[u]){
             v = ancestor[v][i];
         } 
@@ -39,7 +39,7 @@ int lca(int v, int u){
 
     if (u == v) return v;
 
-    for (int i = MAXL-1; i >= 0; i--){
+    for (int i = LOG-1; i >= 0; i--){
         if (ancestor[v][i] != ancestor[u][i]){
             v = ancestor[v][i];
             u = ancestor[u][i];
