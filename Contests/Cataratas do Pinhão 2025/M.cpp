@@ -68,7 +68,7 @@ namespace SegTree {
         gap cur;
         cur.l = left.l + (left.len == left.l ? right.l : 0);
         cur.r = right.r + (right.len == right.r ? left.r : 0);
-        cur.mx = max({right.l + left.r, right.mx, left.mx});
+        cur.mx = max({left.mx, right.mx, left.r + right.l});
         cur.len = left.len + right.len;
         return cur;
     }
@@ -133,7 +133,7 @@ signed main(){
     
     SegTree::build(n,base);
     
-    if (SegTree::tree[1].mx <= k) cout << "SIM\n";
+    if (SegTree::tree[1].mx < k) cout << "SIM\n";
     else cout << "NAO\n";
 
     while(q--){
@@ -141,13 +141,10 @@ signed main(){
         cin >> t >> a >> b;
         a--; b--;
         if (t == 1) SegTree::update(a, b, t);
-        else {
-            t = 0;
-            SegTree::update(a, b, t);
-        }
+        else SegTree::update(a, b, t = 0);
+        
         debug(SegTree::tree[1].mx);
-        if (SegTree::tree[1].mx <= k) cout << "SIM\n";
+        if (SegTree::tree[1].mx < k) cout << "SIM\n";
         else cout << "NAO\n";
     }
-
 }
