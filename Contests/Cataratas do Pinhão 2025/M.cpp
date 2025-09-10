@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -50,9 +50,7 @@ using namespace dbg;
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
-/*Segtree que guarda o maior intervalo de 0 consecutivos presente
-como dar merge?
-*/
+
 const int MAX = 2e5+7;
 
 struct gap{
