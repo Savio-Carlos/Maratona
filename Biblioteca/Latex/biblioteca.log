@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.9.9)  10 SEP 2025 12:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.9.9)  11 SEP 2025 16:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -655,9 +655,6 @@ e
 \tf@toc=\write6
 \openout6 = `biblioteca.toc'.
 
-
-Underfull \vbox (badness 2261) has occurred while \output is active []
-
 LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 7
 6.
 
@@ -673,7 +670,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [5]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1527) has occurred while \output is active []
 
  [6]
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -703,10 +700,10 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [13]
-[14] [15]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1527) has occurred while \output is active []
 
- [16]
+ [14]
+[15] [16]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [17]
@@ -716,50 +713,50 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [19]
+[20]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [20]
-[21] [22]
-Underfull \vbox (badness 1527) has occurred while \output is active []
-
- [23]
-[24]
+ [21]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [25]
-[26]
+ [22]
+[23] [24] [25] [26]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [27]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [28]
+[28]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [29]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [30]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+ [31]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [31]
-[32
+ [32]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [33]
+[34
 
 ] (./biblioteca.aux)
 Package rerunfilecheck Info: File `biblioteca.out' has not changed.
-(rerunfilecheck)             Checksum: B3AB20EC3C4C3D3D246E394AD3FCB491;6534.
+(rerunfilecheck)             Checksum: 1148B103C0B0BF59A921D150F96E8003;7246.
  ) 
 Here is how much of TeX's memory you used:
- 21925 strings out of 478287
- 314362 string characters out of 5849290
- 1172555 words of memory out of 5000000
- 37247 multiletter control sequences out of 15000+600000
+ 22178 strings out of 478287
+ 317798 string characters out of 5849290
+ 1170555 words of memory out of 5000000
+ 37325 multiletter control sequences out of 15000+600000
  483696 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  74i,8n,100p,3263b,1971s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -770,10 +767,10 @@ m-super/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb
 onts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/type1/public/cm
 -super/sfrm1728.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb>
 
-Output written on biblioteca.pdf (32 pages, 335087 bytes).
+Output written on biblioteca.pdf (34 pages, 344591 bytes).
 PDF statistics:
- 3503 PDF objects out of 3580 (max. 8388607)
- 3420 compressed objects within 35 object streams
- 2588 named destinations out of 2984 (max. 500000)
- 433 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 3738 PDF objects out of 4296 (max. 8388607)
+ 3651 compressed objects within 37 object streams
+ 2763 named destinations out of 2984 (max. 500000)
+ 465 words of extra memory for PDF output out of 10000 (max. 10000000)
 

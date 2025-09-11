@@ -1138,6 +1138,43 @@ f56     }
 187 }
 \end{lstlisting}
 
+\subsection{Creating Multiples}
+\begin{lstlisting}
+0dd signed main(){
+5d6     winton;
+b56     int b, l;
+110     cin >> b >> l;
+e28     vector<int> d(l);
+cf7     for(auto &u : d) cin >> u;
+afa     int base = b+1;
+660     int resto = 0;
+d00     for (int i = 0; i < l; i++) {
+01a         int termo = d[i];
+002         if (!((l-1-i)&1)) {
+142             termo = -termo;
+87e         }
+5c5         resto = (resto+termo % base + base) % base;
+de7     }
+9ed     if (resto == 0) {
+005         cout << "0 0" << endl;
+bb3         return 0;
+a7c     }
+d00     for (int i = 0; i < l; i++) {
+4eb         int reducao;
+600         if ((l-1-i)&1) {
+87d             reducao = resto;
+0b4         } 
+2b6         else reducao = base - resto;
+     
+aa1         if (d[i] >= reducao) {
+092             cout << i + 1 << " " << d[i] - reducao << endl;
+bb3             return 0;
+c6f         }
+8da     }
+f82     cout << "-1 -1" << endl;;
+960 }
+\end{lstlisting}
+
 \subsection{Divisor Analysis}
 \begin{lstlisting}
 // quantidade, soma e produto dos divisores
@@ -1195,6 +1232,54 @@ dc0             prod = (prod * (fastExpo(p[i],exp)%MOD)) % MOD;
 e4f     }
 d2a     cout << cnt%MOD << ' ' << sum%MOD << ' ' << prod%MOD << endl;
 a52 }
+\end{lstlisting}
+
+\subsection{Drone Control (3 Equa, 4 Vars)}
+\begin{lstlisting}
+// n(s) = r + s
+// e(s) = (y+p-r)/2 - s
+// w(s) = (y-p-r)/2 - s
+// s(s) = s
+ 
+// n(s) = a + s
+// e(s) = b - s
+// w(s) = c - s
+// s(s) = s
+ 
+// M = max{(|a+s|), (|b-s|), (|c-s|), (|s|)}
+ 
+// |a+s| <= M    ->     -M-a <= s <= M-a
+// |b-s| <= M    ->     -M+b <= s <= M+b
+// |c-s| <= M    ->     -M+c <= s <= M+c
+// |s|   <= M    ->     -M   <= s <= M
+ 
+// achar o minimo e maximo do intervalo de s
+ 
+// smin = max(-a,b,c,0)
+// smax = max(-a,b,c,0)
+// 
+0dd signed main(){
+45f     int q;
+11b     cin >> q;
+1f4     while(q--){
+172         ld p, r, y;
+b47         cin >> p >> r >> y;
+bf3         ld a = r;
+09e         ld b = (y+p-r)/2;
+305         ld c = (y-p-r)/2;
+     
+c79         ld smin = max({-a,b,c,(ld)0.0});
+34f         ld smax = min({-a,b,c,(ld)0.0});
+     
+e2e         ld s = (smin+smax)/2;
+     
+4cb         ld n = r+s;
+e48         ld e = b-s;
+c2d         ld w = c-s;
+     
+e8a         cout << fixed << setprecision(7) << n << ' ' << e << ' ' << s << ' ' << w << ' ' << endl;
+bb1     }
+cb3 }
 \end{lstlisting}
 
 \subsection{Hungaro}
@@ -1551,6 +1636,102 @@ ba2             int a, b;
 0ac         }
 0a4     }
 fba }
+\end{lstlisting}
+
+\subsection{Query de Segtree Offline}
+\begin{lstlisting}
+a03 int n, tree[4*MAX];
+
+d42 int query (int node, int l, int r, int a, int b){
+d5e     if (b < l || r < a) return 0;
+14b     if (l >= a && r <= b)  return tree[node];
+ee4     int m = (l+r)/2; 
+5a3     return query(node*2, l, m, a, b) + query(node*2+1, m+1, r, a, b);
+287 }
+
+27f void update(int node, int l, int r, int i, int x){
+791     if (i < l or i > r) return;
+893     if (l == r) {
+d6d         tree[node]=x;
+505         return;
+b74     }
+ee4     int m = (l+r)/2;
+3b2     update(node*2, l, m, i, x);
+29a     update(node*2+1, m+1, r, i, x);
+a16     tree[node] = tree[node*2] + tree[node*2+1];
+d72 }
+
+0dd signed main(){
+5d6     winton;
+45f     int q;
+55a     cin >> n >> q;
+f96     vector<pair<int,int>> a(n);
+603     for (int i = 0; i < n; i++) {
+8d6         cin >> a[i].first;
+c92         a[i].second = i;
+bd5     }
+816     vector<tuple<int,int,int,int>> queries;
+abf     for (int i = 0; i < q; i++){
+12b         int l, r, m;
+4c8         cin >> l >> m >> r;
+0ef         if (a[l-1].first < m && r > 0){
+205             queries.push_back ({m, l, l+r-1, i});
+705         }
+342     }
+6a2     sort(rall(a));
+7a3     sort(rall(queries));
+bec     int pos = 0;
+4cf     vector<int>ans(q,0);
+5cc     for (auto [m,l,r,i] : queries){
+730         while (pos < n && a[pos].first >= m){
+                // debug(m);
+                // debug(l);
+                // debug(r);
+                // debug(a[pos].second);
+d85             update(1,0,n-1,a[pos].second,1);
+657             pos++;
+f08         }
+a09         ans[i] = query(1,0,n-1,l,r);
+            // cout << tree[8] << " " << tree[9] << " ";
+            // for (int i = 5; i <= 7; i++)cout << tree[i] << " ";
+            // cout << endl;
+088     }
+16b     for (auto u : ans) cout << u << endl;
+e2b }
+\end{lstlisting}
+
+\subsection{Simspons Paradox}
+\begin{lstlisting}
+//Trend or pattern that appears in different groups of data is inconsistent 
+//(disappears or even reverses) with what we see when the groups are combined.
+//
+//
+//In this problem you are to construct an example of the dataset illustrating the Simpson's paradox.0
+//More specifically, let us assume (similarly to the example above) that there are two teams who have been 
+//solving problems of N categories and the total number of problems solved by each of the teams is M
+//Let us denote the number of the problems in i-th category solved by Team X as ai, attempted by bi
+//Similarly, let us define ci as the number of problems solved by Team Y in the i-th category and di as the number of problems attempted.
+
+0dd signed main(){
+14e     int n, m;
+aa3     cin >> n >> m; 
+        // a1 = b1 = 1, isso da um ratio de 1 usando so uma questao
+        // c1 = d1-1, isso da um ratio de 0.99 usando quantas questoes eu quiser
+        // so resta calcular para as restantes das categorias
+        
+8dd     int d1 = m - 3*(n-1);
+        //debug(d1);
+4d4     int c1 = d1-1;
+93a     cout << 1 << " " << 1 << " " << c1 << " " << d1 << endl;
+b28     for (int i = 0; i < n-2; i++){
+0cd         cout << 1 << " " << 2 << " " << 1 << " " << 3 << endl;
+159     }
+abc     int bn = m-((n-2)*2)-1;
+5da     int dn = m-d1-((n-2)*3);
+816     int an = (c1 - 1);
+c56     int cn = 1;
+393     cout << an << " " << bn << " " << cn << " " << dn << endl;
+cbd }
 \end{lstlisting}
 
 \subsection{Steiner Tree}
