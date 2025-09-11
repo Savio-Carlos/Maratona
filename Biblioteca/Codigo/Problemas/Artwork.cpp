@@ -1,9 +1,7 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-#define int long long
-#define fastio ios_base::sync_with_stdio(0); cin.tie(0)
-#define endl '\n'
+//Artwork
+//
+//Grafo de varios circulos
+//saber se chega do 00 ao nm sem encostar nos circulos
 
 int n, m, k; 
 struct DSU{
@@ -11,12 +9,6 @@ struct DSU{
     vector<int> p;
     vector<int> r;
     vector<vector<int>> encosta;
-    /*
-    x0 e xn
-    y0 e ym
-    x0, y0
-    xn e ym 
-    */
     DSU(int _n, vector<vector<int>> _marcador){
         n = _n;
         p.resize(n);
@@ -27,11 +19,9 @@ struct DSU{
             r[i] = 0;
         }
     }
-
     int find(int x){
         return (p[x] == x? x : p[x] = find(p[x]));
     }
-
     void unite(int a, int b){
         a = find(a), b = find(b);
         if(a == b) return;
@@ -51,7 +41,6 @@ struct DSU{
         }
     }
 };
-
 int dist(int x1, int y1, int x2, int y2){
     return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
 }
@@ -76,7 +65,6 @@ signed main(){
         for(int j = i+1; j < k; j++){
             if(j == i) continue;
             auto [x2, y2, r2] = v[j];
-            //cout << i << " " << j << " " << dist(x1, y1, x2, y2) << endl;
             if(dist(x1, y1, x2, y2) <= (r1 + r2)*(r1+r2)){
                 dsu.unite(i, j);
             }
@@ -101,13 +89,6 @@ signed main(){
             break;
         }
     }
-    /*
-    x0 e xn
-    y0 e ym
-    x0, y0
-    xn e ym 
-    */
-
     if(pos) cout << "S\n";
     else cout << "N\n";
 }

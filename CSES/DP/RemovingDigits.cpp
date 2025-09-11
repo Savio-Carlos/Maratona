@@ -25,11 +25,6 @@ signed main() {
         if (i-m >= 0) dp[i] += dp[i - m] + 1;
     }
 
-    /*for (int i = 1; i <= n; i++) {
-        cout << dp[i] << " ";    
-    }
-    cout << endl;
-*/
     cout << dp[n] << endl;
     return 0;
 }

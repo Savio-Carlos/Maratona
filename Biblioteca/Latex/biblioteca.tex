@@ -993,6 +993,102 @@ eb6 }
 
 \section{Problemas}
 
+\subsection{Artwork}
+\begin{lstlisting}
+//Grafo de varios circulos
+//saber se chega do 00 ao nm sem encostar nos circulos
+
+add int n, m, k; 
+d56 struct DSU{
+1a8     int n;
+632     vector<int> p;
+02d     vector<int> r;
+a95     vector<vector<int>> encosta;
+2ea     DSU(int _n, vector<vector<int>> _marcador){
+8fd         n = _n;
+1c4         p.resize(n);
+7e4         r.resize(n);
+972         encosta = _marcador;
+603         for(int i = 0; i < n; i++){
+f13             p[i] = i;
+fd1             r[i] = 0;
+606         }
+68f     }
+57b     int find(int x){
+eab         return (p[x] == x? x : p[x] = find(p[x]));
+ab9     }
+440     void unite(int a, int b){
+605         a = find(a), b = find(b);
+d54         if(a == b) return;
+dac         if(r[a] == r[b]) r[a]++;
+d1b         if(r[a] > r[b]){
+67e             r[a] += r[b];
+264             p[b] = a;
+1cd             for(int i = 0; i < 4; i++){
+9e8                 encosta[a][i] |= encosta[b][i];
+31b             }
+e6c         }else{
+2e3             r[b] += r[a];
+84b             p[a] = b;
+1cd             for(int i = 0; i < 4; i++){
+7a5                 encosta[b][i] |= encosta[a][i];
+f4c             }
+701         }
+15f     }
+b43 };
+80d int dist(int x1, int y1, int x2, int y2){
+a9d     return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
+fb0 }
+0dd signed main(){
+9ae     fastio;
+5fe     cin >> n >> m >> k;
+6ef     int pos = 1;
+c56     vector<tuple<int, int, int>> v;
+0bd     vector<vector<int>> marcador(k, vector<int>(4, 0));
+b3d     for(int i = 0; i < k; i++){
+32e         int a, b, c; cin >> a >> b >> c;
+6c9         v.push_back({a, b, c});
+ea0         if(a-c <= 0) marcador[i][0] = 1;
+8a1         if(a+c >= n) marcador[i][1] = 1;
+552         if(b-c <= 0) marcador[i][2] = 1;
+dfd         if(b+c >= m) marcador[i][3] = 1;
+f3a     }
+    
+313     DSU dsu(k, marcador);
+b3d     for(int i = 0; i < k; i++){
+dde         auto [x1, y1, r1] = v[i];
+453         for(int j = i+1; j < k; j++){
+b4a             if(j == i) continue;
+f7c             auto [x2, y2, r2] = v[j];
+d6c             if(dist(x1, y1, x2, y2) <= (r1 + r2)*(r1+r2)){
+7fd                 dsu.unite(i, j);
+823             }
+88d         }
+c50     }
+    
+b3d     for(int i = 0; i < k; i++){
+a44         auto p = dsu.find(i);
+00d         if(dsu.encosta[p][0] && dsu.encosta[p][1]){
+792             pos = 0;
+c2b             break;
+873         }if(dsu.encosta[p][2] && dsu.encosta[p][3]){
+792             pos = 0;
+c2b             break;
+fd0         }
+089         if(dsu.encosta[p][0] && dsu.encosta[p][2]){
+792             pos = 0;
+c2b             break;
+3c1         }
+b6e         if(dsu.encosta[p][1] && dsu.encosta[p][3]){
+792             pos = 0;
+c2b             break;
+aff         }
+035     }
+c69     if(pos) cout << "S\n";
+100     else cout << "N\n";
+77c }
+\end{lstlisting}
+
 \subsection{Centro de Árvore}
 \begin{lstlisting}
 309 vector<vector<int>> graph;
