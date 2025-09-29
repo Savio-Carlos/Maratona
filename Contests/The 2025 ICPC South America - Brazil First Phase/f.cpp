@@ -120,7 +120,7 @@ signed main(){
     debug(t11, t12, (t11 + t12) % MOD);
     debug(ans[1]);
 
-
+    
 
     // ans[1] = (ans[1] + ans[a[0]] + (modiv(1,2) * a[0]) % MOD) % MOD;//isso ta errado
     for (int i = 0; i < q; i++){
