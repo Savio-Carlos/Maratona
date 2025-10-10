@@ -83,7 +83,7 @@ void solve(){
         ans += q * AGG;
     }
     debug(ans);
-    for (int i = 0; i < s.size() && i < pos+1; i++){
+    for (int i = 0; i < s.size(); i++){
         ans += ((s[i]-'0') * (s[i]-'0'+1))/2;
     }
     debug(ans);
