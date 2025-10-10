@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,30 +51,42 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
+const int AGG = 45;
 
 void solve(){
     int n;
     cin >> n;
-    string s = to_string(n);
-    set<int> ans;
-    for (int k = 0; k < s.size(); k++){
-        int x = (n / (fastExpo(10LL, k) + 1LL)); 
-        int y = x * (fastExpo(10LL, k));
-        debug(x, y);
-        if (n == (x+y) && x != y) ans.insert(x); 
+    int base = 9, sz = 1, tot = 0;
+    while (base*sz < n){
+        n -= base*sz;
+        tot += base;
+        base*=10;
+        sz++;
     }
-    cout << ans.size() << endl;
-    if (ans.size()) {for (auto u : ans) cout << u << " "; cout << endl;}
+    // debug(base, n, sz, tot);
+    int x = ((n + sz - 1) / sz) + tot;
+    int pos = ((n-1)%sz);
+    debug(x, pos);
+    
+    if (x < 10){
+        cout << (x * (x+1)) / 2 << endl;
+        return;
+    }
+
+    string s = to_string(x);
+    int ans = 0;
+    for (int i = s.size()-1; i > 0; i--){
+        string cur = s.substr(0, i);
+        debug(cur);
+        int q = stoll(cur); 
+        debug(q);
+        ans += q * AGG;
+    }
+    debug(ans);
+    for (int i = 0; i < s.size() && i < pos+1; i++){
+        ans += ((s[i]-'0') * (s[i]-'0'+1))/2;
+    }
+    debug(ans);
 }
 
 signed main(){

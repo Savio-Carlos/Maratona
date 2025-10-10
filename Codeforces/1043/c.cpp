@@ -51,6 +51,7 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+vector<int> pot, cost;
 
 int fastExpo(int base, int exp) {
     int res = 1;
@@ -62,24 +63,34 @@ int fastExpo(int base, int exp) {
     return res;
 }
 
-void solve(){
-    int n;
-    cin >> n;
-    string s = to_string(n);
-    set<int> ans;
-    for (int k = 0; k < s.size(); k++){
-        int x = (n / (fastExpo(10LL, k) + 1LL)); 
-        int y = x * (fastExpo(10LL, k));
-        debug(x, y);
-        if (n == (x+y) && x != y) ans.insert(x); 
+void build(){
+    pot.push_back(1);
+    cost.push_back(3);
+    for (int i = 1; i < 20; i++){
+        pot.push_back(fastExpo(3LL, i));
+        cost.push_back(fastExpo(3LL, i+1) + (i * fastExpo(3LL, i-1)));
     }
-    cout << ans.size() << endl;
-    if (ans.size()) {for (auto u : ans) cout << u << " "; cout << endl;}
+    reverse(all(pot));
+    reverse(all(cost));
+}
+
+void solve(){
+    int n, ans = 0;
+    cin >> n;
+    for (int i = 0; i < 20; i++){
+        while (pot[i] <= n){
+            n -= pot[i];
+            ans += cost[i];
+            debug(pot[i], n);
+        }
+    }
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
+    build();
     while(t--) solve();
 }

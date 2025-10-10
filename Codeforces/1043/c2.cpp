@@ -51,6 +51,17 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+/*
+e se eu ir relaxando a quantidade de deals
+eu quero 3 melancias, com k = 3
+eu posso fazer garantidamente com 1 deal
+mas ai eu vejo que se eu tirar esse deal eu posso usar 3 deals de 1 melancia
+entao eu vejo o maior e tento reduzir ele
+fazer vetor de frequenia pra cada potencia de 3 e ao inves de remover um por um dividir e multiplicar
+*/
+
+vector<int> pot;
+map<int,int> cost;
 
 int fastExpo(int base, int exp) {
     int res = 1;
@@ -62,24 +73,70 @@ int fastExpo(int base, int exp) {
     return res;
 }
 
-void solve(){
-    int n;
-    cin >> n;
-    string s = to_string(n);
-    set<int> ans;
-    for (int k = 0; k < s.size(); k++){
-        int x = (n / (fastExpo(10LL, k) + 1LL)); 
-        int y = x * (fastExpo(10LL, k));
-        debug(x, y);
-        if (n == (x+y) && x != y) ans.insert(x); 
+void build(){
+    pot.push_back(1);
+    cost[1] = 3;
+    for (int i = 1; i < 20; i++){
+        pot.push_back(fastExpo(3LL, i));
+        cost[pot.back()] = (fastExpo(3LL, i+1) + (i * fastExpo(3LL, i-1)));
     }
-    cout << ans.size() << endl;
-    if (ans.size()) {for (auto u : ans) cout << u << " "; cout << endl;}
+    reverse(all(pot));
+}
+
+void solve(){
+    map<int,int, greater<int>> freq;
+    int n, k, ans = 0;
+    cin >> n >> k;
+    int cnt = 0;
+        for (int i = 0; i < 20; i++){
+        while (pot[i] <= n){
+            n -= pot[i];
+            cnt++;
+            freq[pot[i]]++;
+            debug(pot[i], n);
+        }
+    }
+    debug(cnt);
+    if (cnt > k) {
+        cout << -1 << endl;
+        return;
+    }
+    debug(freq);
+    for (auto [p, q] : freq){
+        if (p == 1) continue;
+        if (cnt+2 > k) continue;
+    
+        int l = 0, r = q+1; 
+        while (l < r){
+            int mid = (l+r)/2;
+            int tot = mid*3 + cnt - mid;
+            debug(mid,tot);
+            
+            if (tot <= k){
+                l = mid+1;
+            }
+            else {
+                r = mid;
+            }
+        }
+        int red = r-1;
+        debug(p, q, red, cnt);
+        
+        freq[p] -= red;
+        cnt-=red;
+        freq[p/3] += 3*red;
+        cnt += 3*red;
+    }
+    debug(freq);
+    for (auto [p, q] : freq) ans += cost[p] * q;
+
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
+    build();
     while(t--) solve();
 }
