@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,68 +51,53 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int AGG = 45;
-
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
-
-void test(int n){
-    string s = "";
-    for (int i = 1; i <= n; i++){
-        s += to_string(i);
-    }
-    s = s.substr(0, n+1);
-   debug(s.size(), s);
-    int correct = 0;
-    map<char, int> freq;
-    for (int i = 0; i < n; i++) {correct += s[i] - '0';freq[s[i]]++;}
-    debug(correct);
-}
+const int MAX = 1e5+7;
+const int MAXK = 22;
 
 void solve(){
-    int n;
-    cin >> n;
-    // test(n);
-    int base = 9, sz = 1, tot = 0;
-    while (base*sz < n){
-        n -= base*sz;
-        tot += base;
-        base*=10;
-        sz++;
-    }
-    // debug(base, n, sz, tot);
-    int x = ((n + sz - 1) / sz) + tot;//x e o numero que eu paro na string
-    int pos = ((n-1)%sz);
-    debug(x, pos);
+    int n, m, k;
+    string s;
+    cin >> n >> m >> k >> s;
+    k = 2*k;
+
+    vector<vector<int>> graph(n);
     
-    if (x < 10){
-        cout << (x * (x+1)) / 2 << endl;
-        return;
+    for (int i = 0; i < m; i++){
+        int a, b;       
+        cin >> a >> b;
+        graph[--a].push_back(--b);
     }
 
-    string s = to_string(x);
-    int ans = 0, pfx = 0;
-    for (int i = 0; i < s.size(); i++){
-        int pot = fastExpo(10LL, s.size() - (i+1));
-        int cur = (s[i] - '0');
-        int somatorio = (cur * (cur - 1)) / 2;
-        debug(pot, cur, somatorio);
+    vector<vector<int>> dp(k + 1, vector<int>(n));// ganhador[numero de movimentos][aresta] -> 0 ou 1 representando alice e bob
 
-        ans += (cur * pfx * pot) + (somatorio * pot) + (AGG * (s.size() - (i+1)) * (pot/10) * cur);
-        pfx += cur;
-        debug(ans, pfx);
+    for (int i = 0; i < n; i++){
+        if (s[i] == 'A'){
+            dp[k][i] = 0;
+        }
+        else dp[k][i] = 1;
     }
-    for (int i = 0; i <= pos; i++){
-        ans += (s[i] - '0');
-    }debug(ans);
-    cout << ans << endl;
+
+    for (int i = k-1; i >= 0; i--){
+        int vez = i&1 ? 1 : 0;//bob = 1, alice = 0
+        
+        for (int v = 0; v < n; v++){
+            if (!vez){ // alice joga nesse turno
+                int r = 1; // assumindo que ela perde(bob ganha)
+                for (auto u : graph[v]) {
+                    r = min(r, dp[i + 1][u]);
+                }
+                dp[i][v] = r;
+            }
+            else{//bob joga nesse turno
+                int r = 0; // alice ganha, bob perde
+                for (auto u : graph[v]) {
+                    r = max(r, dp[i + 1][u]);
+                }
+                dp[i][v] = r;
+            }
+        }
+    }
+    cout <<( (dp[0][0] == 0) ? "Alice" : "Bob" )<< endl;
 }
 
 signed main(){

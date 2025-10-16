@@ -51,73 +51,11 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int AGG = 45;
-
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
-
-void test(int n){
-    string s = "";
-    for (int i = 1; i <= n; i++){
-        s += to_string(i);
-    }
-    s = s.substr(0, n+1);
-   debug(s.size(), s);
-    int correct = 0;
-    map<char, int> freq;
-    for (int i = 0; i < n; i++) {correct += s[i] - '0';freq[s[i]]++;}
-    debug(correct);
-}
-
-void solve(){
-    int n;
-    cin >> n;
-    // test(n);
-    int base = 9, sz = 1, tot = 0;
-    while (base*sz < n){
-        n -= base*sz;
-        tot += base;
-        base*=10;
-        sz++;
-    }
-    // debug(base, n, sz, tot);
-    int x = ((n + sz - 1) / sz) + tot;//x e o numero que eu paro na string
-    int pos = ((n-1)%sz);
-    debug(x, pos);
-    
-    if (x < 10){
-        cout << (x * (x+1)) / 2 << endl;
-        return;
-    }
-
-    string s = to_string(x);
-    int ans = 0, pfx = 0;
-    for (int i = 0; i < s.size(); i++){
-        int pot = fastExpo(10LL, s.size() - (i+1));
-        int cur = (s[i] - '0');
-        int somatorio = (cur * (cur - 1)) / 2;
-        debug(pot, cur, somatorio);
-
-        ans += (cur * pfx * pot) + (somatorio * pot) + (AGG * (s.size() - (i+1)) * (pot/10) * cur);
-        pfx += cur;
-        debug(ans, pfx);
-    }
-    for (int i = 0; i <= pos; i++){
-        ans += (s[i] - '0');
-    }debug(ans);
-    cout << ans << endl;
-}
-
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    int x, y;
+    cin >> x >> y;
+    int ans = ((x+y)%12);
+    if (!ans) ans = 12;
+    cout << ans << endl;
 }
