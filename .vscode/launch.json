@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Brazilian ICPC Summer School 2023 - BF - Jan 22",
-      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Brazilian ICPC Summer School 2023 - BF - Jan 22/build/Debug/outDebug",
+      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/UTFPR2025.2",
+      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/UTFPR2025.2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
