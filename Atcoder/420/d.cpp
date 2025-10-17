@@ -56,6 +56,8 @@ const int MAX = 505;
 int h, w;
 char grid[MAX][MAX], grid2[MAX][MAX];
 bool visited[MAX][MAX], visited2[MAX][MAX];
+int dx[] = {1,0,0,-1};
+int dy[] = {0,1,-1,0};
 
 int solve(){
     int ans = -1;
@@ -67,7 +69,8 @@ int solve(){
         auto [x,y] = q.front();
         q.pop();
 
-        
+
+
     }
 
     return ans;
