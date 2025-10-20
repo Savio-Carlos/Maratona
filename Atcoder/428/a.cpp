@@ -51,39 +51,17 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 505;
-
-int h, w;
-char grid[MAX][MAX], grid2[MAX][MAX];
-bool visited[MAX][MAX], visited2[MAX][MAX];
-int dx[] = {1,0,0,-1};
-int dy[] = {0,1,-1,0};
-
-int solve(){
-    int ans = -1;
-    bool state = 0;
-    queue<pair<int,int>> q;
-    q.push(0,0);
-
-    while (!q.empty()){
-        auto [x,y] = q.front();
-        q.pop();
-
-    }
-
-    return ans;
-}
-
 signed main(){
-    winton; 
-    cin >> h >> w;
-    for (int i = 0; i < h; i++){
-        for (int j = 0; j < w; j++){
-            cin >> grid[i][j];
-            grid2[i][j] = grid[i][j];
-            if (grid[i][j] == 'x') grid2[i][j] = 'o';
-            if (grid[i][j] == 'o') grid2[i][j] = 'x';
-        } 
+    winton;
+    int s, a, b, x;
+    cin >> s >> a >> b >> x;
+    int ans = 0;
+    while (x > a){
+        x -= a;
+        x -= b;
+        ans += a*s;
     }
-    cout << solve() << endl;
+    debug(x);
+    if (x > 0) ans += x*s;
+    cout << ans << endl;
 }

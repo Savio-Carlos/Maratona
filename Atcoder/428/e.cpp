@@ -51,39 +51,66 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 505;
+const int MAX = 1e6;
 
-int h, w;
-char grid[MAX][MAX], grid2[MAX][MAX];
-bool visited[MAX][MAX], visited2[MAX][MAX];
-int dx[] = {1,0,0,-1};
-int dy[] = {0,1,-1,0};
+vector<vector<int>> graph;
+int n, dist[3][MAX];
 
-int solve(){
-    int ans = -1;
-    bool state = 0;
-    queue<pair<int,int>> q;
-    q.push(0,0);
-
-    while (!q.empty()){
-        auto [x,y] = q.front();
-        q.pop();
-
+void dfs(int v, int p, int id){
+    for (auto u : graph[v]){
+        if (u == p || dist[id][u] > 0) continue;
+        dist[id][u] = dist[id][v] + 1;
+        dfs(u,v,id);
     }
-
-    return ans;
+}
+int distance(int id){
+    int u = -1, mx = 0;
+    for (int i = 1; i <= n; i++){
+        if (dist[id][i] >= mx){
+            u = i;
+            mx = dist[id][i];
+        }
+    }
+    return u;
+}
+int cont(int v, int p, int d){
+    if (d == 0) return 1;
+    int cur = 0;
+    for (auto u : graph[v]){
+        if (u == p) continue;
+        cur += cont(u,v,d-1);
+    }
+    return cur;
 }
 
-signed main(){
-    winton; 
-    cin >> h >> w;
-    for (int i = 0; i < h; i++){
-        for (int j = 0; j < w; j++){
-            cin >> grid[i][j];
-            grid2[i][j] = grid[i][j];
-            if (grid[i][j] == 'x') grid2[i][j] = 'o';
-            if (grid[i][j] == 'o') grid2[i][j] = 'x';
-        } 
+signed main () {
+    winton;
+    cin >> n;
+    graph.resize(n+1);
+    for (int i = 1; i < n; i++){
+        int a, b;
+        cin >> a >> b;
+        graph[a].push_back(b);
+        graph[b].push_back(a);
     }
-    cout << solve() << endl;
+    dfs(1,0,0);
+    int a = distance(0);
+    dfs(a,0,1);
+    int b = distance(1);
+    dfs(b,0,2);
+
+    vector<int> center;
+    for (int i = 1; i <= n; i++){
+        if (dist[1][i] + dist[2][i] == dist[1][b] && abs(dist[1][i] - dist[2][i]) <= 1){
+            center.push_back(i);
+        }
+    }
+
+    debug(a,b);
+
+    for (int i = 1; i <= n; i++){
+        if (dist[1][i] > dist[2][i]) cout << a << endl;
+        else if (dist[1][i] < dist[2][i])cout << b << endl;
+        else cout << max(a,b) << endl;
+    }
 }

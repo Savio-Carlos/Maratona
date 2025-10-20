@@ -51,39 +51,26 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 505;
-
-int h, w;
-char grid[MAX][MAX], grid2[MAX][MAX];
-bool visited[MAX][MAX], visited2[MAX][MAX];
-int dx[] = {1,0,0,-1};
-int dy[] = {0,1,-1,0};
-
-int solve(){
-    int ans = -1;
-    bool state = 0;
-    queue<pair<int,int>> q;
-    q.push(0,0);
-
-    while (!q.empty()){
-        auto [x,y] = q.front();
-        q.pop();
-
-    }
-
-    return ans;
-}
-
 signed main(){
-    winton; 
-    cin >> h >> w;
-    for (int i = 0; i < h; i++){
-        for (int j = 0; j < w; j++){
-            cin >> grid[i][j];
-            grid2[i][j] = grid[i][j];
-            if (grid[i][j] == 'x') grid2[i][j] = 'o';
-            if (grid[i][j] == 'o') grid2[i][j] = 'x';
-        } 
+    winton;
+    int n, k;
+    string s;
+    cin >> n >> k >> s;
+
+    map<string, int> mp;
+    int mx = 0, occ = 0;
+    for (int i = 0; i < n-k+1; i++){
+        string cur = s.substr(i, k);
+        mp[cur]++;
+        if (mp[cur] > mx){
+            mx = mp[cur];
+            occ = 1;
+        }
+        else if (mp[cur] == mx) occ++;
+    }   
+    debug(mp);
+    cout << mx << endl;
+    for (auto [str, cnt] : mp){
+        if (cnt == mx) cout << str << " ";
     }
-    cout << solve() << endl;
 }

@@ -51,39 +51,72 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 505;
+const int MAX = 1e6;
 
-int h, w;
-char grid[MAX][MAX], grid2[MAX][MAX];
-bool visited[MAX][MAX], visited2[MAX][MAX];
-int dx[] = {1,0,0,-1};
-int dy[] = {0,1,-1,0};
-
-int solve(){
-    int ans = -1;
-    bool state = 0;
-    queue<pair<int,int>> q;
-    q.push(0,0);
-
-    while (!q.empty()){
-        auto [x,y] = q.front();
-        q.pop();
-
-    }
-
-    return ans;
-}
+int abre[MAX], fecha[MAX], s[MAX];
 
 signed main(){
-    winton; 
-    cin >> h >> w;
-    for (int i = 0; i < h; i++){
-        for (int j = 0; j < w; j++){
-            cin >> grid[i][j];
-            grid2[i][j] = grid[i][j];
-            if (grid[i][j] == 'x') grid2[i][j] = 'o';
-            if (grid[i][j] == 'o') grid2[i][j] = 'x';
-        } 
+    winton;
+    int q;
+    cin >> q;
+    int i = -1;
+
+    int valid = -1;
+    while (q--){
+        int x;
+        cin >> x;
+        if (x == 1){
+            i++;
+            char c;
+            cin >> c;
+            if (c == '('){
+                abre[i]++;
+                s[i] = 1;
+            }
+            else {
+                fecha[i]++;
+                s[i] = 2;
+            }
+            if (i){
+                fecha[i] = fecha[i-1] + (s[i] == 2 ? 1 : 0);
+                abre[i] = abre[i-1] + (s[i] == 1 ? 1 : 0);
+            }
+        }
+        else {
+            if (s[i] == 1){
+                abre[i]--;
+            }
+            else {
+                fecha[i]--;
+            }
+            s[i] = 0;
+            i--;
+            if (i){
+                fecha[i] = fecha[i-1] + (s[i] == 2 ? 1 : 0);
+                abre[i] = abre[i-1] + (s[i] == 1 ? 1 : 0);
+            }
+            if (valid >= i && abre[i] >= fecha[i]) valid = -1;
+        }
+        if (fecha[i] > abre[i] && valid == -1) valid = i;
+
+        int diff = abre[i] - fecha[i];
+
+        if ((valid == -1 && diff == 0 ) || i == -1) cout << "Yes\n";
+        else cout << "No\n";
+
+        // for (int j = 0; j <= i; j++){
+        //     cout << abre[j] << " ";
+        // }cout << endl;
+        
+        // for (int j = 0; j <= i; j++){
+        //     cout << fecha[j] << " ";
+        // }cout << endl;
+
+        // for (int j = 0; j <= i; j++){
+        //     if (s[j] == 1)cout << '(' ;
+        //     else cout << ')';
+        // }cout << endl;
+        debug(valid);
+        // cout << endl;
     }
-    cout << solve() << endl;
 }
