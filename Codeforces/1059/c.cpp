@@ -51,36 +51,32 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
-
 void solve(){
-    int c, d;
-    cin >> c >> d;
-    int lim = log10(c+d) + 1;
-    int ans = 0;
-    debug(lim);
-    for (int i = 1; i <= lim; i++){
-        int l = max(1LL, fastExpo(10, i-1) - c);
-        int r = min(d, fastExpo(10, i) - 1 - c);
-        debug(l, r);
-        if (l > r) continue;
+    int a, b;
+    cin >> a >> b;
+    int k = (1 << ((int)log2(a) + 1)) - 1;
+    debug(k);
+    if (b > k){
+        cout << -1 << endl;
+        return;
+    } 
+    
+    string abin = bitset<32>(a).to_string();
+    string bbin = bitset<32>(b).to_string();
 
-        int base = c * fastExpo(10, i) + c;
-        int lo = base + l - 1;
-        int hi = base + r;
-        debug(lo, hi);
-
-        ans += (int)floor(sqrtl(hi)) - (int)floor(sqrtl(lo));
+    // debug(abin, bbin);
+    vector<int> ans;
+    for (int i = 31; i >= 0; i--){
+        if (abin[i] != bbin[i]){
+            int pos = 32 - i - 1;
+            ans.push_back(1 << (pos));
+        }
     }
-    cout << ans << endl;
+    cout << ans.size() << endl;
+    for (auto u : ans) cout << u << " "; 
+    cout << endl;
+    
+
 }
 
 signed main () {

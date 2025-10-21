@@ -51,36 +51,45 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
+
+bool palindrome(string s){
+    for (int i = 0; i < s.size(); i++){
+        if (s[i] != s[s.size() - i - 1]) return false;
     }
-    return res;
+    return true;
 }
 
 void solve(){
-    int c, d;
-    cin >> c >> d;
-    int lim = log10(c+d) + 1;
-    int ans = 0;
-    debug(lim);
-    for (int i = 1; i <= lim; i++){
-        int l = max(1LL, fastExpo(10, i-1) - c);
-        int r = min(d, fastExpo(10, i) - 1 - c);
-        debug(l, r);
-        if (l > r) continue;
+    int n;
+    string s;
+    cin >> n >> s;
+    for (int mask = 0; mask < (1 << n); mask++){
+        string cur = "";
+        string x = "";
+        vector<int> diff;
 
-        int base = c * fastExpo(10, i) + c;
-        int lo = base + l - 1;
-        int hi = base + r;
-        debug(lo, hi);
+        for (int i = 0; i < n; i++){
+            if (mask & (1<<i)){
+                diff.push_back(i);
+                cur += (s[i]);
+            } 
+            else x += (s[i]);
+        }
 
-        ans += (int)floor(sqrtl(hi)) - (int)floor(sqrtl(lo));
+        debug(diff);
+        bool pos = true;
+        for (int i = 1; i < diff.size(); i++){
+            if (cur[i-1] > cur[i]) pos = false;
+        }
+        if (!pos || !palindrome(x)) continue;
+        
+        cout << diff.size() << endl;
+        for (auto u : diff) cout << u+1 << " ";
+        cout << endl;
+        return;
+        
     }
-    cout << ans << endl;
+    cout << -1 << endl;
 }
 
 signed main () {

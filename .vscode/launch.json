@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/UTFPR2025.2",
-      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/UTFPR2025.2/build/Debug/outDebug",
+      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Codeforces/1059",
+      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Codeforces/1059/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

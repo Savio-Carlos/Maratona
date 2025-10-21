@@ -51,34 +51,14 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
-
 void solve(){
-    int c, d;
-    cin >> c >> d;
-    int lim = log10(c+d) + 1;
+    int n;
+    cin >> n;
     int ans = 0;
-    debug(lim);
-    for (int i = 1; i <= lim; i++){
-        int l = max(1LL, fastExpo(10, i-1) - c);
-        int r = min(d, fastExpo(10, i) - 1 - c);
-        debug(l, r);
-        if (l > r) continue;
-
-        int base = c * fastExpo(10, i) + c;
-        int lo = base + l - 1;
-        int hi = base + r;
-        debug(lo, hi);
-
-        ans += (int)floor(sqrtl(hi)) - (int)floor(sqrtl(lo));
+    for (int i = 0; i < n; i++){
+        int a;
+        cin >> a;
+        ans = max(ans,a);
     }
     cout << ans << endl;
 }

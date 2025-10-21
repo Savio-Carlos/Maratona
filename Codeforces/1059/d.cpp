@@ -51,40 +51,40 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base;
-        base = base * base;
-        exp >>= 1;
-    }
-    return res;
-}
-
 void solve(){
-    int c, d;
-    cin >> c >> d;
-    int lim = log10(c+d) + 1;
-    int ans = 0;
-    debug(lim);
-    for (int i = 1; i <= lim; i++){
-        int l = max(1LL, fastExpo(10, i-1) - c);
-        int r = min(d, fastExpo(10, i) - 1 - c);
-        debug(l, r);
-        if (l > r) continue;
+    int n;
+    cin >> n;
+    int l = 1, r = n;
+    int ans1, ans2;
 
-        int base = c * fastExpo(10, i) + c;
-        int lo = base + l - 1;
-        int hi = base + r;
-        debug(lo, hi);
+    cout << "1 " << l << " " << r << endl;
+    cin >> ans1;
+    cout << "2 " << l << " " << r << endl;
+    cin >> ans2;
 
-        ans += (int)floor(sqrtl(hi)) - (int)floor(sqrtl(lo));
+    int sum = ans2 - ans1;
+    int e = 1;
+
+    while(l <= r){
+        int mid = l + (r-l)/2;
+        cout << "1 " << mid << " " << n << endl;
+        cin >> ans1;
+        cout << "2 " << mid << " " << n << endl;
+        cin >> ans2;
+
+        int diff = ans2 - ans1;
+        if (diff == sum){
+            e = mid;
+            l = mid+1;
+        }
+        else r = mid-1;
     }
-    cout << ans << endl;
+
+    cout << "! " << e << " " << e+sum-1 << endl;
 }
 
 signed main () {
-    winton;
+    //winton;
     int t;
     cin >> t;
     while(t--) solve();
