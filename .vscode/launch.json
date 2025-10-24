@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Codeforces/1059",
-      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Codeforces/1059/build/Debug/outDebug",
+      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/2024-2025 ICPC German Collegiate Programming Contest (GCPC 2024)",
+      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/2024-2025 ICPC German Collegiate Programming Contest (GCPC 2024)/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
