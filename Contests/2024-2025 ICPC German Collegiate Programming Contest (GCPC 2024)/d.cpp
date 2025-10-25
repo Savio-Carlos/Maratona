@@ -106,7 +106,7 @@ signed main(){
             if (t == '+'){
                 bitl.update(x, vall);
                 bitr.update(x, valr); 
-            }
+            } 
             else {
                 bitl.update(x, MOD-vall);
                 bitr.update(x, MOD-valr); 
