@@ -55,28 +55,66 @@ const int MOD = 43200;
 
 signed main(){
     winton;
-    int n;
-    cin >> n;
-    vector<int> a(n);
-    for (int i = 0; i < n; i++){
-        int h, m, s;
-        cin >> h >> m >> s;
-        a[i] = h*3600 + m*60 + s;
-    } 
-    sort(all(a));
-    vector<int> s;
-    for (int i = 1; i < n; i++){
-        s.push_back(min(abs(a[i]-a[i-1]), abs(a[i]-(a[i-1]+MOD))));
+    int t;
+    cin>>t;
+    while(t--){
+        int n;
+        cin>>n;
+        vector<int> toys (n);
+        vector<int> ordem (n);
+        int pares=0,impares=0;
+        
+        for(int i = 0; i<n; i++){
+            int x;
+            cin>>x;
+            toys[i]=x;
+
+            ordem[i]=x;
+        
+            if(x%2)impares++;
+            else pares++;
+        }
+        int num = min(impares,pares);
+        sort(ordem.begin(),ordem.end());
+        
+        
+        int x=0;
+        for(int i = 0; i<num; i++){
+            bool flag = true,flare = true;
+            // cout<<"a"<<endl;
+            int l,r,aux;
+            for(int j = 0; j < n; j++){
+                if(toys[j]==ordem[x]){
+                    flare = false;
+                     r = j;
+                }
+                if(toys[j]>ordem[x] && flare){
+                    if((ordem[x]%2)!=(toys[j]%2)){
+                         aux = toys[j];
+                          l = j;
+                        flag = false;
+                    }
+                }
+            }
+            
+
+            if(flag){
+                i--;
+            }
+            else {
+            toys[l]=ordem[x];
+            toys[r]=aux;
+            }
+
+            if(x<n-1){
+                x++;
+            }
+        }
+
+        for(int i = 0; i < n-1; i++){
+            cout<<toys[i]<<" ";
+        }
+        cout<<toys.back()<<endl;
+
     }
-    debug(a, s);
-    int aux = 0;
-    for (int i = n-2; i > 0; i--){
-        aux += a[i] - a[i+1];
-        a[i-1] = (a[i-1] + aux) % MOD;
-        debug(a);
-        debug(aux);
-    }
-    int ans = a[0] - a[1] + aux;
-    debug((ans+MOD)%MOD);
-    cout << (ans+MOD)%MOD << endl;
 }

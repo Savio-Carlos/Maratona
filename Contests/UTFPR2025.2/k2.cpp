@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
  
-#define DEBUG
+// #define DEBUG
  
 #if defined(DEBUG)
     #define winton (void)0
@@ -58,25 +58,19 @@ signed main(){
     int n;
     cin >> n;
     vector<int> a(n);
+    int sum = 0;
     for (int i = 0; i < n; i++){
         int h, m, s;
         cin >> h >> m >> s;
         a[i] = h*3600 + m*60 + s;
+        sum += a[i];
     } 
     sort(all(a));
-    vector<int> s;
-    for (int i = 1; i < n; i++){
-        s.push_back(min(abs(a[i]-a[i-1]), abs(a[i]-(a[i-1]+MOD))));
+    int ans = LLONG_MAX;
+    for (int i = 0; i < n; i++){
+        debug(n*a[i], sum-n*a[i], sum - n * a[i] + i * MOD);
+        ans = min(ans, sum - n * a[i] + i * MOD);//a gente tira a[i] de todo mundo e ve o quanto precisa pra equiparar-los a a[i]
+        //i*mod e quantos a gente vai ter que completar um ciclo pra chegar nele
     }
-    debug(a, s);
-    int aux = 0;
-    for (int i = n-2; i > 0; i--){
-        aux += a[i] - a[i+1];
-        a[i-1] = (a[i-1] + aux) % MOD;
-        debug(a);
-        debug(aux);
-    }
-    int ans = a[0] - a[1] + aux;
-    debug((ans+MOD)%MOD);
-    cout << (ans+MOD)%MOD << endl;
+    cout << ans << endl;
 }
