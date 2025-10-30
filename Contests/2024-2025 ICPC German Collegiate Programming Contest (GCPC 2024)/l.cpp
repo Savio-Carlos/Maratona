@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -53,24 +53,210 @@ using namespace dbg;
 
 const int INF = 1e18;
 
-int calc(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+int calc1(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
     a += ab;
-    c += ac;
+    a += ac;
+    // debug(a,ab,ac);
+    int aux4 = min(a%k, ac);
+    a -= aux4;
+    c += aux4;
     c += bc;
+
     int aux = min(c%k, bc);
     c -= aux;
     b += aux;
-    int ans = 0;
-    int aux2 = min((a + abc)%k, abc);
-    a = a + abc - aux2;
-    abc = aux2;
-
-    int aux3 =  min(abc, (b + abc)%k);
-    b = b + abc - aux3;
-    abc = aux3;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
 
     c += abc;
 
+    ans += a/k + ((a%k) ? 1 : 0);
+    ans += b/k + ((b%k) ? 1 : 0);
+    ans += c/k + ((c%k) ? 1 : 0);
+    debug(a,b,c,ab,ac,bc,abc,ans);
+    return ans;
+}
+
+int calc2(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
+    a += ac;
+    a += ab;
+    // debug(a,ab,ac);
+    int aux4 = min(a%k, ab);
+    a -= aux4;
+    b += aux4;
+    b += bc;
+
+    int aux = min(b%k, bc);
+    b -= aux;
+    c += aux;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
+
+    c += abc;
+
+    ans += a/k + ((a%k) ? 1 : 0);
+    ans += b/k + ((b%k) ? 1 : 0);
+    ans += c/k + ((c%k) ? 1 : 0);
+    debug(a,b,c,ab,ac,bc,abc,ans);
+    return ans;
+}
+
+int calc3(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
+    b += ab;
+    b += bc;
+    // debug(a,ab,ac);
+    int aux4 = min(b%k, bc);
+    b -= aux4;
+    c += aux4;
+    c += ac;
+
+    int aux = min(c%k, ac);
+    c -= aux;
+    a += aux;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
+
+    c += abc;
+
+    ans += a/k + ((a%k) ? 1 : 0);
+    ans += b/k + ((b%k) ? 1 : 0);
+    ans += c/k + ((c%k) ? 1 : 0);
+    debug(a,b,c,ab,ac,bc,abc,ans);
+    return ans;
+}
+
+int calc4(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
+    b += bc;
+    b += ab;
+    // debug(a,ab,ac);
+    int aux4 = min(b%k, ab);
+    b -= aux4;
+    a += aux4;
+    a += ac;
+
+    int aux = min(a%k, ac);
+    a -= aux;
+    c += aux;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
+
+    c += abc;
+
+    ans += a/k + ((a%k) ? 1 : 0);
+    ans += b/k + ((b%k) ? 1 : 0);
+    ans += c/k + ((c%k) ? 1 : 0);
+    debug(a,b,c,ab,ac,bc,abc,ans);
+    return ans;
+}
+
+int calc5(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
+    c += ac;
+    c += bc;
+    // debug(a,ab,ac);
+    int aux4 = min(c%k, bc);
+    c -= aux4;
+    b += aux4;
+    b += ab;
+
+    int aux = min(b%k, ab);
+    b -= aux;
+    a += aux;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
+
+    c += abc;
+
+    ans += a/k + ((a%k) ? 1 : 0);
+    ans += b/k + ((b%k) ? 1 : 0);
+    ans += c/k + ((c%k) ? 1 : 0);
+    debug(a,b,c,ab,ac,bc,abc,ans);
+    return ans;
+}
+
+int calc6(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+    int ans = 0;
+    
+    debug(c,bc,ac);
+    c += bc;
+    c += ac;
+    // debug(a,ab,ac);
+    int aux4 = min(c%k, ac);
+    c -= aux4;
+    a += aux4;
+    a += ab;
+
+    int aux = min(a%k, ab);
+    a -= aux;
+    b += aux;
+    // debug(aux4, aux, a, b, c);    
+    if (a%k != 0){    
+        int aux2 = min((a + abc)%k, abc);
+        a = a + abc - aux2;
+        abc = aux2;
+    }
+        
+    if (b%k != 0){
+        int aux3 =  min(abc, (b + abc)%k);
+        b = b + abc - aux3;
+        abc = aux3;
+    }
+
+    c += abc;
 
     ans += a/k + ((a%k) ? 1 : 0);
     ans += b/k + ((b%k) ? 1 : 0);
@@ -90,29 +276,37 @@ void solve(){
     b = b%k;
     c = c%k;
     debug(ans);
+
     int best = INF;
-    //caso base acoplar ab em a
-    best = min(best, calc(a,b,c,ab,bc,ac,abc,k));
+    // //caso base acoplar ab em a
+    // best = min(best, calc(a,b,c,ab,bc,ac,abc,k));
+ 
+    // //acoplar ac em a
+    // best = min(best, calc(a,c,b,ac,bc,ab,abc,k));
+ 
+    // //acoplar ab em b
+    // best = min(best, calc(b,a,c,ab,ac,bc,abc,k));
+ 
+    // //acoplar bc em b
+    // best = min(best, calc(b,c,a,bc,ac,ab,abc,k));
+ 
+    // //acoplar ac em c
+    // best = min(best, calc(c,a,b,ac,ab,bc,abc,k));
+ 
+    // //acoplar bc em c
+    // best = min(best, calc(c,b,a,bc,ab,ac,abc,k));
 
-    //acoplar ac em a
-    best = min(best, calc(a,c,b,ac,bc,ab,abc,k));
-
-    //acoplar ab em b
-    best = min(best, calc(b,a,c,ab,ac,bc,abc,k));
-
-    //acoplar bc em b
-    best = min(best, calc(b,c,a,bc,ab,ac,abc,k));
-
-    //acoplar ac em c
-    best = min(best, calc(c,a,b,ac,ab,bc,abc,k));
-
-    //acoplar bc em c
-    best = min(best, calc(c,b,a,bc,ac,ab,abc,k));
-
+    best = min({best, 
+        calc1(a,b,c,ab,bc,ac,abc,k), 
+        calc2(a,b,c,ab,bc,ac,abc,k), 
+        calc3(a,b,c,ab,bc,ac,abc,k), 
+        calc4(a,b,c,ab,bc,ac,abc,k), 
+        calc5(a,b,c,ab,bc,ac,abc,k), 
+        calc6(a,b,c,ab,bc,ac,abc,k)});
+ 
     debug(best);
     cout << ans + best << endl;
 }
-
 signed main(){
     winton;
     int t;
