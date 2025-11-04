@@ -1,21 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
-
+ 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
 #define int long long
 #define ld long double
-
+ 
 namespace dbg {
     const char* const RESET     = "\033[0m";
     const char* const BOLD_BLUE = "\033[1;34m";
     const char* const YELLOW    = "\033[33m";
     const char* const BOLD_WHITE= "\033[1;37m";
-
+ 
     template<typename T1, typename T2>
     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
+ 
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
         os << '{';
@@ -23,7 +23,7 @@ namespace dbg {
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
         return os << '}';
     }
-
+ 
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
     void debug_out(string_view s, H h, T... t) {
@@ -40,9 +40,9 @@ namespace dbg {
     }
 } 
 using namespace dbg;
-
+ 
 #define DEBUG
-
+ 
 #if defined(DEBUG)
     #define winton (void)0
     #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
@@ -51,70 +51,32 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 3e2+7;
+const int MOD = 43200;
 
-int dp[MAX][MAX][MAX][2];//1 = me, 0 = you -> na verdade vai ser se essa paridade ganha ou nao, entao 1 = sucesso 0 = fail
-int n, nochange, even, change;
-
-
-int pd(int nc, int c, int e, bool p){
-    if (nc + e + c == n){
-        if ((nc+c+e)%2 == 1) return (p == 0);
-        else return (p == 1);
-    }
-    
-    if(dp[nc][c][e][p] != -1LL) return dp[nc][c][e][p];
-    
-    int pos = 0;
-    
-    //se ele jogar uma carta de tal tipo e NAO ganhar, entao a gente ganha
-    if (nc < nochange && !pd(nc+1, e, c, !p)) pos = 1;
-    if (!pos && c < change && !pd(nc, c+1, e, !p)) pos = 1;
-    if (!pos && e < even && !pd(nc, c, e+1, !p)) pos = 1;
-    
-    debug(nc, c, e, p, dp[nc][c][e][p] = pos);
-    return dp[nc][c][e][p] = pos;
-}
-
-signed main () {
+signed main(){
     winton;
-    // int n;
+    int n;
     cin >> n;
-    memset(dp, -1, sizeof(dp));
+    vector<int> a(n);
     for (int i = 0; i < n; i++){
-        char type;
-        int v;
-        cin >> type >> v;
-        v%=2;
-        if (type == '+'){
-            if (v == 0) nochange++;
-            else change++;
-        }
-        else {
-            if (v == 0) even++;
-            else nochange++;
-        }
+        int h, m, s;
+        cin >> h >> m >> s;
+        a[i] = h*3600 + m*60 + s;
+    } 
+    sort(all(a));
+    vector<int> s;
+    for (int i = 1; i < n; i++){
+        s.push_back(min(abs(a[i]-a[i-1]), abs(a[i]-(a[i-1]+MOD))));
     }
-    int x;
-    cin >> x;
-    debug(nochange, change, even);
-    pd(0,0,0,x%2);
-    debug(dp[0][0][0][0],dp[0][0][0][1]);
-    int turn = -1;
-    if (dp[0][0][0][x%2]){
-        cout << "me\n";
-        turn = 0;
+    debug(a, s);
+    int aux = 0;
+    for (int i = n-2; i > 0; i--){
+        aux += a[i] - a[i+1];
+        a[i-1] = (a[i-1] + aux) % MOD;
+        debug(a);
+        debug(aux);
     }
-    else {
-        cout << "you\n";
-        turn = 1;
-    }
-    for (int i = 0; i < n; i++){
-        if (!turn){
-
-        }    
-    }
-
-
-
+    int ans = a[0] - a[1] + aux;
+    debug((ans+MOD)%MOD);
+    cout << (ans+MOD)%MOD << endl;
 }

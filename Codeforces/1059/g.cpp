@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,70 +51,26 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 3e2+7;
+void solve(){
+    int n;
+    cin >> n;
+    if (n == 2){cout << "-1\n"; return;}
+    if (n == 3){cout << "1 3\n2 3\n"; return;}
+    if (n == 4){cout << "1 2\n1 3\n1 4\n"; return;}
 
-int dp[MAX][MAX][MAX][2];//1 = me, 0 = you -> na verdade vai ser se essa paridade ganha ou nao, entao 1 = sucesso 0 = fail
-int n, nochange, even, change;
-
-
-int pd(int nc, int c, int e, bool p){
-    if (nc + e + c == n){
-        if ((nc+c+e)%2 == 1) return (p == 0);
-        else return (p == 1);
-    }
-    
-    if(dp[nc][c][e][p] != -1LL) return dp[nc][c][e][p];
-    
-    int pos = 0;
-    
-    //se ele jogar uma carta de tal tipo e NAO ganhar, entao a gente ganha
-    if (nc < nochange && !pd(nc+1, e, c, !p)) pos = 1;
-    if (!pos && c < change && !pd(nc, c+1, e, !p)) pos = 1;
-    if (!pos && e < even && !pd(nc, c, e+1, !p)) pos = 1;
-    
-    debug(nc, c, e, p, dp[nc][c][e][p] = pos);
-    return dp[nc][c][e][p] = pos;
+    vector<pair<int,int>> ans;
+    ans.emplace_back(1,2);
+    ans.emplace_back(2,3);
+    ans.emplace_back(3,4);
+    for (int i = 5; i <= n-1; i++) ans.emplace_back(2,i);
+    ans.emplace_back(1,n);
+    for (auto [u,v] : ans) cout << u << ' ' << v << endl;
 }
 
 signed main () {
     winton;
-    // int n;
-    cin >> n;
-    memset(dp, -1, sizeof(dp));
-    for (int i = 0; i < n; i++){
-        char type;
-        int v;
-        cin >> type >> v;
-        v%=2;
-        if (type == '+'){
-            if (v == 0) nochange++;
-            else change++;
-        }
-        else {
-            if (v == 0) even++;
-            else nochange++;
-        }
-    }
-    int x;
-    cin >> x;
-    debug(nochange, change, even);
-    pd(0,0,0,x%2);
-    debug(dp[0][0][0][0],dp[0][0][0][1]);
-    int turn = -1;
-    if (dp[0][0][0][x%2]){
-        cout << "me\n";
-        turn = 0;
-    }
-    else {
-        cout << "you\n";
-        turn = 1;
-    }
-    for (int i = 0; i < n; i++){
-        if (!turn){
-
-        }    
-    }
-
-
+    int t;
+    cin >> t;
+    while(t--) solve();
 
 }

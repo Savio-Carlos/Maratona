@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,70 +51,52 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 3e2+7;
+const int MAX = 2e5+7;
 
-int dp[MAX][MAX][MAX][2];//1 = me, 0 = you -> na verdade vai ser se essa paridade ganha ou nao, entao 1 = sucesso 0 = fail
-int n, nochange, even, change;
+int cnt[MAX];
 
-
-int pd(int nc, int c, int e, bool p){
-    if (nc + e + c == n){
-        if ((nc+c+e)%2 == 1) return (p == 0);
-        else return (p == 1);
-    }
-    
-    if(dp[nc][c][e][p] != -1LL) return dp[nc][c][e][p];
-    
-    int pos = 0;
-    
-    //se ele jogar uma carta de tal tipo e NAO ganhar, entao a gente ganha
-    if (nc < nochange && !pd(nc+1, e, c, !p)) pos = 1;
-    if (!pos && c < change && !pd(nc, c+1, e, !p)) pos = 1;
-    if (!pos && e < even && !pd(nc, c, e+1, !p)) pos = 1;
-    
-    debug(nc, c, e, p, dp[nc][c][e][p] = pos);
-    return dp[nc][c][e][p] = pos;
-}
-
-signed main () {
+signed main(){
     winton;
-    // int n;
-    cin >> n;
-    memset(dp, -1, sizeof(dp));
+    int n, m, c;
+    cin >> n >> m >> c;
+    map<int,int> mp;
     for (int i = 0; i < n; i++){
-        char type;
-        int v;
-        cin >> type >> v;
-        v%=2;
-        if (type == '+'){
-            if (v == 0) nochange++;
-            else change++;
-        }
+        int a;
+        cin >> a;
+        mp[a]++;
+    }
+    vector<pair<int,int>> a;
+    for (auto [w, q] : mp){
+        a.push_back({q,w});
+    }
+    debug(mp);
+    debug(a);
+    int nn = a.size();
+    vector<pair<int,int>> pfx(2*nn);
+    for (int i = 0; i < 2*nn; i++){
+        if (i < nn){
+            pfx[i] = a[i];
+            debug(i);
+        } 
         else {
-            if (v == 0) even++;
-            else nochange++;
+            pfx[i].second = a[i%nn].second + m; 
+            pfx[i].first = a[i%nn].first;
         }
+        if (i) pfx[i].first += pfx[i-1].first;
     }
-    int x;
-    cin >> x;
-    debug(nochange, change, even);
-    pd(0,0,0,x%2);
-    debug(dp[0][0][0][0],dp[0][0][0][1]);
-    int turn = -1;
-    if (dp[0][0][0][x%2]){
-        cout << "me\n";
-        turn = 0;
+    debug(pfx);
+    int ans = 0;
+    for (int i = 0; i < nn; i++){
+        int goal = pfx[i].first + c;
+        auto it = lower_bound(pfx.begin(), pfx.end(), make_pair(goal,0LL));
+        debug(*it);
+        int met = (*it).first - pfx[i].first;
+        if (pfx[i].second + 1 == m) ans += met;
+        else ans += (pfx[i+1].second - pfx[i].second) * met;
+        debug(ans);
+        //(pfx[i+1].second - pfx[i].second) saber quantos caras tem essa pfx
     }
-    else {
-        cout << "you\n";
-        turn = 1;
-    }
-    for (int i = 0; i < n; i++){
-        if (!turn){
-
-        }    
-    }
-
-
-
+    cout << ans << endl;
 }
+
+

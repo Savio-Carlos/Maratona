@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,70 +51,50 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 3e2+7;
+const int MAX = 2e5+7;
 
-int dp[MAX][MAX][MAX][2];//1 = me, 0 = you -> na verdade vai ser se essa paridade ganha ou nao, entao 1 = sucesso 0 = fail
-int n, nochange, even, change;
-
-
-int pd(int nc, int c, int e, bool p){
-    if (nc + e + c == n){
-        if ((nc+c+e)%2 == 1) return (p == 0);
-        else return (p == 1);
+void solve(){   
+    int n, m;
+    cin >> n >> m;
+    map<int,vector<int>> shafts;
+    vector<int> score(n,0);//score atualmente no shaft n
+    vector<tuple<int,int,int>> tunnels(m);
+    for (int i = 0; i < m; i++){
+        int l, r, v;
+        cin >> l >> r >> v;
+        l--;
+        r--;
+        tunnels[i] = {l,r,v};
+        shafts[l].push_back(i);
+        shafts[r].push_back(i);
     }
-    
-    if(dp[nc][c][e][p] != -1LL) return dp[nc][c][e][p];
-    
-    int pos = 0;
-    
-    //se ele jogar uma carta de tal tipo e NAO ganhar, entao a gente ganha
-    if (nc < nochange && !pd(nc+1, e, c, !p)) pos = 1;
-    if (!pos && c < change && !pd(nc, c+1, e, !p)) pos = 1;
-    if (!pos && e < even && !pd(nc, c, e+1, !p)) pos = 1;
-    
-    debug(nc, c, e, p, dp[nc][c][e][p] = pos);
-    return dp[nc][c][e][p] = pos;
+    for (int i = m-1; i >= 0; i--){
+        //olhar o proximo tunel abaixo de mim e somar o score dele no meu do lado oposto
+        auto [l,r,v] = tunnels[i];
+        debug(i, l, r);
+
+        int sl = score[l];
+        int sr = score[r];
+
+        score[l] = v + sr;
+        score[r] = v + sl;
+ 
+        debug(score);
+        debug(i, l, score[l], r, score[r]);
+    }
+    debug(score);
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        ans = max(ans, score[i]);
+        debug(i, shafts[i]);
+    }
+    cout << ans << endl;
+    // debug(tunnels);
 }
 
-signed main () {
+signed main(){
     winton;
-    // int n;
-    cin >> n;
-    memset(dp, -1, sizeof(dp));
-    for (int i = 0; i < n; i++){
-        char type;
-        int v;
-        cin >> type >> v;
-        v%=2;
-        if (type == '+'){
-            if (v == 0) nochange++;
-            else change++;
-        }
-        else {
-            if (v == 0) even++;
-            else nochange++;
-        }
-    }
-    int x;
-    cin >> x;
-    debug(nochange, change, even);
-    pd(0,0,0,x%2);
-    debug(dp[0][0][0][0],dp[0][0][0][1]);
-    int turn = -1;
-    if (dp[0][0][0][x%2]){
-        cout << "me\n";
-        turn = 0;
-    }
-    else {
-        cout << "you\n";
-        turn = 1;
-    }
-    for (int i = 0; i < n; i++){
-        if (!turn){
-
-        }    
-    }
-
-
-
+    int t;
+    cin >> t;
+    while(t--)solve();
 }
