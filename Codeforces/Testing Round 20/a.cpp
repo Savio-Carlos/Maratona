@@ -52,73 +52,30 @@ using namespace dbg;
 #endif
 
 const int MAX = 2e5+7;
-const int INF = LLONG_MAX;
 
-int n, m;
-pair<int,int> dist[MAX][2];
-vector<vector<int>> graph;
-
-void djikstra(string s){
-    for (int i = 0; i < n; i++)dist[i][0] = dist[i][1] = {INF,-1};
-    priority_queue<tuple<int,int,int>> pq;//dist, vertice, origem
-
+void first(){
+    int n;
+    cin >> n;
+    string s;
     for (int i = 0; i < n; i++){
-        if (s[i] == 'S'){
-            dist[i][0] = {0,i};
-            pq.push({0,i,i});
-        }
+        int x;
+        cin >> x;
+        s += 'a' + (x-1);
     }
+    cout << s << endl;
+}
 
-    while(!pq.empty()){
-        auto [d, v, o] = pq.top();
-        d = -d;
-        pq.pop();
-        if (d != dist[v][0].first && d != dist[v][1].first) continue;
-        for (auto u : graph[v]){
-            int  novadistancia = d + 1;
-            if (novadistancia < dist[u][0].first && o != dist[u][0].second) {
-                dist[u][0].first = novadistancia;
-                dist[u][0].second = o;
-                pq.push({-novadistancia, u, o});
-            }
-            else if ((novadistancia < dist[u][1].first || dist[u][1].second == -1) && o != dist[u][0].second) {
-                dist[u][1].first = novadistancia;
-                dist[u][1].second = o;
-                pq.push({-novadistancia, u, o});
-            }
-        }
-    }
+void second(){
+    string s;
+    cin >> s;
+    cout << s.size() << endl;
+    for (auto c : s) cout << (c+1) - 'a' << " " ;
 }
 
 signed main(){
     winton;
-    cin >> n >> m;
-    graph.resize(n);
-    for (int i = 0; i < m; i++){
-        int a, b;
-        cin >> a >> b;
-        graph[--a].push_back(--b);
-        graph[b].push_back(a);
-    }
     string s;
     cin >> s;
-    djikstra(s);
-
-    for (int i = 0; i < n; i++){
-        debug(dist[i][0], dist[i][1]);
-        if (s[i] == 'S') continue;
-        int mn1 = INF, mn2 = INF;
-        mn1 = dist[i][0].first;
-        mn2 = dist[i][1].first;
-        // for (auto u : graph[i]){
-        //     if (dist[u][0].first + 1 < mn1){
-        //         mn2 = mn1;
-        //         mn1 = dist[u][0].first + 1;
-        //     } 
-        //     else if (dist[u][0].first + 1 < mn2) mn2 = dist[u][0].first + 1;
-        // }
-        cout << mn1+mn2 << endl;
-    }
+    if (s == "first") first();
+    else second();
 }
-
-

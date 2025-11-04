@@ -52,73 +52,49 @@ using namespace dbg;
 #endif
 
 const int MAX = 2e5+7;
-const int INF = LLONG_MAX;
 
-int n, m;
-pair<int,int> dist[MAX][2];
-vector<vector<int>> graph;
+void solve(){   
+    int n, m;
+    cin >> n >> m;
+    map<int,vector<int>> shafts;
+    vector<int> score(n,0);//score atualmente no shaft n
+    vector<tuple<int,int,int>> tunnels(m);
+    for (int i = 0; i < m; i++){
+        int l, r, v;
+        cin >> l >> r >> v;
+        l--;
+        r--;
+        tunnels[i] = {l,r,v};
+        shafts[l].push_back(i);
+        shafts[r].push_back(i);
+    }
+    for (int i = m-1; i >= 0; i--){
+        //olhar o proximo tunel abaixo de mim e somar o score dele no meu do lado oposto
+        auto [l,r,v] = tunnels[i];
+        debug(i, l, r);
 
-void djikstra(string s){
-    for (int i = 0; i < n; i++)dist[i][0] = dist[i][1] = {INF,-1};
-    priority_queue<tuple<int,int,int>> pq;//dist, vertice, origem
+        int sl = score[l];
+        int sr = score[r];
 
+        score[l] = v + sr;
+        score[r] = v + sl;
+ 
+        debug(score);
+        debug(i, l, score[l], r, score[r]);
+    }
+    debug(score);
+    int ans = 0;
     for (int i = 0; i < n; i++){
-        if (s[i] == 'S'){
-            dist[i][0] = {0,i};
-            pq.push({0,i,i});
-        }
+        ans = max(ans, score[i]);
+        debug(i, shafts[i]);
     }
-
-    while(!pq.empty()){
-        auto [d, v, o] = pq.top();
-        d = -d;
-        pq.pop();
-        if (d != dist[v][0].first && d != dist[v][1].first) continue;
-        for (auto u : graph[v]){
-            int  novadistancia = d + 1;
-            if (novadistancia < dist[u][0].first && o != dist[u][0].second) {
-                dist[u][0].first = novadistancia;
-                dist[u][0].second = o;
-                pq.push({-novadistancia, u, o});
-            }
-            else if ((novadistancia < dist[u][1].first || dist[u][1].second == -1) && o != dist[u][0].second) {
-                dist[u][1].first = novadistancia;
-                dist[u][1].second = o;
-                pq.push({-novadistancia, u, o});
-            }
-        }
-    }
+    cout << ans << endl;
+    // debug(tunnels);
 }
 
 signed main(){
     winton;
-    cin >> n >> m;
-    graph.resize(n);
-    for (int i = 0; i < m; i++){
-        int a, b;
-        cin >> a >> b;
-        graph[--a].push_back(--b);
-        graph[b].push_back(a);
-    }
-    string s;
-    cin >> s;
-    djikstra(s);
-
-    for (int i = 0; i < n; i++){
-        debug(dist[i][0], dist[i][1]);
-        if (s[i] == 'S') continue;
-        int mn1 = INF, mn2 = INF;
-        mn1 = dist[i][0].first;
-        mn2 = dist[i][1].first;
-        // for (auto u : graph[i]){
-        //     if (dist[u][0].first + 1 < mn1){
-        //         mn2 = mn1;
-        //         mn1 = dist[u][0].first + 1;
-        //     } 
-        //     else if (dist[u][0].first + 1 < mn2) mn2 = dist[u][0].first + 1;
-        // }
-        cout << mn1+mn2 << endl;
-    }
+    int t;
+    cin >> t;
+    while(t--)solve();
 }
-
-
