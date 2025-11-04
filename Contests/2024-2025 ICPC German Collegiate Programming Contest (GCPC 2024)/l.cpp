@@ -53,259 +53,87 @@ using namespace dbg;
 
 const int INF = 1e18;
 
-int calc1(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
+int calc(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
     int ans = 0;
-    a += ab;
-    a += ac;
-    // debug(a,ab,ac);
-    int aux4 = min(a%k, ac);
-    a -= aux4;
-    c += aux4;
-    c += bc;
+    int cntA = (a + k - 1) / k;
+    int cntB = (b + k - 1) / k;
+    int cntC = (c + k - 1) / k;
 
-    int aux = min(c%k, bc);
-    c -= aux;
-    b += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
-    }
+    ans += cntA + cntB + cntC;
+    int remA = cntA*k - a;
+    int remB = cntB*k - b;
+    int remC = cntC*k - c;
+    //restante livre em cada letra
 
-    c += abc;
+    //preencher bc em c
+    int needC = min(remC, bc);
+    remC -= needC;
+    bc -= needC;
 
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
-    return ans;
-}
+    //preencher bc em b
+    int needB = min(remB, bc);
+    remB -= needB;
+    bc -= needB;
 
-int calc2(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
-    a += ac;
-    a += ab;
-    // debug(a,ab,ac);
-    int aux4 = min(a%k, ab);
-    a -= aux4;
-    b += aux4;
-    b += bc;
-
-    int aux = min(b%k, bc);
-    b -= aux;
-    c += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
+    //se ainda tem bc preciso passar para B
+    if(bc > 0) {
+        int cntBC = (bc + k - 1) / k;
+        ans += cntBC;
+        remB += cntBC * k - bc; 
+        bc = 0; // bc foi todo processado
     }
 
-    c += abc;
-
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
-    return ans;
-}
-
-int calc3(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
-    b += ab;
-    b += bc;
-    // debug(a,ab,ac);
-    int aux4 = min(b%k, bc);
-    b -= aux4;
-    c += aux4;
-    c += ac;
-
-    int aux = min(c%k, ac);
-    c -= aux;
-    a += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
-    }
-
-    c += abc;
-
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
-    return ans;
-}
-
-int calc4(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
-    b += bc;
-    b += ab;
-    // debug(a,ab,ac);
-    int aux4 = min(b%k, ab);
-    b -= aux4;
-    a += aux4;
-    a += ac;
-
-    int aux = min(a%k, ac);
-    a -= aux;
-    c += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
-    }
-
-    c += abc;
-
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
-    return ans;
-}
-
-int calc5(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
-    c += ac;
-    c += bc;
-    // debug(a,ab,ac);
-    int aux4 = min(c%k, bc);
-    c -= aux4;
-    b += aux4;
-    b += ab;
-
-    int aux = min(b%k, ab);
-    b -= aux;
-    a += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
-    }
-
-    c += abc;
-
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
-    return ans;
-}
-
-int calc6(int a, int b, int c, int ab, int bc, int ac, int abc, int k){
-    int ans = 0;
+    //preencher c e b com abc
+    int needABC = min(abc, remC);
+    abc -= needABC;
+    remC -= needABC;
     
-    debug(c,bc,ac);
-    c += bc;
-    c += ac;
-    // debug(a,ab,ac);
-    int aux4 = min(c%k, ac);
-    c -= aux4;
-    a += aux4;
-    a += ab;
+    //o que sobrou vai pra B
+    int needABC2 = min(abc, remB);
+    abc -= needABC2;
+    remB -= needABC2;
 
-    int aux = min(a%k, ab);
-    a -= aux;
-    b += aux;
-    // debug(aux4, aux, a, b, c);    
-    if (a%k != 0){    
-        int aux2 = min((a + abc)%k, abc);
-        a = a + abc - aux2;
-        abc = aux2;
-    }
-        
-    if (b%k != 0){
-        int aux3 =  min(abc, (b + abc)%k);
-        b = b + abc - aux3;
-        abc = aux3;
-    }
+    //preenchendo c com ac
+    int needAC = min(ac, remC);
+    ac -= needAC;
+    remC -= needAC;
+    
+    //preenchendo b com ab
+    int needAB = min(ab, remB);
+    ab -= needAB;
+    remB -= needAB;
+    
+    //pega o que soborou e que TEM que ir pra A
+    int left = ab + ac + abc;
+    int needA = min(left, remA);
+    remA -= needA;
+    left -= needA;
+    ans += (left + k - 1) / k;
 
-    c += abc;
-
-    ans += a/k + ((a%k) ? 1 : 0);
-    ans += b/k + ((b%k) ? 1 : 0);
-    ans += c/k + ((c%k) ? 1 : 0);
-    debug(a,b,c,ab,ac,bc,abc,ans);
+    debug(ans, remA, remB, remC, left);
     return ans;
 }
+
 
 void solve(){
     int k;
     cin >> k;
     int a, b, c, ab, ac, bc, abc;
     cin >> a >> b >> c >> ab >> bc >> ac >> abc;
-    int ans = 0;
-    ans += a/k + b/k + c/k;
-    a = a%k;
-    b = b%k;
-    c = c%k;
-    debug(ans);
 
     int best = INF;
-    // //caso base acoplar ab em a
-    // best = min(best, calc(a,b,c,ab,bc,ac,abc,k));
- 
-    // //acoplar ac em a
-    // best = min(best, calc(a,c,b,ac,bc,ab,abc,k));
- 
-    // //acoplar ab em b
-    // best = min(best, calc(b,a,c,ab,ac,bc,abc,k));
- 
-    // //acoplar bc em b
-    // best = min(best, calc(b,c,a,bc,ac,ab,abc,k));
- 
-    // //acoplar ac em c
-    // best = min(best, calc(c,a,b,ac,ab,bc,abc,k));
- 
-    // //acoplar bc em c
-    // best = min(best, calc(c,b,a,bc,ab,ac,abc,k));
 
-    best = min({best, 
-        calc1(a,b,c,ab,bc,ac,abc,k), 
-        calc2(a,b,c,ab,bc,ac,abc,k), 
-        calc3(a,b,c,ab,bc,ac,abc,k), 
-        calc4(a,b,c,ab,bc,ac,abc,k), 
-        calc5(a,b,c,ab,bc,ac,abc,k), 
-        calc6(a,b,c,ab,bc,ac,abc,k)});
+    best = min({best,
+        calc(a,b,c,ab,bc,ac,abc,k), 
+        calc(a,c,b,ac,bc,ab,abc,k), 
+        calc(b,a,c,ab,ac,bc,abc,k), 
+        calc(b,c,a,bc,ac,ab,abc,k), 
+        calc(c,a,b,ac,ab,bc,abc,k), 
+        calc(c,b,a,bc,ab,ac,abc,k)
+    });
  
     debug(best);
-    cout << ans + best << endl;
+    cout << best << endl;
 }
 signed main(){
     winton;
