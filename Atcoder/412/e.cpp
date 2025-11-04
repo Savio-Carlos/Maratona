@@ -40,7 +40,8 @@ ai depois pega todos os primos ate a raiz de r e testa os seus expoentes, quando
 
 mas por que o lcm muda quando chegamos num quadrado perfeito (ou qualquer outro n^k)?
 
-meu chute e que os outros numeros podem ser fatorados em varios primos diferentes com um expoente menor, quando encontramos um primo elevado a um expoente k maior que todos os outros vistos ate agora entao esse numero altera nosso lcm
+meu chute e que os outros numeros podem ser fatorados em varios primos diferentes com um expoente menor, 
+quando encontramos um primo elevado a um expoente k maior que todos os outros vistos ate agora entao esse numero altera nosso lcm
 
 quando fatoramos um numero pegamos os primos e sua maior potencia para cada um
 quando fazemos lcm de 1...n o lcm se torna todos os maiores fatores primos que apareceram na fatoracao de todos os numeros 1...n
