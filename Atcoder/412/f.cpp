@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -54,64 +54,58 @@ using namespace dbg;
 const int MOD = 998244353;
 
 int fastExpo(int base, int exp) {
+    base %= MOD;
+    if (base < 0) base += MOD;
     int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base % MOD;
-        base = base * base % MOD;
+    while (exp) {
+        if (exp & 1) res = (res * base) % MOD;
+        base = (base * base) % MOD;
         exp >>= 1;
     }
-    return res%MOD;
+    return res % MOD;
 }
 
 int modiv(int a, int b){
     return ((a%MOD) * fastExpo((b%MOD), MOD-2)) % MOD;
 }
 
-signed main(){
+signed main() {
+    winton;
     int n, c;
     cin >> n >> c;
     vector<int> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    a[c - 1]++;
+
     vector<pair<int,int>> r(n);
-    int tot = 0;
-    for (int i = 0; i < n; i++){
-        cin >> a[i];
-        tot += a[i];
-        r[i] = {a[i], i};
-    } 
-    tot--;
-
-    sort(rall(r));
+    for (int i = 0; i < n; i++) r[i] = {a[i], i};
+    sort(all(r));
     debug(r);
-    
-    vector<int> e(n, 0), pfx(n, 0);
-    for (int i = n-2; i >= 0; i--){
-        if (r[i].first == r[i+1].first){
-            pfx[i] = pfx[i+1];
-        }
-        else {
-            pfx[i] = pfx[i+1] + r[i+1].first; //guuardar quantos menores que eu existem
-        }
-    } 
-    debug(pfx);
 
-    e[0] = modiv(tot, r[0].first - 1);
-    debug(modiv(5,2), modiv(25,8), modiv(21,10), modiv(45,8));
-    debug(e[0]);
-    
-    int acc = 0;
-
-    for (int i = 1; i < n; i++){
-        if (r[i].first == r[i-1].first){
-            e[i] = e[i-1];
-            continue;
-        }
-        acc = (acc + ((e[i-1] * modiv(r[i-1].first, tot)) + modiv(r[i-1].first, tot) % MOD) % MOD) % MOD;
-        debug(acc);
-
-        e[i] = ((r[i].first-1 + pfx[i]) % MOD + (acc * tot) % MOD) % MOD;
-        e[i] = modiv(e[i], tot - pfx[i]);
+    vector<int> sortedA(n + 1), pos(n);
+    for (int i = 0; i < n; i++) {
+        sortedA[i + 1] = r[i].first;
+        pos[r[i].second] = i + 1;
     }
 
-    debug(e);
+    vector<int> pfx(n + 1, 0);
+    int tot = 0;
+    for (int i = 1; i <= n; i++) {
+        tot += sortedA[i];
+        pfx[i] = pfx[i - 1] + sortedA[i];
+    }
+    int S = tot - 1;
 
+    vector<int> e_sorted(n + 1, 0);
+    int acc = 0;
+
+    for (int i = n; i >= 1; i--) {
+        e_sorted[i] = modiv(S % MOD + acc % MOD, (S - pfx[i - 1] % MOD + MOD) % MOD);
+        acc = (acc + (sortedA[i] % MOD) * (e_sorted[i] % MOD)) % MOD;
+    }
+
+    vector<int> e(n, 0);
+    for (int i = 0; i < n; i++) e[i] = e_sorted[pos[i]];
+
+    cout << (e[c - 1] % MOD + MOD) % MOD << endl;
 }
