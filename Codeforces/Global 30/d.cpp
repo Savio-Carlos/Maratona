@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -63,39 +63,76 @@ void solve(){
         return;
     }
     int k = kmax;
-
-    map<char, int> lastt;
-    map<char, int> lasts;
-    for (int i = 0; i < n; i++) lastt[t[i]] = i;
-    for (int i = 0; i < n; i++) lasts[s[i]] = i;
-    
-    debug(lasts);
-    debug(lastt);
-    vector<string> ans;
-
-    while (k--){
-        if (s == t) break;
-        for (int i = n-1; i > 0; i--){
-            if (s[i] != t[i] && (s[i-1]) == t[i]) s[i] = s[i-1];
-            else if (lastt[s[i-1]] >= i && lasts[s[i-1]] == i-1){//tenho um cara la pra frente entao preciso propagar
-                s[i] = s[i-1];
-            }
-            //falta uns if aqui
-        }
-
-        debug(s);
-        ans.push_back(s);
-        for (int i = 0; i < n; i++) lastt[t[i]] = i;
-        for (int i = 0; i < n; i++) lasts[s[i]] = i;
-
-        if (s == t) break;
+    map<char, vector<int>> occ;
+    for (int i = 0; i < n; i++){
+        occ[s[i]].push_back(i);
     }
-    if (s != t){
+
+    vector<vector<int>> next (n, vector<int> (26));
+    
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < 26; j++){
+            auto it = lower_bound(occ[j + 'a'].begin(), occ[j + 'a'].end(), i);
+            int x = 0;
+            if (it == occ[j + 'a'].end()) x = -1;
+            else x = *it;
+            // debug(x);
+            next[i][j] = x;
+        }
+    }
+    // debug(next);
+
+    int fk = -1;
+    vector<int> pk;
+    for (int k = 1; k <= kmax; k++){
+        if (fk != -1) break;
+        bool falhou = false;
+        vector<int> p(n, 0);
+
+        for (int j = 0; j < n; j++){
+            int pmin = max(0LL, j - k);
+            if (j) pmin = max(pmin, p[j-1]);
+            int pmax = j;
+
+            int pos = next[pmin][t[j] - 'a'] ;
+            // debug(pos);     
+            if (pos == -1 || pos > pmax){
+                falhou = true;  
+                break;
+            } 
+            p[j] = pos;
+        }
+        // debug(p);
+        if (!falhou){
+            pk = p;
+            fk = k;
+        } 
+    }
+    debug(fk, pk);
+    if (fk == -1){
         cout << "-1\n";
         return;
     }
-    cout << kmax - k << endl;
-    for (auto r : ans) cout << r << endl;
+    vector<vector<int>> ans(fk);
+    ans[fk-1] = pk;
+    for (int i = fk-2; i >= 0; i--){
+        vector<int> cur;
+        auto prox = ans[i+1];
+        for (int j = 0; j < n; j++){
+            if (prox[j] == j) cur.push_back(prox[j]);
+            else cur.push_back(prox[j]+1);
+        }
+        ans[i] = cur;
+    }
+    debug(ans);
+    cout << fk << endl;
+    for (int i = 0; i < fk; i++){
+        string si = "";
+        for (int j = 0; j < n; j++){
+            si += s[ans[i][j]];
+        }
+        cout << si << endl;
+    }
 }
 
 signed main () {
