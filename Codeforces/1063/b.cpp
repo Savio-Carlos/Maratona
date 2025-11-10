@@ -4,7 +4,7 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
 
 namespace dbg {
@@ -51,86 +51,62 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int INF = 1e18;
+
 void solve(){
-    int n, kmax;
-    cin >> n >> kmax;
-    string s, t;
-    cin >> s >> t;
-    if (s == t){
-        cout << 0 << endl;
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    string x, s;
+    map<int,int> posicao;
+    for (int i = 0; i < n; i++){
+        cin >> a[i];
+        posicao[a[i]] = i+1;
+        s += "0";
+    } 
+    cin >> x;
+    if (x[0] == '1' || x[n-1] == '1'){
+        cout << "-1" << endl;
         return;
     }
-    int k = kmax;
-    map<char, vector<int>> occ;
-    for (int i = 0; i < n; i++){
-        occ[s[i]].push_back(i);
-    }
-
-    vector<vector<int>> next (n, vector<int> (26));
+    vector<int> menorL(a), maiorL(a), menorR(a), maiorR(a);
     
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < 26; j++){
-            auto it = lower_bound(occ[j + 'a'].begin(), occ[j + 'a'].end(), i);
-            int x = 0;
-            if (it == occ[j + 'a'].end()) x = -1;
-            else x = *it;
-            // debug(x);
-            next[i][j] = x;
-        }
+    for (int i = 1; i < n; i++){
+        menorL[i] = min(menorL[i-1], a[i]);
+        maiorL[i] = max(maiorL[i-1], a[i]);
     }
-    // debug(next);
-
-    int fk = -1;
-    vector<int> pk;
-    for (int k = 1; k <= kmax; k++){
-        if (fk != -1) break;
-        bool falhou = false;
-        vector<int> p(n, 0);
-
-        for (int j = 0; j < n; j++){
-            int pmin = max(0, j - k);
-            if (j) pmin = max(pmin, p[j-1]);
-            int pmax = j;
-
-            int pos = next[pmin][t[j] - 'a'] ;
-            // debug(pos);     
-            if (pos == -1 || pos > pmax){
-                falhou = true;  
-                break;
-            } 
-            p[j] = pos;
-        }
-        // debug(p);
-        if (!falhou){
-            pk = p;
-            fk = k;
-        } 
+    for (int i = n-2; i >= 0; i--){
+        menorR[i] = min(menorR[i+1], a[i]);
+        maiorR[i] = max(maiorR[i+1], a[i]);
     }
-    debug(fk, pk);
-    if (fk == -1){
-        cout << "-1\n";
-        return;
-    }
-    cout << fk << endl;
-    auto q = pk;
-    string cur = s;
 
-    for (int i = 0; i < fk; i++) {
-        string next = "";
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) next += cur[j-1];
-            else next += cur[j];
-        }
-
-        cout << next << endl;
-        cur = next;
-
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) {
-                q[j]++;
+    // debug(menorL);
+    // debug(maiorR);
+    // debug(menorR);
+    // debug(maiorL);
+    
+    bool pos = false;
+    for (int i = 0; i < n; ++i) {
+        if (x[i] == '1') {
+            pos = true;
+            int cur = i + 1;
+            if (cur == 1 || cur == n || cur == posicao[1] || cur == posicao[n]) {
+                cout << -1 << "\n";
+                return;
             }
         }
     }
+    if (!pos) {
+        cout << 0 << "\n";
+        return;
+    }
+
+    cout << 5 << endl;
+    cout << 1 << " " << n << endl;
+    cout << 1 << " " << posicao[1] << endl;
+    cout << 1 << " " << posicao[n] << endl;
+    cout << posicao[1] << " " << n << endl;
+    cout << posicao[n] << " " << n << endl;
 }
 
 signed main () {

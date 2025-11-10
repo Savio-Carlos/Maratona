@@ -4,7 +4,7 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
 
 namespace dbg {
@@ -51,86 +51,19 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int INF = LLONG_MAX;
+
 void solve(){
-    int n, kmax;
-    cin >> n >> kmax;
-    string s, t;
-    cin >> s >> t;
-    if (s == t){
-        cout << 0 << endl;
-        return;
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    sort(all(a));
+    bool pos = true;
+    for (int i = 1; i < n-1; i+= 2){
+        if (a[i] != a[i+1]) pos = false;
     }
-    int k = kmax;
-    map<char, vector<int>> occ;
-    for (int i = 0; i < n; i++){
-        occ[s[i]].push_back(i);
-    }
-
-    vector<vector<int>> next (n, vector<int> (26));
-    
-    for (int i = 0; i < n; i++){
-        for (int j = 0; j < 26; j++){
-            auto it = lower_bound(occ[j + 'a'].begin(), occ[j + 'a'].end(), i);
-            int x = 0;
-            if (it == occ[j + 'a'].end()) x = -1;
-            else x = *it;
-            // debug(x);
-            next[i][j] = x;
-        }
-    }
-    // debug(next);
-
-    int fk = -1;
-    vector<int> pk;
-    for (int k = 1; k <= kmax; k++){
-        if (fk != -1) break;
-        bool falhou = false;
-        vector<int> p(n, 0);
-
-        for (int j = 0; j < n; j++){
-            int pmin = max(0, j - k);
-            if (j) pmin = max(pmin, p[j-1]);
-            int pmax = j;
-
-            int pos = next[pmin][t[j] - 'a'] ;
-            // debug(pos);     
-            if (pos == -1 || pos > pmax){
-                falhou = true;  
-                break;
-            } 
-            p[j] = pos;
-        }
-        // debug(p);
-        if (!falhou){
-            pk = p;
-            fk = k;
-        } 
-    }
-    debug(fk, pk);
-    if (fk == -1){
-        cout << "-1\n";
-        return;
-    }
-    cout << fk << endl;
-    auto q = pk;
-    string cur = s;
-
-    for (int i = 0; i < fk; i++) {
-        string next = "";
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) next += cur[j-1];
-            else next += cur[j];
-        }
-
-        cout << next << endl;
-        cur = next;
-
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) {
-                q[j]++;
-            }
-        }
-    }
+    cout << (pos ? "YES\n" : "NO\n");
 }
 
 signed main () {

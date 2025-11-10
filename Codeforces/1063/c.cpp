@@ -4,7 +4,7 @@ using namespace std;
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
-#define ll long long
+#define int long long
 #define ld long double
 
 namespace dbg {
@@ -51,86 +51,50 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int INF = 1e18;
+
 void solve(){
-    int n, kmax;
-    cin >> n >> kmax;
-    string s, t;
-    cin >> s >> t;
-    if (s == t){
-        cout << 0 << endl;
-        return;
-    }
-    int k = kmax;
-    map<char, vector<int>> occ;
-    for (int i = 0; i < n; i++){
-        occ[s[i]].push_back(i);
-    }
+    int n;
+    cin >> n;
+    vector<int> cima(n), baixo(n);
+    for (auto &u : cima) cin >> u;
+    for (auto &u : baixo) cin >> u;
 
-    vector<vector<int>> next (n, vector<int> (26));
+    vector<int> menorLC(cima), maiorLC(cima), menorRC(cima), maiorRC(cima);
+    vector<int> menorLB(baixo), maiorLB(baixo), menorRB(baixo), maiorRB(baixo);
     
+    for (int i = 1; i < n; i++){
+        menorLC[i] = min(menorLC[i-1], cima[i]);
+        maiorLC[i] = max(maiorLC[i-1], cima[i]);
+        menorLB[i] = min(menorLB[i-1], baixo[i]);
+        maiorLB[i] = max(maiorLB[i-1], baixo[i]);
+    }
+    for (int i = n-2; i >= 0; i--){
+        menorRC[i] = min(menorRC[i+1], cima[i]);
+        maiorRC[i] = max(maiorRC[i+1], cima[i]);
+        menorRB[i] = min(menorRB[i+1], baixo[i]);
+        maiorRB[i] = max(maiorRB[i+1], baixo[i]);
+    }
+
+    vector<vector<int>> grid((2*n)+3);
+
     for (int i = 0; i < n; i++){
-        for (int j = 0; j < 26; j++){
-            auto it = lower_bound(occ[j + 'a'].begin(), occ[j + 'a'].end(), i);
-            int x = 0;
-            if (it == occ[j + 'a'].end()) x = -1;
-            else x = *it;
-            // debug(x);
-            next[i][j] = x;
-        }
+        int y = min(menorLC[i], menorRB[i]); 
+        int x = max(maiorLC[i], maiorRB[i]); 
+        grid[y].push_back(x);
     }
-    // debug(next);
 
-    int fk = -1;
-    vector<int> pk;
-    for (int k = 1; k <= kmax; k++){
-        if (fk != -1) break;
-        bool falhou = false;
-        vector<int> p(n, 0);
+    int ans = 0;
+    int curmn = INF;
 
-        for (int j = 0; j < n; j++){
-            int pmin = max(0, j - k);
-            if (j) pmin = max(pmin, p[j-1]);
-            int pmax = j;
-
-            int pos = next[pmin][t[j] - 'a'] ;
-            // debug(pos);     
-            if (pos == -1 || pos > pmax){
-                falhou = true;  
-                break;
-            } 
-            p[j] = pos;
-        }
-        // debug(p);
-        if (!falhou){
-            pk = p;
-            fk = k;
-        } 
+    for (int l = 2*n; l >= 1; l--){
+        for (auto x : grid[l]) curmn = min(curmn, x);
+        if (curmn == INF) continue;
+        int need = max(l, curmn);
+        if (need <= 2*n) ans += (2*n - need + 1);
     }
-    debug(fk, pk);
-    if (fk == -1){
-        cout << "-1\n";
-        return;
-    }
-    cout << fk << endl;
-    auto q = pk;
-    string cur = s;
 
-    for (int i = 0; i < fk; i++) {
-        string next = "";
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) next += cur[j-1];
-            else next += cur[j];
-        }
-
-        cout << next << endl;
-        cur = next;
-
-        for (int j = 0; j < n; j++) {
-            if (q[j] < j) {
-                q[j]++;
-            }
-        }
-    }
+    cout << ans << endl;
 }
 
 signed main () {
