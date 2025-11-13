@@ -51,66 +51,27 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int P = 31; 
-const int MOD = 972663749;
+void solve(){
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    int sum = accumulate(all(a), 0LL);
 
-// signed main(){
-//     winton;
-//     string s, t;
-//     cin >> t >> s;
+    vector<int> dp(n+2, 0);
+    a.push_back(0);
 
-//     int S = s.size(), T = t.size();
-    
-//     vector<int> p_pow(max(S, T)); 
-//     p_pow[0] = 1; 
-//     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-    
-//     vector<int> h(T + 1, 0); 
-//     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
-    
-//     int h_s = 0; 
-//     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
-    
-//     debug(h_s, h[T-1]);
-//     vector<int> occurrences;
-//     for (int i = 0; i + S - 1 < T; i++) {
-//         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
-//         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
-//     }
-//     cout << occurrences.size() << endl;
-// }
-
-
-//implementacao minha
-vector<int> kmp(string s){
-    int n = s.size(), pfxlen = 0;
-    vector<int> a(n, 0);
-    for (int i = 1; i < n; i++){
-        if (s[i] == s[pfxlen]){
-            a[i] = ++pfxlen;
-        }
-        else if (pfxlen){
-            pfxlen = a[pfxlen-1];
-            i--;
-        }
-        else a[i] = 0;
+    for (int i = n-1; i >= 0; i--){
+        dp[i] = max(a[i] - dp[i+1], a[i] + a[i+1] - dp[i+2]);
     }
-    return a;
+    debug(dp);
+    int ans = (sum + dp[0]) / 2;
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
-    string s, t;
-    cin >> t >> s;
-    vector<int> a = kmp(s);
-
-    int ans = 0;
-    debug(a);
-
-    for (int i = 0, j = 0; i < t.size(); i++){
-        while (j and s[j] != t[i]) j = a[j-1];
-		if (s[j] == t[i]) j++;
-		if (j == s.size()) ans++, j = a[j-1];
-    }
-    cout << ans << endl;
+    int t;
+    cin >> t;
+    while(t--) solve();
 }

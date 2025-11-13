@@ -51,66 +51,49 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int P = 31; 
-const int MOD = 972663749;
-
-// signed main(){
-//     winton;
-//     string s, t;
-//     cin >> t >> s;
-
-//     int S = s.size(), T = t.size();
-    
-//     vector<int> p_pow(max(S, T)); 
-//     p_pow[0] = 1; 
-//     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-    
-//     vector<int> h(T + 1, 0); 
-//     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
-    
-//     int h_s = 0; 
-//     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
-    
-//     debug(h_s, h[T-1]);
-//     vector<int> occurrences;
-//     for (int i = 0; i + S - 1 < T; i++) {
-//         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
-//         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
-//     }
-//     cout << occurrences.size() << endl;
-// }
-
-
-//implementacao minha
-vector<int> kmp(string s){
-    int n = s.size(), pfxlen = 0;
-    vector<int> a(n, 0);
-    for (int i = 1; i < n; i++){
-        if (s[i] == s[pfxlen]){
-            a[i] = ++pfxlen;
+vector<int> manacher_odd(string s) {
+    int n = s.size();
+    s = "$" + s + "^";
+    vector<int> p(n + 2);
+    int l = 0, r = 1;
+    for(int i = 1; i <= n; i++) {
+        p[i] = min(r - i, p[l + (r - i)]);
+        while(s[i - p[i]] == s[i + p[i]]) {
+            p[i]++;
         }
-        else if (pfxlen){
-            pfxlen = a[pfxlen-1];
-            i--;
+        if(i + p[i] > r) {
+            l = i - p[i];
+            r = i + p[i];
         }
-        else a[i] = 0;
     }
-    return a;
+    return vector<int>(begin(p) + 1, end(p) - 1);
 }
 
-signed main(){
-    winton;
-    string s, t;
-    cin >> t >> s;
-    vector<int> a = kmp(s);
-
-    int ans = 0;
-    debug(a);
-
-    for (int i = 0, j = 0; i < t.size(); i++){
-        while (j and s[j] != t[i]) j = a[j-1];
-		if (s[j] == t[i]) j++;
-		if (j == s.size()) ans++, j = a[j-1];
+vector<int> manacher(string s) {
+    string t;
+    for(auto c: s) {
+        t += string("#") + c;
     }
+    auto res = manacher_odd(t + "#");
+    return res;
+}
+
+signed main() {
+    winton;
+    string s;
+    cin >> s;
+    
+    vector<int> mnc = manacher(s);
+    vector<pair<int,int>> palindromes;
+    for (int i = 0; i < mnc.size(); i++){
+        if (mnc[i]-1 > 0){
+            palindromes.push_back({mnc[i]-1,i});//guarda os palindromes com {tamanho, centro}
+        }
+    }
+
+    sort(rall(palindromes));//ordena pelos maiores(opicional ne)
+    auto [size, centro] = palindromes[0];
+    int st = ((centro - size)/2);
+    string ans = s.substr(st, size);
     cout << ans << endl;
 }

@@ -54,63 +54,48 @@ using namespace dbg;
 const int P = 31; 
 const int MOD = 972663749;
 
-// signed main(){
-//     winton;
-//     string s, t;
-//     cin >> t >> s;
+struct hashing {
+    vector<int> h, p_pow;
+    string s;
+    int n;
+    
+    hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size(), 0) {} 
 
-//     int S = s.size(), T = t.size();
-    
-//     vector<int> p_pow(max(S, T)); 
-//     p_pow[0] = 1; 
-//     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-    
-//     vector<int> h(T + 1, 0); 
-//     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
-    
-//     int h_s = 0; 
-//     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
-    
-//     debug(h_s, h[T-1]);
-//     vector<int> occurrences;
-//     for (int i = 0; i + S - 1 < T; i++) {
-//         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
-//         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
-//     }
-//     cout << occurrences.size() << endl;
-// }
+    void build(){
+        p_pow[0] = 1; 
 
-
-//implementacao minha
-vector<int> kmp(string s){
-    int n = s.size(), pfxlen = 0;
-    vector<int> a(n, 0);
-    for (int i = 1; i < n; i++){
-        if (s[i] == s[pfxlen]){
-            a[i] = ++pfxlen;
-        }
-        else if (pfxlen){
-            pfxlen = a[pfxlen-1];
-            i--;
-        }
-        else a[i] = 0;
+        for (int i = 1; i < n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+        for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
     }
-    return a;
-}
+    
+
+    int get_hash(int l, int len){
+        int r = l + len;
+        return ((h[r] + MOD - h[l]) % MOD);
+    }
+
+    bool equal_substrings(int len) {
+        if (!len) return true;
+
+        int h1 = get_hash(0, len);
+        int h2 = get_hash(n - len, len);
+
+        int left  = (h1 * p_pow[n-len]) % MOD;
+        int right = (h2) % MOD;
+        return left == right;
+    }
+};
 
 signed main(){
     winton;
-    string s, t;
-    cin >> t >> s;
-    vector<int> a = kmp(s);
+    string s;
+    cin >> s;
 
-    int ans = 0;
-    debug(a);
+    hashing hash(s);
+    hash.build();
+    debug(hash.h);
 
-    for (int i = 0, j = 0; i < t.size(); i++){
-        while (j and s[j] != t[i]) j = a[j-1];
-		if (s[j] == t[i]) j++;
-		if (j == s.size()) ans++, j = a[j-1];
+    for (int i = 1; i < s.size(); i++){
+        if (hash.equal_substrings(i)) cout << i << " ";
     }
-    cout << ans << endl;
 }
