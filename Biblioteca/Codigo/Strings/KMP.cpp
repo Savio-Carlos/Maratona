@@ -18,9 +18,7 @@ vector<int> kmp(string s){
     int n = s.size(), pfxlen = 0;
     vector<int> a(n, 0);
     for (int i = 1; i < n; i++){
-        if (s[i] == s[pfxlen]){
-            a[i] = ++pfxlen;
-        }
+        if (s[i] == s[pfxlen]) a[i] = ++pfxlen;
         else if (pfxlen){
             pfxlen = a[pfxlen-1];
             i--;
