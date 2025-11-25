@@ -53,11 +53,36 @@ using namespace dbg;
 
 const int INF = 1e18;
 const int MOD = 998244353;
+const int MAX = 5e3+7;
+
+int dp[MAX];//numero de conjuntos que a cor i n foi usada
+int cnt[MAX];
 
 void solve(){
     int n;
     cin >> n;
+    vector<int> a(n);
+    int mx = 0;
+    memset(dp, 0, sizeof(dp));
+    memset(cnt, 0, sizeof(cnt));
 
+    for (auto &u : a){
+        cin >> u;
+        mx = max(mx, ++cnt[u]);
+    }
+    dp[0] = 1;
+
+    for (int i = 0; i <= n; i++){
+        if (cnt[i]){
+            for (int j = n; j >= cnt[i]; j--){
+                dp[j] = (dp[j] + cnt[i] * (dp[j - cnt[i]]) % MOD) % MOD;
+                debug(i, j, dp[j]);
+            }
+        }
+    }
+    int ans = 0;
+    for (int i = mx; i <= n; i++) ans = (ans + dp[i]) % MOD;
+    cout << ans << endl;
 }
 
 
