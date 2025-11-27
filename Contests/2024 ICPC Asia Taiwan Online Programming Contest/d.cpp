@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -83,13 +83,19 @@ signed main(){
 
     int tot = 0, ans = 0;
 
-    for (auto &i : grid) for (auto &j : i) {cin >> j; if (j == '?') tot++;};
+    for (auto &i : grid) for (auto &j : i) cin >> j;
     
+    debug(modiv(15, 16));
+    debug(modiv(7, 4));
+
     for (int i = 0; i < n; i++){
         for (int j = 0; j < m; j++){
+            
             int a2 = 0;
             int a1 = 0;
             int a0 = 0;
+
+            int mn = 0;
             
             for (auto x : dx){
                 for (auto y : dy){
@@ -97,22 +103,59 @@ signed main(){
                         if (grid[i+x][j+y] == '?'){
                             if (abs(x) + abs(y) == 2) a0++;
                             else if (abs(x) + abs(y) == 1) a1++;
-                            else a0++;
+                            else a2++;
                         }
+                        else if (grid[i+x][j+y] == 'V'){
+                            if (abs(x) + abs(y) == 2) mn = max(d0, mn);
+                            else if (abs(x) + abs(y) == 1) mn = max(d1, mn);
+                            else mn = max(d2, mn);
+                        }  
                     }
                 }
             }
-            int around = fastExpo(2LL, a0 + a1 + a2);
-            debug(i, j, a2, a1, a0, around);
-
-            ans = ans + ((around - modiv(around, fastExpo(2LL,a2))) * d2);
-            around = around - modiv(around, fastExpo(2LL,a2));
-            ans = ans + ((around - modiv(around, fastExpo(2LL,a1))) * d1);
-            around = around - modiv(around, fastExpo(2LL,a1));
-            ans = ans + ((around - modiv(around, fastExpo(2LL,a0))) * d0);
-            around = around - modiv(around, fastExpo(2LL,a0));
+            // cout << "-------------------viado-----------------------\n";
+            if (!a0 && !a1 && !a2){
+                debug(ans, mn, i, j);
+                ans += mn;
+                continue;
+            } 
+            int poss = fastExpo(2LL, a0 + a1 + a2);
+            int all = poss;
+            debug(i, j, a2, a1, a0, poss, mn);
+           
+            int qtd2 = poss - modiv(poss, fastExpo(2LL, a2)) % MOD; // em quantas possibilidades eu viro d2
+            ans = (ans + (modiv(qtd2, all) * d2 % MOD)) % MOD;
+            poss = poss - qtd2;
+            debug(ans,poss, qtd2);
+            if (mn == d2){
+                ans = (ans + (modiv(poss,all) * mn) % MOD) % MOD;
+                debug(ans);
+                continue;
+            }
+            int qtd1 = poss - modiv(poss, fastExpo(2LL, a1)) % MOD; // em quantas possibilidades eu viro d1
+            ans = (ans + (modiv(qtd1, all) * d1 % MOD)) % MOD;
+            poss = poss - qtd1;
+            debug(ans,poss, qtd1);
+            if (mn == d1){
+                ans = (ans + (modiv(poss,all) * mn) % MOD) % MOD;
+                debug(ans);
+                continue;
+            }
+            int qtd0 = poss - modiv(poss, fastExpo(2LL, a0)) % MOD; // em quantas possibilidades eu viro d0
+            ans = (ans + (modiv(qtd0, all) * d0 % MOD)) % MOD;
+            poss = poss - qtd0;
+            debug(ans,poss, qtd0);
+            if (mn == d0){
+                ans = (ans + (modiv(poss,all) * mn) % MOD) % MOD;
+                debug(ans);
+                continue;
+            }
             
+
             debug(ans);
+            
         }
     }
+    debug(ans);
+    cout << ans << endl;
 }
