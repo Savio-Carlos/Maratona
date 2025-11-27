@@ -51,52 +51,68 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int INF = 1e18;
-const int MOD = 998244353;
-const int MAX = 5e3+7;
+const int MOD = 1e9+7;
 
-/*
-frequencia de cada elemento determina o tamanho minimo maximo de conjuntos que consigo fazer onde aquele valor e o modo
-existem cnt[i] maneiras de escolher o elemento i como modo e adicionar no conjunto S
-knapsack onde o peso e cnt[i]
-dp[j] conta quantos subsets de tamanho j sao possiveis, considerando 
-quantas maneiras eu tenho de adicionar x ao tamanho
-*/
+int dx[] = {-1, 0, 1};
+int dy[] = {-1, 0, 1};
+int n, m, d0, d1, d2;
 
-int dp[MAX];//numero de conjuntos de tamanho i
-int cnt[MAX];
-
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n);
-    int mx = 0;
-    memset(dp, 0, sizeof(dp));
-    memset(cnt, 0, sizeof(cnt));
-
-    for (auto &u : a){
-        cin >> u;
-        mx = max(mx, ++cnt[u]);
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base % MOD;
+        base = base * base % MOD;
+        exp >>= 1;
     }
-    dp[0] = 1;
-
-    for (int i = 0; i <= n; i++){
-        if (cnt[i]){
-            for (int j = n; j >= cnt[i]; j--){
-                dp[j] = (dp[j] + cnt[i] * (dp[j - cnt[i]]) % MOD) % MOD;
-                debug(i, j, dp[j]);
-            }
-        }
-    }
-    int ans = 0;
-    for (int i = mx; i <= n; i++) ans = (ans + dp[i]) % MOD;
-    cout << ans << endl;
+    return res%MOD;
 }
 
+int modiv(int a, int b){
+    return (a%MOD * fastExpo(b, MOD-2)) % MOD;
+}
+
+bool valid(int x, int y){
+    return (x >= 0 && x < n && y >= 0 && y < m);
+}
 
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    cin >> n >> m >> d2 >> d1 >> d0;
+
+    vector<vector<char>> grid(n, vector<char>(m));
+
+    int tot = 0, ans = 0;
+
+    for (auto &i : grid) for (auto &j : i) {cin >> j; if (j == '?') tot++;};
+    
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < m; j++){
+            int a2 = 0;
+            int a1 = 0;
+            int a0 = 0;
+            
+            for (auto x : dx){
+                for (auto y : dy){
+                    if (valid(i+x, j+y)){
+                        if (grid[i+x][j+y] == '?'){
+                            if (abs(x) + abs(y) == 2) a0++;
+                            else if (abs(x) + abs(y) == 1) a1++;
+                            else a0++;
+                        }
+                    }
+                }
+            }
+            int around = fastExpo(2LL, a0 + a1 + a2);
+            debug(i, j, a2, a1, a0, around);
+
+            ans = ans + ((around - modiv(around, fastExpo(2LL,a2))) * d2);
+            around = around - modiv(around, fastExpo(2LL,a2));
+            ans = ans + ((around - modiv(around, fastExpo(2LL,a1))) * d1);
+            around = around - modiv(around, fastExpo(2LL,a1));
+            ans = ans + ((around - modiv(around, fastExpo(2LL,a0))) * d0);
+            around = around - modiv(around, fastExpo(2LL,a0));
+            
+            debug(ans);
+        }
+    }
 }

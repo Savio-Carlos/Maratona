@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,46 +51,55 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int INF = 1e18;
-const int MOD = 998244353;
-const int MAX = 5e3+7;
-
-/*
-frequencia de cada elemento determina o tamanho minimo maximo de conjuntos que consigo fazer onde aquele valor e o modo
-existem cnt[i] maneiras de escolher o elemento i como modo e adicionar no conjunto S
-knapsack onde o peso e cnt[i]
-dp[j] conta quantos subsets de tamanho j sao possiveis, considerando 
-quantas maneiras eu tenho de adicionar x ao tamanho
-*/
-
-int dp[MAX];//numero de conjuntos de tamanho i
-int cnt[MAX];
-
 void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n);
-    int mx = 0;
-    memset(dp, 0, sizeof(dp));
-    memset(cnt, 0, sizeof(cnt));
+    int n, m, q;
+    cin >> n >> m >> q;
+    vector<int> a(n), b(m);
+    for (auto &u : a) cin >> u;
+    for (auto &u : b) cin >> u;
+    sort(rall(a));
+    sort(rall(b));
 
-    for (auto &u : a){
-        cin >> u;
-        mx = max(mx, ++cnt[u]);
-    }
-    dp[0] = 1;
+    vector<int> pfxa(n+1), pfxb(m+1);
+    
+    for (int i = 1; i <= n; i++){
+        pfxa[i] = a[i-1];
+        pfxa[i] += pfxa[i-1];
+    } 
+    for (int i = 1; i <= m; i++){
+        pfxb[i] = b[i-1];
+        pfxb[i] += pfxb[i-1];
+    } 
+    
+    debug(pfxa, pfxb);
 
-    for (int i = 0; i <= n; i++){
-        if (cnt[i]){
-            for (int j = n; j >= cnt[i]; j--){
-                dp[j] = (dp[j] + cnt[i] * (dp[j - cnt[i]]) % MOD) % MOD;
-                debug(i, j, dp[j]);
-            }
+    while (q--){
+        int x, y, z;
+        cin >> x >> y >> z;
+        if (!z) {cout << 0 << endl; continue;}
+        int l = max(0LL, z-y);
+        int r = min(z, x);
+
+        while (l + 2 < r){
+            int m1 = l + (r-l)/3;
+            int m2 = r - (r-l)/3;
+            debug(m1,m2, l, r);
+
+            int ans1 = pfxa[min(x, m1)] + pfxb[min(y, (z-m1 < 0 ? 0 : z-m1))];
+            int ans2 = pfxa[min(x, m2)] + pfxb[min(y, (z-m2 < 0 ? 0 : z-m2))];
+            debug(ans1, ans2);
+
+            if (ans1 > ans2) r = m2;
+            else if (ans1 < ans2) l = m1;
+            else {l = m1, r = m2;}
         }
+        int ans = 0;
+        for (int i = l; i <= r; i++){
+            ans = max(ans, pfxa[i] + pfxb[z-i]);
+        }
+        cout << ans << endl;
     }
-    int ans = 0;
-    for (int i = mx; i <= n; i++) ans = (ans + dp[i]) % MOD;
-    cout << ans << endl;
+
 }
 
 
