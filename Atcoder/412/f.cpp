@@ -22,7 +22,7 @@ namespace dbg {
         bool first = true;
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
         return os << '}';
-    }
+    } 
 
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>

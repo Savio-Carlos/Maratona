@@ -51,42 +51,62 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    queue<int> d, t, r;
-    for (int i = 1; i <= n; i++){
-        if (i%2 == 0) d.push(i);
-        else if (i%3 == 0) t.push(i);
-        else r.push(i);
+const int MOD = 998244353;
+
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base % MOD;
+        base = base * base % MOD;
+        exp >>= 1;
     }
-    for (int i = 1; i <= n; i++){
-        if (i%3 == 1 || i%3 == 2){
-            if (!d.empty()){
-                cout << d.front() << " ";
-                d.pop();
-            }
-            else if (!t.empty()){
-                cout << t.front() << " ";
-                t.pop();
-            }
-            else {
-                cout << r.front() << " ";
-                r.pop();
-            }
-        }
-        else {
-            cout << r.front() << " ";
-            r.pop();
-        }
-    }
-    cout << endl;
+    return res%MOD;
 }
 
+int modiv(int a, int b){
+    return (a%MOD * fastExpo(b, MOD-2)) % MOD;
+}
 
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    int n;
+    cin >> n;
+    vector<vector<int>> dice(n, vector<int>(6,0));
+    vector<vector<int>> cnt(n, vector<int>(7,0));//contagem de quantos de cada numero por dado
+    vector<vector<int>> pfx(n, vector<int>(7,0));//probabilidade de todos os dados sairem <= j
+    vector<int> tot(7,1);//probabilidade de todos os dados serem <= j
+
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < 6; j++){
+            cin >> dice[i][j];
+            cnt[i][dice[i][j]]++;
+        }
+    }
+
+    for (int i = 0; i < n; i++){
+        for (int j = 1; j <= 6; j++){
+            pfx[i][j] = (pfx[i][j-1] + modiv(cnt[i][j], 6LL)) % MOD;
+            tot[j] = tot[j] * pfx[i][j] % MOD;
+        }
+        debug(i, pfx[i]);
+    }
+    vector<int> e(7,0);
+    for (int j = 1; j <= 6; j++){
+        for (int i = 0; i < n; i++){
+            int v = j;
+            e[v] = (e[v] + modiv(tot[v], pfx[i][v])) % MOD;
+            if (j != 1) e[v] = e[v] * modiv(cnt[i][v], 6LL) % MOD;
+            
+        }
+    }   
+    debug(tot);
+    debug(e);
+
+    int ans = 0;
+    for (int i = 1; i <= 6; i++){
+        ans = ans + (e[i] * i % MOD) % MOD;
+    }
+
+
+    cout << ans % MOD << endl;
 }

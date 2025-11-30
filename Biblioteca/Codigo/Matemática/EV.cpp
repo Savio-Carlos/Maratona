@@ -9,4 +9,4 @@ r: resultado
 m: quantidade de resultados possiveis para um evento
 */
 
-r * ((fastExpo((r/k), n)) - (fastExpo((ld)(r-1)/k, n)));
+r * ((fastExpo((r/m), n)) - (fastExpo((ld)(r-1)/m, n)));
