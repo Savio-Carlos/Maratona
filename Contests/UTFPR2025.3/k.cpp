@@ -51,7 +51,7 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const INF = 1e18;
+const int INF = 2e18; 
 
 struct tacada {
     int v;
@@ -74,61 +74,72 @@ signed main(){
 
     int curx = 0, cury = 0;
     char curdir;
-    bool stop = false;
+    
     for (int i = 0; i < m; i++){
         auto [v, t] = tac[i];
         debug(v, t);
         int rem = v;
         curdir = t;
-        stop = false;
+        bool stop = false;
 
-        while (!stop){
+        while (rem > 0 && !stop){
             int nextx = -INF, nexty = -INF;
             char nextid = '0';
+            int d = INF;
 
-            for (int j = 0; j < n; j++){//tenho que olhar a curdirecao que eu to indo e achar o primeiro obstaculo nessa direcao
+            for (int j = 0; j < n; j++){
                 auto [x, y, id] = obs[j];
-                if (curdir == '^' && y > cury && x == curx){   
-                    if (nexty == -INF || y < nexty){
-                        nexty = y;
-                        nextx = x;
-                        nextid = id;
+                
+                if (curdir == '^' && x == curx && y > cury){   
+                    if (y < d + cury){
+                        nexty = y; nextx = x; nextid = id;
+                        d = y - cury;
                     } 
                 }
-                if (curdir == 'v' && y < cury && x == curx){   
-                    if (nexty == -INF || y > nexty){
-                        nexty = y;
-                        nextx = x;
-                        nextid = id;
+                if (curdir == 'v' && x == curx && y < cury){   
+                    if (cury - y < d){
+                        nexty = y; nextx = x; nextid = id;
+                        d = cury - y;
                     } 
                 }
-                if (curdir == '>' && x > curx && y == cury){   
-                    if (nextx == -INF || x < nextx){
-                        nexty = y;
-                        nextx = x;
-                        nextid = id;
+                if (curdir == '>' && y == cury && x > curx){   
+                    if (x < d + curx){
+                        nexty = y; nextx = x; nextid = id;
+                        d = x - curx;
                     } 
                 }
-                if (curdir == '<' && x < curx && y == cury){   
-                    if (nextx == -INF || x > nextx){
-                        nexty = y;
-                        nextx = x;
-                        nextid = id;
+                if (curdir == '<' && y == cury && x < curx){   
+                    if (curx - x < d){
+                        nexty = y; nextx = x; nextid = id;
+                        d = curx - x;
                     } 
                 }
-            }
-            if (nextid == 'o'){
-                cout << i << endl;
-                return 0;
-            }
-            
-            if (curdir == '>'){
-                curx += rem;
             }
 
-            if (nextid == '#' or rem == 0) stop = true;
+            if (nextid != '0' && d <= rem) {
+
+                curx = nextx;
+                cury = nexty;
+                rem -= d;
+
+                if (nextid == 'o'){
+                    cout << i + 1 << endl;
+                    return 0;
+                } else if (nextid == '#') {
+                    rem = 0; 
+                    stop = true;
+                } 
+                else curdir = nextid;
+                
+            } else {
+                if (curdir == '^') cury += rem;
+                if (curdir == 'v') cury -= rem;
+                if (curdir == '>') curx += rem;
+                if (curdir == '<') curx -= rem;
+                rem = 0;
+                stop = true;
+            }
         }
-
-
     }
+    cout << -1 << endl;
 }
