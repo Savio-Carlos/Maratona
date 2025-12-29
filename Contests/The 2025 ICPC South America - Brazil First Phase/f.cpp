@@ -105,26 +105,10 @@ signed main(){
         int ins = a[i+1];
         aux[i] = ((modiv(aux[i+1],2) % MOD) + ((f * qtd) % MOD * ins) % MOD )% MOD;
         debug(i, aux[i], qtd, f, ins);
-    }
-    for (int i = q-2; i >= 0; i--){
         ans[a[i]] = (ans[a[i]] + aux[i]) % MOD; 
     }
 
-    int t1 = (modiv(1,8) + modiv(3,4) + modiv(5,8) + modiv(10,32) + 1) % MOD;
-    int t2 = (modiv(1,8) + modiv(3,4) + modiv(1,8) + modiv(9,16)) % MOD;
-    int t3 = (modiv(1,4) + modiv(1,4) + modiv(1,8)) % MOD;
-    debug(t1, t2, t3);
-
-    int t11 = (modiv(1,8) + modiv(3,4) + modiv(1,8) + modiv(1,16) + 1) % MOD;
-    int t12 = (modiv(8,16) + modiv(8,32)) % MOD;
-    debug(t11, t12, (t11 + t12) % MOD);
-    debug(ans[1]);
-
+    for (int i = 0; i < q; i++) ans[1] = (ans[1] + (a[i] * fator[i]) % MOD) % MOD;
     
-
-    // ans[1] = (ans[1] + ans[a[0]] + (modiv(1,2) * a[0]) % MOD) % MOD;//isso ta errado
-    for (int i = 0; i < q; i++){
-        ans[1] = (ans[1] + (a[i] * fator[i]) % MOD) % MOD;
-    }
     for (int i = 1; i <= n; i++) cout << ans[i] << endl;
 }

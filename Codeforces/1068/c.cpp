@@ -1,21 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
 #define int long long
 #define ld long double
- 
+
 namespace dbg {
     const char* const RESET     = "\033[0m";
     const char* const BOLD_BLUE = "\033[1;34m";
     const char* const YELLOW    = "\033[33m";
     const char* const BOLD_WHITE= "\033[1;37m";
- 
+
     template<typename T1, typename T2>
     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
- 
+
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
         os << '{';
@@ -23,7 +23,7 @@ namespace dbg {
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
         return os << '}';
     }
- 
+
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
     void debug_out(string_view s, H h, T... t) {
@@ -40,9 +40,9 @@ namespace dbg {
     }
 } 
 using namespace dbg;
- 
-#define DEBUG
- 
+
+// #define DEBUG
+
 #if defined(DEBUG)
     #define winton (void)0
     #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
@@ -51,70 +51,45 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MOD = 43200;
+void solve(){
+    int n, k;
+    cin >> n >> k;
+    set<int> s, ans;
+    map<int,int> exist;
+    for (int i = 0; i < n; i++){
+        int x;
+        cin >> x;
+        s.insert(x);
+        exist[x] = 1;
+    }
+
+    debug(s);
+    while(s.size()){
+        int search = *s.begin();
+        s.erase(search);
+        debug(search);
+        debug(s);
+        for (int i = search*2; i <= k; i+= search){
+            if (!exist[i]){
+                cout << -1 << endl;
+                return;
+            }
+            else {
+                auto it = s.find(i);
+                if (it != s.end()) s.erase(it);
+            }
+        }
+        ans.insert(search);
+        debug(ans);
+    }
+    cout << ans.size() << endl;
+    for (auto u : ans) cout << u << " ";
+    cout << endl;
+}
 
 signed main(){
     winton;
     int t;
-    cin>>t;
-    while(t--){
-        int n;
-        cin>>n;
-        vector<int> toys (n);
-        vector<int> ordem (n);
-        int pares=0,impares=0;
-        
-        for(int i = 0; i<n; i++){
-            int x;
-            cin>>x;
-            toys[i]=x;
-
-            ordem[i]=x;
-        
-            if(x%2)impares++;
-            else pares++;
-        }
-        int num = min(impares,pares);
-        sort(ordem.begin(),ordem.end());
-        
-        
-        int x=0;
-        for(int i = 0; i<num; i++){
-            bool flag = true,flare = true;
-            // cout<<"a"<<endl;
-            int l,r,aux;
-            for(int j = 0; j < n; j++){
-                if(toys[j]==ordem[x]){
-                    flare = false;
-                     r = j;
-                }
-                if(toys[j]>ordem[x] && flare){
-                    if((ordem[x]%2)!=(toys[j]%2)){
-                         aux = toys[j];
-                          l = j;
-                        flag = false;
-                    }
-                }
-            }
-            
-
-            if(flag){
-                i--;
-            }
-            else {
-            toys[l]=ordem[x];
-            toys[r]=aux;
-            }
-
-            if(x<n-1){
-                x++;
-            }
-        }
-
-        for(int i = 0; i < n-1; i++){
-            cout<<toys[i]<<" ";
-        }
-        cout<<toys.back()<<endl;
-
-    }
+    cin >> t;
+    while(t--) solve();
 }
