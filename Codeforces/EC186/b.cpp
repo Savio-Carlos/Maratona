@@ -51,33 +51,26 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    string s;
-    cin >> s;
-    int mx = 0;
-    string dvs = "2026";
-    string dvc = "2025";
-    bool has5 = false;
-    bool has6 = false;
+int calc(int a, int b){
+    int cnt = 0;
+    int base = 1;
+    bool flip = 1;
 
-    for (int i = 0; i < n-3; i++){
-        int cnt = 0;
-        for (int j = 0; j < 4; j++){
-            if (dvs[j] == s[i+j]) cnt++;
-        }
-        if (s.substr(i,4) == dvc) has5 = true;
-        if (s.substr(i,4) == dvs) has6 = true;
-        debug(s.substr(i,4));
-        mx = max(mx, cnt);
-        debug(mx);
+    while ((a >= base && flip) || (b >= base && !flip)){
+        if (flip) a -= base;
+        else b -= base;
+        base *= 2;
+        cnt++;
+        flip = !flip;    
     }
-    if (s == dvc) {has5 = true; mx = 3;}
-    if (s == dvs) {has6 = true; mx = 4;}
+    if (flip && a >= base) cnt++;
+    return cnt;
+}
 
-    if (!has5 || has6) cout << 0 << endl;
-    else cout << 4 - mx << endl;
+void solve(){
+    int a, b;
+    cin >> a >> b;
+    cout << max(calc(a,b), calc(b,a)) << endl;
 }
 
 

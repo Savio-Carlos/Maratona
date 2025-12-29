@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -51,35 +51,38 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+/*
+guardo a posicao e o maior indice do primeiro vetor
+para cada cara do segundo vetor que for maior que esse maximo, eu testo pra ver se esse parametro(i,j) e valido
+isso deve ser n^2
+se nessa verificacao eu achar alguem valido, entao todos os indices do primeiro eu consigo juntar com o do segundo de maneira que seja possivel
+se (1,2) e possivel, (2,3) e possivel, entao eu ganho n combinacoes
+
+depois eu guardo quais indices sao validos no vetor 2, e para cada indice do vetor 3 eu testo se esse parametro (j,k) e valido
+se todos ou quase todos indices do vetor 2 forem validos entao essa verificacao fica n^3
+*/
+
 void solve(){
     int n;
     cin >> n;
-    string s;
-    cin >> s;
-    int mx = 0;
-    string dvs = "2026";
-    string dvc = "2025";
-    bool has5 = false;
-    bool has6 = false;
-
-    for (int i = 0; i < n-3; i++){
-        int cnt = 0;
-        for (int j = 0; j < 4; j++){
-            if (dvs[j] == s[i+j]) cnt++;
+    vector<int> a(n), b(n), c(n);
+    int mx1 = 0, idx1 = 0;
+    for (int i = 0; i < n; i++){
+        cin >> a[i];
+        if (a[i] > mx1){
+            mx1 = a[i];
+            idx1 = i;
         }
-        if (s.substr(i,4) == dvc) has5 = true;
-        if (s.substr(i,4) == dvs) has6 = true;
-        debug(s.substr(i,4));
-        mx = max(mx, cnt);
-        debug(mx);
+    } 
+    for (auto &u : b) cin >> u;
+    for (auto &u : c) cin >> u;
+
+    for (int i = 0; i < n; i++){
+        if (b[i] > mx1){
+
+        }
     }
-    if (s == dvc) {has5 = true; mx = 3;}
-    if (s == dvs) {has6 = true; mx = 4;}
-
-    if (!has5 || has6) cout << 0 << endl;
-    else cout << 4 - mx << endl;
 }
-
 
 signed main(){
     winton;
