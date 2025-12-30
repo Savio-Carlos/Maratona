@@ -72,6 +72,161 @@ basicstyle=\ttfamily\footnotesize, % fonte
 
 \section{Strings}
 
+\subsection{arrumar tudo essa porra de hashing depois}
+\begin{lstlisting}
+295 vector<int> rabin_karp(string const& s, string const& t) {
+2b7     int S = s.size(), T = t.size();
+            
+d52     vector<int> p_pow(max(S, T)); 
+b60     p_pow[0] = 1; 
+8db     for (int i = 1; i < (int)p_pow.size(); i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+        
+404     vector<int> h(T + 1, 0); 
+a59     for (int i = 0; i < T; i++) h[i+1] = (h[i] + (t[i] - 'a' + 1) * p_pow[i]) % MOD; //hash do texto(vetor a)
+        
+2d8     int h_s = 0; 
+535     for (int i = 0; i < S; i++) h_s = (h_s + (s[i]- 'a' + 1) * p_pow[i]) % MOD; //hash da string s (vetor b)
+        
+a15     vector<int> occurrences;
+fce     for (int i = 0; i + S - 1 < T; i++) {
+d38         int cur_h = (h[i+S] + MOD - h[i]) % MOD;
+7f5         if (cur_h == h_s * p_pow[i] % MOD) occurrences.push_back(i);
+77b     }
+831     return occurrences;
+78d }
+
+
+//struct para um vetor de strings
+//consegue retornar um vetor sem as strings que sao substrings de outras
+//consegue checar se o prefixo de uma string e o sufixo de outra
+
+803 struct hashing {
+2a9     int p_pow[MAX]; 
+52b     vector<int> hashes[11];
+3df     vector<string> strings;
+1a8     int n;
+        
+f09     hashing(int _n, vector<string> _a) : n(_n), strings(_a) {} 
+    
+0a8     void build(){
+b60         p_pow[0] = 1; 
+    
+2cf         for (int i = 1; i < MAX; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+bde         for (int i = 0; i < n; i++)hashes[i] = calcHash(strings[i]);
+e10     }
+    
+e10     vector<string> trim(){
+86b         vector<string> ret;
+            //funcao pra remover do vetor original as strings que sao substrings de outras
+            //nao preciso delas pra fazer a verificacao depois
+3c4         set<int> occurrences;
+603         for (int i = 0; i < n; i++){
+578             for (int j = 0; j < n; j++){
+4ce                 if (i == j) continue;
+680                 int S = strings[i].size(), T = strings[j].size();
+d36                 int h_s = hashes[i][S];
+568                 for (int k = 0; k + S - 1 < T; k++) {
+df2                     int cur_h = (hashes[j][k+S] + MOD - hashes[j][k]) % MOD;
+f30                     if (cur_h == h_s * p_pow[k] % MOD) occurrences.insert(i);
+e4e                 }
+b00             }
+f98         }
+603         for (int i = 0; i < n; i++){
+851             if (occurrences.find(i) != occurrences.end()) continue;
+07c             ret.push_back(strings[i]);
+aa6         }
+9ca         debug(occurrences);
+edf         return ret;
+391     }
+        
+5ae     vector<int> calcHash(string s){
+fa3         vector<int> h(s.size() + 1, 0); 
+18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
+81c         return h;
+a53     }
+        
+4c8     int get_hash(int l, int len, int idx){
+488         int r = l + len;
+915         return ((hashes[idx][r] + MOD - hashes[idx][l]) % MOD);
+96f     }
+    
+166     bool equal_substrings(int len, int i, int j) {
+2bf         if (!len) return true;
+    
+34c         int h1 = get_hash(0, len, i);
+393         int h2 = get_hash(strings[j].size() - len, len, j);
+    
+21f         int left  = (h1 * p_pow[strings[j].size()-len]) % MOD;
+eeb         int right = (h2) % MOD;
+7ef         return left == right;
+bda     }
+890 };
+
+//struct de hashing pra uma string so
+803 struct hashing {
+bfe     vector<int> h, p_pow;
+ac0     string s;
+1a8     int n;
+        
+e68     hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size(), 0) {} 
+    
+0a8     void build(){
+b60         p_pow[0] = 1; 
+    
+25f         for (int i = 1; i < n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
+18f         for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - 'a' + 1) * p_pow[i]) % MOD;
+6c1     }
+        
+    
+77c     int get_hash(int l, int len){
+488         int r = l + len;
+9c5         return ((h[r] + MOD - h[l]) % MOD);
+2b2     }
+    
+a15     bool equal_substrings(int len) {
+2bf         if (!len) return true;
+    
+925         int h1 = get_hash(0, len);
+8f8         int h2 = get_hash(n - len, len);
+    
+ba9         int left  = (h1 * p_pow[n-len]) % MOD;
+eeb         int right = (h2) % MOD;
+7ef         return left == right;
+c7c     }
+e94 };
+\end{lstlisting}
+
+\subsection{implementacao do cp-algorithms}
+\begin{lstlisting}
+737     int n = (int)s.length();
+d93     vector<int> pi(n);
+6f5     for (int i = 1; i < n; i++) {
+3f8         int j = pi[i-1];
+a2c         while (j > 0 && s[i] != s[j])
+25c             j = pi[j-1];
+f36         if (s[i] == s[j])
+04b             j++;
+d2e         pi[i] = j;
+a4e     }
+81d     return pi;
+cbb }
+    
+    //implementacao minha
+6cc vector<int> kmp(string s){
+357     int n = s.size(), pfxlen = 0;
+ca9     vector<int> a(n, 0);
+6f5     for (int i = 1; i < n; i++){
+e60         if (s[i] == s[pfxlen]) a[i] = ++pfxlen;
+7f3         else if (pfxlen){
+6b3             pfxlen = a[pfxlen-1];
+169             i--;
+4de         }
+409         else a[i] = 0;
+535     }
+3f5     return a;
+836 }
+\end{lstlisting}
+
 \subsection{Manacher}
 \begin{lstlisting}
 /*
@@ -792,34 +947,34 @@ b84 	return qt != 0;
 
 \subsection{Geometria Int}
 \begin{lstlisting}
-be5 struct point {
+b2a struct pt {
 e91     int x, y;
-f3e     point(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+df1     pt(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
     
-be2     bool operator < (const point p) const {
+5bc     bool operator < (const pt p) const {
 95a 		if (x != p.x) return x < p.x;
 89c 		return y < p.y;
-679 	}
+dcd 	}
     
-418 	bool operator == (const point p) const {
+a83 	bool operator == (const pt p) const {
 d74 		return x == p.x and y == p.y;
-a8c 	}
+7b4 	}
     
-ac5     point operator + (const point& p) const { return point(x + p.x, y + p.y); }
-6d4     point operator - (const point& p) const { return point(x - p.x, y - p.y); }
+7af     pt operator + (const pt& p) const { return pt(x + p.x, y + p.y); }
+b23     pt operator - (const pt& p) const { return pt(x - p.x, y - p.y); }
 477     template<typename U>
-563     point operator * (const U c) const { return point(x * c, y * c); }
-522     auto operator * (const point& p) const { return (int)x * p.x + (int)y * p.y; }
-5db     auto operator ^ (const point& p) const { return (int)x * p.y - (int)y * p.x; }
+60f     pt operator * (const U c) const { return pt(x * c, y * c); }
+818     auto operator * (const pt& p) const { return (int)x * p.x + (int)y * p.y; }
+9a6     auto operator ^ (const pt& p) const { return (int)x * p.y - (int)y * p.x; }
     
-d70     friend istream& operator >> (istream& in, point& p) { return in >> p.x >> p.y; }
-322     friend ostream& operator << (ostream& os, const point& p) { return os << "(" << p.x << ", " << p.y << ")"; }
-252 };
+e45     friend istream& operator >> (istream& in, pt& p) { return in >> p.x >> p.y; }
+03c     friend ostream& operator << (ostream& os, const pt& p) { return os << "(" << p.x << ", " << p.y << ")"; }
+df0 };
 
 b3a struct line {
-b1f 	point p, q;
+730 	pt p, q;
 0d6 	line() {}
-50a 	line(point p_, point q_) : p(p_), q(q_) {}
+4b8 	line(pt p_, pt q_) : p(p_), q(q_) {}
         
 8d7     friend istream& operator >> (istream& in, line& r) {
 4cb 		return in >> r.p >> r.q;
@@ -828,60 +983,64 @@ b1f 	point p, q;
 6b7     friend ostream& operator << (ostream& os, line& r) {
 e8e 		return os << "[" << r.p << " -> " << r.q << "]";
 bbb 	}
-7f5 };
+3b6 };
 
-6cb int sq(point p){
+46d int sq(pt p){
 8a7     return p.x*p.x + p.y*p.y;
-225 }
+b0e }
 
-12e int abs(point p){
+f20 int abs(pt p){
 61f     return sqrt(sq(p));
-b3e }
+9b3 }
 
 //checa se dois vetores sao perpendiculares
-1f0 bool perpendicular(point v, point w){
+6b8 bool perpendicular(pt v, pt w){
 350     return (v*w == 0);
-3e1 }
+99e }
 
 //ccw, 0 colineares, -1 r a direita, 1 r a esquerda
-7bf int orientation(point p, point q, point r){
+f2b int orientation(pt p, pt q, pt r){
 c5b     int val = ((q-p) ^ (r-p));
 db6     if (!val) return 0;
 326     return (val > 0) ? 1 : -1;
-288 }
+dd6 }
 
 //checa se um ponto esta contido no angulo do segmento pq e pr
-5f0 bool onAngle (point p, point q, point r, point g){
+e82 bool onAngle (pt p, pt q, pt r, pt g){
 999     if (!orientation(p,q,r)) return false;
 673     if (orientation(p,q,r) > 0) swap(q,r);
 d46     return orientation(p,q,g) >= 0 && orientation(p,r,g) <= 0; 
-fe6 }
+edb }
 
 // quadrante de um ponto
-533 int quad(point p) { 
+c31 int quad(pt p) { 
 dbb 	return (p.x<0)^3*(p.y<0);
-c46 }
+fcf }
 
 //dist quadrada de dois pontos
-4c6 int dist2(point p, point q){
+9ea int dist2(pt p, pt q){
 f24     return sq(p.x - q.x) + sq(p.y - q.y);
-507 }
+d54 }
 
 // 2 * area com sinal
-45e int sarea2(point p, point q, point r) { 
+a15 int sarea2(pt p, pt q, pt r) { 
 586 	return (q-p)^(r-q);
-73b }
+9ef }
+
+e32 bool col(pt p, pt q, pt r) { // se p, q e r sao colin.
+034 	return sarea2(p, q, r) == 0;
+a08 }
 
 // 2 * area do poligono
-c1f int polarea2(vector<point> v) { 
+fc1 int polarea2(vector<pt> v) { 
 7c9 	int ret = 0;
 c6e 	for (int i = 0; i < v.size(); i++)
-de6 		ret += sarea2(point(0, 0), v[i], v[(i + 1) % v.size()]);
+532 		ret += sarea2(pt(0, 0), v[i], v[(i + 1) % v.size()]);
 d03 	return abs(ret);
-4a3 }
+87e }
 
 //checa se o poligono e convexo
-a72 bool isConvex(vector<point> p) {
+f12 bool isConvex(vector<pt> p) {
 ff7     bool hasPos = false, hasNeg = false;
 ed0     for (int i = 0, n = p.size(); i < n; i++) {
 568         int o = orientation(p[i], p[(i+1)%n], p[(i+2)%n]);
@@ -889,37 +1048,37 @@ f42         if (o > 0) hasPos = true;
 162         if (o < 0) hasNeg = true;
 455     }
 f61     return !(hasPos && hasNeg);
-c83 }
+61d }
 
 
-a6f bool half(point p) { // true if in blue half
+ae2 bool half(pt p) { // true if in blue half
 184     assert(p.x != 0 || p.y != 0); // the argument of (0,0) isundefined
 a12     return p.y > 0 || (p.y == 0 && p.x < 0);
-326 }
+a70 }
 
 //ordena os pontos de acordo com o angulo
-fa6 void polarSort(vector<point> &v) {
-621     sort(v.begin(), v.end(), [](point v, point w) { 
+61f void polarSort(vector<pt> &v) {
+2f2     sort(v.begin(), v.end(), [](pt v, pt w) { 
 8ba         return make_tuple(half(v), 0, sq(v)) < 
 99d         make_tuple(half(w), (v^w), sq(w));
-fa2     });
-68e }
+486     });
+34d }
 
 //rotaciona o vetor 90 graus
-5cf point rotate90(point p) {
-128 	return point(-p.y, p.x);
-c3b }
+ab1 pt rotate90(pt p) {
+a0d 	return pt(-p.y, p.x);
+e4a }
 
 //retorna uma linha perpendicular a linha s que passa pelo ponto p
-9b2 line perpointhrough(line s, point p){
+9c9 line perpthrough(line s, pt p){
 e02     return {p, p + (rotate90(s.p - s.q))};//pode alterar a ordem
-e2c }
+d9d }
 
 // se p pertence ao seg de r
-b49 bool isinseg (line r, point p) { 
-517 	point a = r.p - p, b = r.q - p;
+63e bool isinseg (line r, pt p) { 
+f65 	pt a = r.p - p, b = r.q - p;
 2ac 	return (a ^ b) == 0 and (a * b) <= 0;
-a51 }
+6e6 }
 
 147 bool intersect(line r, line s){
 0d5     int o1 = orientation(r.p, r.q, s.p);
@@ -938,21 +1097,21 @@ d1f     return false;
 e86 }
 
 // numero de pontos inteiros no segmento
-9e0 int segpoints(line r) { 
+fae int segpts(line r) { 
 508 	return 1 + gcd(abs(r.p.x - r.q.x), abs(r.p.y - r.q.y));
-a3e }
+28a }
 
-c1f int polarea2(vector<point> v){ // 2 * area do poligono
+fc1 int polarea2(vector<pt> v){ // 2 * area do poligono
 7c9 	int ret = 0;
 f14 	for (int i = 0; i < v.size(); i++){
-de6 		ret += sarea2(point(0, 0), v[i], v[(i + 1) % v.size()]);
-3fe     }
+532 		ret += sarea2(pt(0, 0), v[i], v[(i + 1) % v.size()]);
+1a6     }
 d03     return abs(ret);
-e97 }
+4b9 }
 
 // se o ponto ta dentro do poligono: retorna 0 se ta fora,
 // 1 se ta no interior e 2 se ta na borda
-fb6 int inpol(vector<point>& v, point p){ // O(n)
+8e7 int inpol(vector<pt>& v, pt p){ // O(n)
 8de 	int qt = 0;
 f14 	for (int i = 0; i < v.size(); i++) {
 bda 		if (p == v[i]) return 2;
@@ -968,7 +1127,7 @@ b47 		}
 0bb 		if (baixo == (t > 0)) qt += baixo ? 1 : -1;
 9cf 	}
 b84 	return qt != 0;
-604 }
+afd }
 
 421 int paralelos(vector<pair<int,int>> &pontos){
 39c     int qnt = 0;
@@ -2083,7 +2242,7 @@ e08 n: numero de eventos
 0ee m: quantidade de resultados possiveis para um evento
 c4c */
 
-6e6 r * ((fastExpo((r/k), n)) - (fastExpo((ld)(r-1)/k, n)));
+0e8 r * ((fastExpo((r/m), n)) - (fastExpo((ld)(r-1)/m, n)));
 \end{lstlisting}
 
 \subsection{Exponenciação Rápida}
@@ -2772,6 +2931,17 @@ f6a }
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Extra}
+
+\subsection{random.cpp}
+\begin{lstlisting}
+#include <random>
+#include <chrono>
+
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+uniform_int_distribution<long long> dist(0, n);//valores min e max
+
+int x = dist(rng);
+\end{lstlisting}
 
 \subsection{debug.cpp}
 \begin{lstlisting}

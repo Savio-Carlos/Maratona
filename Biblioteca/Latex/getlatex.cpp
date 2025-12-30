@@ -14,10 +14,10 @@ string NO_PRINT = "noprint";
 
 string path = "../Codigo/";
 #ifdef __clang__
-string hash_cmd = "sed -n 1','10000' p' tmp.cpp | sed '/^#w/d' "
+string hash_cmd = "sed -n '1,10000p' tmp.cpp | sed '/^#w/d' "
            "| clang -E -x c++ -dD -P - | tr -d '[:space:]' | md5sum | cut -c-";
 #else
-string hash_cmd = "sed -n 1','10000' p' tmp.cpp | sed '/^#w/d' "
+string hash_cmd = "sed -n '1,10000p' tmp.cpp | sed '/^#w/d' "
 "| cpp -dD -P -fpreprocessed | tr -d '[:space:]' | md5sum | cut -c-";
 #endif
 
@@ -30,7 +30,7 @@ string exec(string cmd) {
 	if (!pipe) throw runtime_error("popen() failed!");
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr)
 		result += buffer.data();
-	result.pop_back();
+	if (!result.empty() && result.back() == '\n') result.pop_back();
 	return result;
 }
 
@@ -129,7 +129,13 @@ void printa_arquivo_codigo(string file, bool extra = false) {
 
 		for (char c : line) {
 			if (c == '{') depth++, st.push(line_idx);
-			if (c == '}') depth--, start_line = st.top(), st.pop();
+			if (c == '}') {
+				depth--;
+				if (!st.empty()) {
+					start_line = st.top();
+					st.pop();
+				}
+			}
 		}
 		
 		bool comment = is_comment(line);
@@ -209,7 +215,11 @@ void dfs(vector<pair<string, string>>& files, string s, bool extra = false) {
 
 		if (entry->d_type == DT_DIR) dfs(files, s + "/" + string(entry->d_name), extra);
 		else {
-			if (!extra) files.emplace_back(entry->d_name, s + "/" + string(entry->d_name));
+			string filename = entry->d_name;
+			if (!extra) {
+				if (filename.size() >= 4 && filename.substr(filename.size() - 4) == ".cpp")
+					files.emplace_back(entry->d_name, s + "/" + string(entry->d_name));
+			}
 			else printa_listing(entry->d_name, s + "/" + entry->d_name,
 					extra and strcmp(entry->d_name, "vimrc"));
 			//	A condicao acima printa o hash do vimrc.
