@@ -49,8 +49,9 @@ void build_component_graph() {
         }
     }
     //remove duplicatas
-    for (int i = 1; i <= com; i++) {
+    for (int i = 1; i <= com; i++){
         sort(g_scc[i].begin(), g_scc[i].end());
+        if (g_scc[i].empty())continue;
         g_scc[i].erase(unique(g_scc[i].begin(), g_scc[i].end()), g_scc[i].end());
     }
 }

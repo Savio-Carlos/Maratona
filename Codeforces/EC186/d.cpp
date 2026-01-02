@@ -51,36 +51,83 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int MOD = 998244353;
+
+int fact[55];
+
+void build(){
+    fact[0] = 1;
+    for (int i = 1; i < 55; i++){
+        fact[i] = (i * fact[i-1]) % MOD;
+    }
+}
+
+int fastExpo(int base, int exp) {
+    int res = 1;
+    base %= MOD;
+    while (exp > 0) {
+        if (exp % 2 == 1) res = (res * base) % MOD;
+        base = (base * base) % MOD;
+        exp /= 2;
+    }
+    return res;
+}
+
+int modInverse(int n) {
+    return fastExpo(n, MOD - 2);
+}
+
+int combinations_mod(int n, int k) {
+    if (k < 0 || k > n) return 0;
+    if (k == 0 || k == n) return 1;
+    if (k > n / 2) k = n - k;
+    int numerator = 1;
+    for(int i = 0; i < k; i++) numerator = (numerator * (n - i)) % MOD;
+    int denominator = 1;
+    for(int i = 1; i <= k; i++) denominator = (denominator * i) % MOD;
+    return (numerator * modInverse(denominator)) % MOD;
+}
+
 void solve(){
     int n;
     cin >> n;
-    vector<int> a(n), b(n), c(n);
+    vector<int> a(n+1);
+    int sum = 0;
+    for (auto &u : a){cin >> u; sum += u;}
+    int d = sum/n;
+    int r = sum%n;
 
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
-    for (auto &u : c) cin >> u;
+    bool pos = true;
+    int tot = 0;
+    for (int i = 1; i <= n; i++){
+        int ex = min(d,a[i]);
+        a[i] -= ex;
+        a[0] -= (d - ex);
+        if (a[0] < 0 || a[i] > 1) pos = false; //se precisarmos pegar emprestado mais do que temos ou alguma das caixas tem mais que a "media" e impossivel        
+        if (a[i] == 1) tot++;
 
-    int ij = 0;
-    for (int shift = 0; shift < n; shift++){
-        bool pos = true;
-        for (int i = 0; i < n; i++){
-            if (b[(i + shift) % n] <= a[i]) pos = false;
-        }
-        if (pos) ij++;
     }
-    int jk = 0;
-    for (int shift = 0; shift < n; shift++){
-        bool pos = true;
-        for (int i = 0; i < n; i++){
-            if (c[(i + shift) % n] <= b[i]) pos = false;
-        }
-        if (pos) jk++;
+    debug(a);
+    //todos os 1's que sobraram no vetor jogam na ultima rodada, tot tem que ser == r
+    int zeros = n - tot;
+    if (a[0] > zeros) pos = false;
+    if (!pos){
+        cout << 0 << endl;
+        return;
     }
-    cout << ij * jk * n << endl;
+    tot += a[0];
+    debug(tot, zeros);
+    int ans = (fact[tot] * fact[n-tot]) % MOD;
+    debug(ans);
+    ans = (ans * combinations_mod(zeros, a[0])) % MOD;
+
+    cout << ans << endl;
+
 }
 
 signed main(){
     winton;
+    build();
     int t;
     cin >> t;
     while(t--)solve();
