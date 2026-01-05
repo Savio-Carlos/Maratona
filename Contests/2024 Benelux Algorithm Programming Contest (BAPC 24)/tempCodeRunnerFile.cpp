@@ -82,13 +82,13 @@ void solve(){
         }
     }
 
-    ld mx = -1.0;
+    ld mn = 1.0;
     for (int i = 1; i <= com; i++){
         // cout << "i: " << i << " sccnot_fail: "<< scc_not_fail[i] << endl;
-        if (!indeg[i]) mx = max(mx, scc_not_fail[i]);
+        if (!indeg[i]) mn = min(mn, scc_not_fail[i]);
     }
 
-    cout << setprecision(15) << mx << endl;
+    cout << fixed << setprecision(15) << mn << endl;
     
 
 }
