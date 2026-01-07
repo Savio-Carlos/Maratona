@@ -37,7 +37,7 @@ signed main(){
         if (xi == mx){
             vector<int> temp;
             for (auto yi : st) temp.emplace_back(yi);
-            sort(rall(temp));a
+            sort(rall(temp));
             for (auto yi : temp) ans.emplace_back(xi, yi);
             if (ans.back().second > 1) {
                 if (all.find({xi, 1}) == all.end()) ans.emplace_back(xi, 1);

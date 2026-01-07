@@ -120,3 +120,40 @@ struct hashing {
         return left == right;
     }
 };
+
+//double mod hashing
+struct hashing {
+    string s;
+    int n;
+    vector<int> h1, h2;
+    vector<int> p1, p2;
+
+    hashing(const string &_s) : s(_s) {
+        n = (int)s.size();
+        h1.assign(n+1, 0);
+        h2.assign(n+1, 0);
+        p1.assign(n+1, 0);
+        p2.assign(n+1, 0);
+    }
+
+    void build() {
+        p1[0] = 1;
+        p2[0] = 1;
+        for (int i = 1; i <= n; i++) {
+            p1[i] = (p1[i-1] * P1) % MOD1;
+            p2[i] = (p2[i-1] * P2) % MOD2;
+        }
+        for (int i = 0; i < n; i++) {
+            int val = (s[i] - 'a' + 1);
+            h1[i+1] = (h1[i] + val * p1[i]) % MOD1;
+            h2[i+1] = (h2[i] + val * p2[i]) % MOD2;
+        }
+    }
+
+    pair<int,int> get_hash(int l, int len) {
+        int r = l + len;
+        int x1 = ((h1[r] - h1[l]) + MOD1) % MOD1;
+        int x2 = ((h2[r] - h2[l]) + MOD2) % MOD2;
+        return {x1, x2};
+    }
+};
