@@ -1,64 +1,97 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define int long long
-#define ld long double
-#define endl '\n'
-#define all(x) x.begin(), x.end()
-#define rall(x) x.rbegin(), x.rend()
-
-#define fastio ios_base::sync_with_stdio(false), cin.tie(NULL), cout.tie(NULL)
-
-signed main(){
-    fastio;
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    
     int n;
     cin >> n;
-    map<int, set<int>> mp;
-    vector<int> ones;
-
-    map<pair<int,int>, bool> all;
-    int mx = 1;
-    int first = 1e9+7;
-    for (int i = 0; i < n; i++){
-        int x, y;
+    
+    map<long long, vector<long long>> byX;
+    
+    for (int i = 0; i < n; i++) {
+        long long x, y;
         cin >> x >> y;
-        first = min(first, x);
-        mx = max(mx, x);
-        all[{x,y}] = true;
-        if (y == 1) ones.push_back(x);
-        else mp[x].insert(y);
+        byX[x].push_back(y);
     }
-    int tot = mp.size();
-    int cnt = 0;
-
-    int last = 1;
-    vector<pair<int,int>> ans;
-    for (auto [xi, st] : mp){
-        if (xi == mx){
-            vector<int> temp;
-            for (auto yi : st) temp.emplace_back(yi);
-            sort(rall(temp));
-            for (auto yi : temp) ans.emplace_back(xi, yi);
-            if (ans.back().second > 1) {
-                if (all.find({xi, 1}) == all.end()) ans.emplace_back(xi, 1);
-            }
-            break;
+    
+    // Sort each group by y-coordinate
+    for (auto& [x, ys] : byX) {
+        sort(ys.begin(), ys.end());
+    }
+    
+    vector<long long> xs;
+    for (auto& [x, ys] : byX) {
+        xs.push_back(x);
+    }
+    
+    vector<pair<long long, long long>> polygon;
+    
+    // Strategy:
+    // Upper boundary: teeth pointing up at y >= 2 level
+    // Lower boundary: straight line at y = 1, visiting any points with y=1
+    //
+    // For points with y=1, we DON'T include them in the upper trace (since they're below baseline)
+    // Instead, we include them in the lower trace going right-to-left
+    
+    // Upper trace (left to right)
+    polygon.push_back({xs.front(), 1});  // bottom-left corner
+    polygon.push_back({xs.front(), 2});  // up to teeth level
+    
+    for (int i = 0; i < (int)xs.size(); i++) {
+        long long x = xs[i];
+        auto& ys = byX[x];
+        
+        if (i > 0) {
+            polygon.push_back({x, 2});
         }
-        if (all.find({xi, 2}) == all.end()) ans.emplace_back(xi, 2);
-        for (auto yi : st) ans.emplace_back(xi, yi);
-        if (xi+1 == mx) continue;;
-        last = xi+1;
-        ans.emplace_back(last, 2);
-        all[{last,2}] = true;
+        
+        // Only add points with y >= 2 on upper trace
+        for (long long y : ys) {
+            if (y >= 2) {
+                polygon.push_back({x, y});
+            }
+        }
+        
+        polygon.push_back({x + 1, 2});
     }
-    // ans.emplace_back(last, 1);
-    if(mp.empty()) ans.emplace_back(first, 2);
-    sort(rall(ones));
-    for (auto u : ones) {
-        ans.emplace_back(u, 1);
-        all[{u,1}] = true;
+    
+    // Right edge: go down to y=1
+    polygon.push_back({xs.back() + 1, 1});
+    
+    // Lower trace (right to left): visit points with y=1
+    for (int i = (int)xs.size() - 1; i >= 0; i--) {
+        long long x = xs[i];
+        auto& ys = byX[x];
+        
+        for (long long y : ys) {
+            if (y == 1) {
+                polygon.push_back({x, 1});
+            }
+        }
     }
-    if (all.find({first,1}) == all.end()) ans.emplace_back(first,1);
-    cout << ans.size() << endl;
-    for (auto [x,y] : ans) cout << x << " " << y << endl;
+    
+    // Left edge: connect back to start
+    polygon.push_back({xs.front(), 1});
+    
+    // Remove consecutive duplicates
+    vector<pair<long long, long long>> result;
+    for (auto& p : polygon) {
+        if (result.empty() || result.back() != p) {
+            result.push_back(p);
+        }
+    }
+    
+    // Remove last if equals first
+    if (result.size() > 1 && result.front() == result.back()) {
+        result.pop_back();
+    }
+    
+    cout << result.size() << "\n";
+    for (auto& [x, y] : result) {
+        cout << x << " " << y << "\n";
+    }
+    
+    return 0;
 }
