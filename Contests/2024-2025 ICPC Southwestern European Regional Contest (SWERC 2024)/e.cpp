@@ -17,6 +17,7 @@ signed main(){
     vector<int> ones;
 
     map<pair<int,int>, bool> all;
+    set<pair<int,int>> req;
     int mx = 1;
     int first = 1e9+7;
     for (int i = 0; i < n; i++){
@@ -24,7 +25,7 @@ signed main(){
         cin >> x >> y;
         first = min(first, x);
         mx = max(mx, x);
-        all[{x,y}] = true;
+        req.insert({x,y});
         if (y == 1) ones.push_back(x);
         else mp[x].insert(y);
     }
@@ -33,32 +34,103 @@ signed main(){
 
     int last = 1;
     vector<pair<int,int>> ans;
+
+    auto add = [&](int x, int y){
+        if (x < 1 || x > 1e9) return;
+        if (all.find({x,y}) != all.end()) return;
+        if(!ans.empty() && ans.back() == make_pair(x, y)) return;
+        ans.emplace_back(x, y);
+        all[{x,y}] = true;
+    };
+
     for (auto [xi, st] : mp){
-        if (xi == mx){
+        if (xi == mx && xi != 1){
             vector<int> temp;
             for (auto yi : st) temp.emplace_back(yi);
-            sort(rall(temp));a
-            for (auto yi : temp) ans.emplace_back(xi, yi);
-            if (ans.back().second > 1) {
-                if (all.find({xi, 1}) == all.end()) ans.emplace_back(xi, 1);
+            sort(rall(temp));
+            if (xi > 1) add(xi-1, 2);
+            else if (xi < 1e9) add(xi + 1, 2);
+
+            for (auto yi : temp) add(xi, yi);
+            if (!ans.empty() && ans.back().second > 1) { 
+                add(xi, 1);
             }
+            last = xi;
             break;
         }
-        if (all.find({xi, 2}) == all.end()) ans.emplace_back(xi, 2);
-        for (auto yi : st) ans.emplace_back(xi, yi);
-        if (xi+1 == mx) continue;;
+        add(xi, 2);
+        for (auto yi : st) add(xi, yi);
+        if (xi+1 == mx) continue;
         last = xi+1;
-        ans.emplace_back(last, 2);
-        all[{last,2}] = true;
+        add(last, 2);
     }
-    // ans.emplace_back(last, 1);
-    if(mp.empty()) ans.emplace_back(first, 2);
-    sort(rall(ones));
-    for (auto u : ones) {
-        ans.emplace_back(u, 1);
-        all[{u,1}] = true;
+    if (mp.empty()){
+        sort(all(ones));
+        for (auto u : ones) add(u, 1);
+        add(mx, 2);
+        add(first, 2);
+        add(first, 1);
+    } else {
+        add(mx, 1);
+        if(mp.empty()) add(first, 2);
+        sort(rall(ones));
+        for (auto u : ones) add(u, 1);
+        add(first,1);
     }
-    if (all.find({first,1}) == all.end()) ans.emplace_back(first,1);
-    cout << ans.size() << endl;
-    for (auto [x,y] : ans) cout << x << " " << y << endl;
+
+    vector<pair<int,int>> comp;
+    for (auto &p : ans) {
+        if (comp.size() < 2) {
+            comp.push_back(p);
+            continue;
+        }
+        auto A = comp[comp.size()-2];
+        auto B = comp[comp.size()-1];
+        auto C = p;
+        int x1 = B.first - A.first;
+        int y1 = B.second - A.second;
+        int x2 = C.first - B.first;
+        int y2 = C.second - B.second;
+        if (x1 * y2 - y1 * x2 == 0) {
+            if (req.find(B) == req.end()) {
+                comp.pop_back();
+                comp.push_back(C);
+            } 
+            else comp.push_back(C);
+        } 
+        else comp.push_back(C);
+    }
+
+    while (comp.size() >= 3) {
+        auto A = comp[comp.size()-2];
+        auto B = comp[comp.size()-1];
+        auto C = comp[0];
+        int x1 = B.first - A.first;
+        int y1 = B.second - A.second;
+        int x2 = C.first - B.first;
+        int y2 = C.second - B.second;
+        if (x1 * y2 - y1 * x2 == 0) {
+            if (req.find(B) == req.end()) {
+                comp.pop_back();
+            } else break;
+        } else break;
+    }
+
+    while (comp.size() >= 3) {
+        auto A = comp.back();
+        auto B = comp[0];
+        auto C = comp[1];
+        int x1 = B.first - A.first;
+        int y1 = B.second - A.second;
+        int x2 = C.first - B.first;
+        int y2 = C.second - B.second;
+        if (x1 * y2 - y1 * x2 == 0) {
+            if (req.find(B) == req.end()) {
+                comp.erase(comp.begin());
+            } else break;
+        } else break;
+    }
+
+    cout << comp.size() << endl;
+    for (auto [x,y] : comp) cout << x << " " << y << endl;
 }
