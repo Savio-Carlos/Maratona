@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,12 +52,13 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+
+   
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while (t--) solve();
 }

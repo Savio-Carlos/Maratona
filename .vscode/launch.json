@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/2024 Benelux Algorithm Programming Contest (BAPC 24)",
-      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/2024 Benelux Algorithm Programming Contest (BAPC 24)/build/Debug/outDebug",
+      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Summer2026/Brazilian ICPC Summer School 2026 - Contest 1",
+      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Summer2026/Brazilian ICPC Summer School 2026 - Contest 1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

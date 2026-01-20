@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,12 +52,38 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    sort(all(a));
+    vector<int> pfx(n,0), sfx(n,0);
+    int cur = 0;
+    for (int i = 0; i < n; i++){
+        if (a[i] == cur) cur++;
+        pfx[i] = cur;
+    }
+    cur = 0;
+    set<int> aux;
+    for (int i = n-1; i >= 0; i--){
+        aux.insert(a[i]);
+        while (aux.count(cur)) cur++;
+        sfx[i] = cur;
+    }
+    debug(pfx);
+    debug(sfx) ;
+    for (int i = 0; i < n-1; i++){
+        if (pfx[i] == sfx[i+1]){
+            cout << "NO" << endl;
+            return;
+        }
+    }
+    cout << "YES" << endl;
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while (t--) solve();
 }

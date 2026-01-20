@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,12 +52,27 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    vector<pair<int,int>> o;
+    for (int i = 0; i < n; i++){
+        cin >> a[i];
+        o.push_back({a[i],i%2});
+    }
+    sort(all(o));
+    for (int i = 1; i < n; i++){
+        if (o[i].second == o[i-1].second){
+            cout << "NO" << endl;
+            return; 
+        }
+    }
+    cout << "YES" << endl;
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while (t--) solve();
 }

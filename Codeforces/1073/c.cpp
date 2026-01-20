@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,12 +52,31 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    string s;
+    cin >> s;
+    string sorted = s;
+    sort(all(sorted));
+    if (s == sorted){
+        cout << "Bob\n";
+        return; 
+    }
+    vector<int> ans;
+    debug(sorted);
+    for (int i = 0; i < n; i++){
+        if (s[i] != sorted[i])ans.push_back(i+1);
+    }
+    cout << "Alice\n";
+    cout << ans.size() << endl;
+    for (auto u : ans) cout << u << " ";
+    cout << endl;
+   
 }
 
 signed main(){
     winton;
     int t;
     cin >> t;
-    while(t--) solve();
+    while (t--) solve();
 }

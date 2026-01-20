@@ -41,7 +41,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+/// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -52,7 +52,50 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<int> a(n), d(n);
+    for (auto &u : a) cin >> u;
+    for (auto &u : d) cin >> u;
+
+    vector<int> l(n), r(n);
+    for(int i = 0; i < n; i++) {
+        l[i] = i - 1;
+        r[i] = i + 1;
+    }
+
+    vector<int> check;
+    vector<int> ans;
+    for(int i = 0; i < n; i++) check.push_back(i);
+
+    while(!check.empty()) {
+        set<int> dead;
+
+        for (auto u : check){
+            int damage = 0;
+            if (l[u] >= 0) damage += a[l[u]];
+            if (r[u] < n) damage += a[r[u]];
+            if (damage > d[u]) dead.insert(u);
+        }
+
+        ans.push_back(dead.size());
+        if(dead.empty()) break;
+
+        vector<int> next;
+
+        for (auto u : dead){
+            if (l[u] >= 0) r[l[u]] = r[u];
+            if (r[u] < n) l[r[u]] = l[u];
+            if (l[u] >= 0 && !dead.count(l[u])) next.push_back(l[u]);
+            if (r[u] < n && !dead.count(r[u])) next.push_back(r[u]);
+        }
+        sort(all(next));
+        next.erase(unique(next.begin(), next.end()), next.end());
+        check = next; 
+    }
+    for (auto u : ans) cout << u << " ";
+    for (int i = 0; i < n-ans.size(); i++) cout << "0 ";
+    cout << endl;
 }
 
 signed main(){

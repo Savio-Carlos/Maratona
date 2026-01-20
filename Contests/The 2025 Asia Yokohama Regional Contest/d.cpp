@@ -16,7 +16,7 @@ void dbg_out(H h, T... t) {cerr << ' ' << h; dbg_out(t...);}
     #define fastio (void)0
     #define debug(...) cerr << #__VA_ARGS__ << ':'; dbg_out(__VA_ARGS__);
 #else 
-    #define fastio ios_base::sync_with_stdio(false), cout.tie(NULL). cin.tie(NULL)
+    #define fastio ios_base::sync_with_stdio(false), cout.tie(NULL), cin.tie(NULL)
     #define debug(...) (void)0
 #endif
 
