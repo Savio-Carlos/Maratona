@@ -71,4 +71,10 @@ namespace HLD {
         if (pos[a] < pos[b]) swap(a,b);
         return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
     }
+    int dist(int a, int b) {
+        if (a == b) return 0;
+        if (pos[a] < pos[b]) swap(a,b);
+        if (h[a] == h[b]) return pos[a] - pos[b];
+        return pos[a] - pos[h[a]] + 1 + dist(ancestor[h[a]], b);
+    }
 }
