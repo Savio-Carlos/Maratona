@@ -66,7 +66,7 @@ signed main(){
         }
 
         int mask = (1 << n) - 1;
-        bool pos = fal se;
+        bool pos = false;
         vector<int> ans;
 
         queue<pair<int, vector<int>>> q;
@@ -75,7 +75,7 @@ signed main(){
         vector<bool> visited(1 << n, false);
         visited[mask] = true;
 
-        while(!q.empty()){
+        while(!q.empty()){ 
             auto [cur_mask, seq] = q.front();
             q.pop();
 

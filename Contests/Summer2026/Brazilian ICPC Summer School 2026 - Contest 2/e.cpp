@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -54,14 +54,81 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+struct DSU {
+	vector<int> id, sz;
 
-void solve(){
-    
-}
+	DSU(int n) : id(n), sz(n, 1) { iota(id.begin(), id.end(), 0); }
+
+	int find(int a) { return a == id[a] ? a : id[a] = find(id[a]); }
+    int sizee(int a) { return sz[find(a)]; }
+
+	void unite(int a, int b) {
+		a = find(a), b = find(b);
+		if (a == b) return;
+		if (sz[a] < sz[b]) swap(a, b);
+		sz[a] += sz[b], id[b] = a;
+	}
+};
 
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    int n, m; 
+    cin >> n >> m;
+    vector<vector<int>> inter(n);
+    vector<pair<int,int>> sorted(n);
+    for (int i = 0; i < n; i++){
+        int k;
+        cin >> k;
+        sorted[i] = {k,i};
+        for (int j = 0; j < k; j++){
+            int x;
+            cin >> x;
+            inter[i].push_back(x);
+        }   
+    }
+    DSU dsu(m+1);
+    sort(all(sorted));
+    int p1 = -1;
+    for (auto [siz, idx] : sorted){
+        if (siz <= 1) continue;
+
+        for (int i = 0; i+1 < siz; i++){
+            dsu.unite(inter[idx][i], inter[idx][i+1]);
+        }
+        debug(idx, siz,dsu.sz[inter[idx][0]]);
+        debug(dsu.sizee(inter[idx][0]));
+
+        if (dsu.sizee(inter[idx][0]) != siz){
+            p1 = idx;
+            break;
+        }
+    }
+
+    if (p1 == -1){
+        cout << "NO" << endl;
+        return 0;
+    }
+
+    cout << "YES" << endl;
+    cout << p1+1 << " ";
+    vector<int> freq(m+1, 0);
+    auto st = inter[p1];
+    for (auto u : st) freq[u]++;
+    for (int i = 0; i < n; i++){
+        if (i == p1) continue;
+        int equal = 0;
+        int diff = 0;
+        for (auto u : inter[i]){
+            if(freq[u]) equal++;
+            else diff++; 
+        }
+        int r = (int)st.size() - equal;
+
+        // debug(p1, i, equal, diff, r);
+        if (r > 0 && equal > 0 && diff > 0) {
+            cout << i+1 << endl;
+            return 0;
+        }
+    }
 }
+  
