@@ -24,7 +24,7 @@ int main () {
         }
         int mae ;
         int irmao;
-        int mx = 0, mn = LLONG_MAX;
+        int mx = 0, mn = 1e9;
 
         for (int i = 1; i <= n-d+1; i++){
             if (vis[i] > mx) mx = vis[i], irmao = i;

@@ -9,6 +9,9 @@ int fastExpo(int base, int exp) {
     }
     return res%MOD;
 }
+int modiv(int a, int b){
+    return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+}
 
 int fastExpo(int base, int exp) {
     int res = 1;
@@ -40,3 +43,4 @@ ld fastExpo(ld base, int exp) {
     }
     return res;
 }
+
