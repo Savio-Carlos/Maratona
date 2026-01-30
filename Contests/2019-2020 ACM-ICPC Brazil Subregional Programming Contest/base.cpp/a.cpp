@@ -2,7 +2,7 @@
 using namespace std;
 
 #define int long long
-#define fastio ios_base::sync_with_stdio(0); cin.tie(0)
+#define fastio22 ios_base::sync_with_stdio(0); cin.tie(0)
 #define endl '\n'
 
 int n, m, k; 
@@ -56,7 +56,7 @@ int dist(int x1, int y1, int x2, int y2){
     return (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2);
 }
 signed main(){
-    fastio;
+    fastio22;
     cin >> n >> m >> k;
     int pos = 1;
     vector<tuple<int, int, int>> v;

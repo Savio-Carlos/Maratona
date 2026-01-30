@@ -14,7 +14,7 @@ struct DSU{
     }
 
     int find(int x){
-        return p[x] == x ? x : find(p[x]);
+        return p[x] == x ? x : p[x] = find(p[x]);
     }
 
     bool unite(int a, int b){
