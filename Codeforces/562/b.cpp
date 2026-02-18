@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -56,19 +56,29 @@ using namespace dbg;
 
 
 void solve(){
-    int n, a, b, x, y;
-    cin >> n >> a >> x >> b >> y;
-    a--;b--;x--;y--;
-    while (a != x && b != y){
-        a = (a + 1) % n;
-        b = (b - 1 + n) % n;
-        if (a == b){
-            cout << "YES\n";
-            return;
+    int n, m;
+    cin >> n >> m;
+    vector<pair<int,int>> p(m);
+    for (auto &[a,b] : p) cin >> a >> b;
+
+    auto check = [&](int x) -> bool {
+        map<int,int> freq;
+        int cnt = 0;
+        for (auto &[a, b] : p) {
+            if (a == x || b == x) continue;
+            cnt++;
+            freq[a]++;
+            freq[b]++;
         }
-    }
-    if (a == b) cout << "YES\n";
-    else cout << "NO\n";
+        if (!cnt) return 1;
+        for (auto &[val, f] : freq) if (f == cnt) return 1;
+        return 0;
+    };
+
+    int x1 = p[0].first;
+    int x2 = p[0].second;
+    if (check(x1) || check(x2)) cout << "YES" << endl;
+    else cout << "NO" << endl;
 }
 
 signed main(){
