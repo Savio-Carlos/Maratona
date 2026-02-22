@@ -58,32 +58,43 @@ using namespace dbg;
 void solve(){
     int n, m;
     cin >> n >> m;
-    vector<pair<int,int>> p(m);
-    for (auto &[a,b] : p) cin >> a >> b;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    int ans = 0;
 
-    auto check = [&](int x) -> bool {
-        map<int,int> freq;
-        int cnt = 0;
-        for (auto &[a, b] : p) {
-            if (a == x || b == x) continue;
-            cnt++;
-            freq[a]++;
-            freq[b]++;
+    int l = 0, r = m;
+    while (l <= r){
+        int mid = (l + r) / 2;
+        int prev = 0;
+        bool pos = true;
+        debug(mid);
+        for (int i = 0; i < n; i++){
+            int range_up = min(m-1, a[i] + mid);//do a[i] ate range_up
+            int range_down = (a[i] + mid >= m) ? ((a[i] + mid) % m) : -1;//do 0 ate o range_down, ou nada se nao bater no mod
+            debug(i, a[i], prev, range_down, range_up);
+
+            int cur = a[i];
+            if (range_down >= prev) cur = prev;
+            if (range_up >= prev && prev >= a[i]) cur = prev;
+            if (cur < prev) pos = false;
+            prev = cur;
+            debug(i, cur, prev);
         }
-        if (!cnt) return 1;
-        for (auto &[val, f] : freq) if (f == cnt) return 1;
-        return 0;
-    };
-
-    int x1 = p[0].first;
-    int x2 = p[0].second;
-    if (check(x1) || check(x2)) cout << "YES" << endl;
-    else cout << "NO" << endl;
+        debug(pos);
+        if (pos){
+            ans = mid;
+            r = mid - 1;
+        }
+        else {
+            l = mid + 1;
+        }
+    }
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t ;
+    // cin >> t;
     while(t--) solve();
 }
