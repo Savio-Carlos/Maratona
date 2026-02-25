@@ -59,12 +59,17 @@ void solve(){
     cin >> n;
     vector<int> a(n);
     for (auto &u : a) cin >> u;
-
-
-    int ans = 0;
-
-    for (int i = 0; i < n; i++){
-
+    stack<pair<int,int>> st;
+    int ans =  0;
+    int cur = 0;
+    for (int i = n-1; i >= 0; i--){
+        while (!st.empty() && st.top().first == a[i] + 1){
+            cur -= (n - st.top().second);
+            st.pop();
+        }
+        cur += n - i;
+        ans += cur;
+        st.emplace(a[i], i);
     }
     cout << ans << endl;
 }

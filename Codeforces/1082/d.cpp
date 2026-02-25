@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -57,8 +57,36 @@ using namespace dbg;
 void solve(){
     int n, k;
     cin >> n >> k;
+    if (k < n || k >= 2*n){
+        cout << "NO" << endl;
+        return;
+    }
+    if (n == 1){
+        cout << "YES" << endl;
+        cout << 1 << ' ' << 1 << endl;
+        return;
+    }
+    int r = k - n + 1;
+    cout << "YES" << endl;
 
+    if (k == n){
+        for (int i = 1; i <= n; i++){
+            cout << i << " " << i << " ";
+        }
+        cout << endl;
+        return;
+    }
     
+    cout << 1 << ' ' << 2 << ' ';
+    r -= 2;
+    int velho = 1;
+    int novo = 3;
+    while(r--){
+        cout << novo++ << ' ' << velho++ << ' ';
+    } 
+    while (velho < novo) cout << velho++ << ' ';
+    while (novo <= n)cout << novo << ' ' << novo++ << ' ';
+    cout << endl;
 }
 
 signed main(){
