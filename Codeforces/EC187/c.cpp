@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -57,27 +57,42 @@ using namespace dbg;
 void solve(){
     int s, m;
     cin >> s >> m;
-    if (m > s){
+
+    auto lsb = [&](int x) -> int {
+        return (x & (-x));
+    };
+ 
+    if(lsb(s) < lsb(m)) {
         cout << -1 << endl;
         return;
     }
-    int rem = s;
-    int div = m;
+
+    auto check = [&](int mid) -> bool {
+        int sum = s;
+        for(int i = 63; i >= 0; i--){
+            int p = (1LL << i);//potencia de 2 atual
+            if(m & p){
+                int q = min(mid, sum / p);//quantas vezes posso subtrair essa potencia de sum
+                int d = q*p;
+                sum -= d;
+                debug(mid, sum, p, q, d);
+                if(!sum) return 1;
+            }
+        }
+        return (!sum);
+    };
+
+    int l = 1, r = s;
     int ans = 0;
-    for (int i = 32; i >= 0; i--){
-        if (!(m & (1LL<<i))) continue;
-        int d = rem / div;
-        debug(div, d);
-        rem -= d * div;
-        div ^= (1LL << i);
-        ans += d;
-        if (!rem) break;
+    while(l <= r){
+        int mid = l + (r - l) / 2;
+        if(check(mid)){
+            ans = mid;
+            r = mid - 1;
+        } 
+        else l = mid + 1;
     }
-    if (rem != 0) {
-        cout << -1 << endl;
-        return;
-    }
-    else cout << ans << endl;   
+    cout << ans << endl;
 }
 
 signed main(){
