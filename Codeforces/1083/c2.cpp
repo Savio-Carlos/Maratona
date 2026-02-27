@@ -57,6 +57,7 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
+
     vector<vector<int>> a(n);
     for (int i = 0; i < n; i++){
         int q;
@@ -65,29 +66,43 @@ void solve(){
         unordered_set<int> c;
         for (auto &u : b) cin >> u;
         debug(b);
-        c.insert(all(b));
-        a[i] = vector<int>(all(c));
+        for (int j = q - 1; j >= 0; j--){
+            if (c.insert(b[j]).second) a[i].push_back(b[j]);
+        }
     }
-    sort(rall(a));
-    debug(a);
 
+    vector<bool> used(1e6+7, 0);
+    vector<bool> visited(n, 0);
     vector<int> ans;
-    for (int i = 0; i < n; i++){
-        vector<int> aa;
-        for(auto u : a[i]) aa.push_back(u);
-        reverse(all(aa));
-        for (auto u : aa) ans.push_back(u);
+
+    for (int step = 0; step < n; step++) {
+        int best_idx = -1;
+        vector<int> best_v;
+
+        for (int i = 0; i < n; i++) {
+            if (visited[i]) continue;
+
+            vector<int> v;
+            for (int u : a[i]) {
+                if (!used[u]) {
+                    v.push_back(u);
+                }
+            }
+
+            if (best_idx == -1 || v < best_v) {
+                best_idx = i;
+                best_v = v;
+            }
+        }
+
+        visited[best_idx] = true;
+        for (int u : best_v) {
+            used[u] = true;
+            ans.push_back(u);
+        }
     }
-    reverse(all(ans));
-    debug(ans); 
-    set<int> aaa(all(ans));
-    int m = aaa.size();
-    vector<bool> visited(1e6+7, false);
-    int cnt = 0;
-    for (int i = 0; cnt < m; i++){
-        if (visited[ans[i]]) continue;
-        visited[ans[i]] = 1;
-        cnt++;
+
+    for (int i = 0; i < ans.size(); i++){
         cout << ans[i] << ' ';
     }
     cout << endl;
