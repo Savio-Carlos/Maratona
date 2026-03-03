@@ -61,7 +61,7 @@ void solve(){
     vector<pair<int,int>> particles(n), shop(m);
     map<int,vector<int>> mp;
 
-    vector<int> mn(n+1,0);
+    vector<int> mn(n+2,0);
     for (auto &[x,y] : particles){
         cin >> x >> y;
         mp[y].push_back(x); 
@@ -69,18 +69,20 @@ void solve(){
     for (auto &[x,y] : shop) cin >> x >> y;
 
     debug(mp);
-    vector<int> best(n+1);
+    vector<int> best(n+2);
     multiset<int> mt;
     int sum = 0;
     for (auto u : mp[n]){
         mt.insert(u);
         sum += u;
-        if (mt.size() > n) {
+        if (mt.size() > n+1) {
             auto it = mt.begin();
             sum -= *it;
             mt.erase(it);
         }
     }
+    best[n+1] = sum;
+    int melhor = 0;
 
     for (int i = n; i ; i--){
         for (auto u :mp[i-1]){
@@ -100,15 +102,19 @@ void solve(){
         mn[i] = mt.size() == i ? *mt.begin() : 0LL;
         best[i] = sum;
         debug(mt);
+        melhor = max(melhor, best[i]);
     }
-    int melhor = *max_element(all(best));
 
     debug(best);
     debug(mn);
     debug(melhor);
-    
+
+    vector<int> pfx(n+2, 0);
+    for (int i = 1; i <= n+1; i++) pfx[i] = max(pfx[i-1], best[i] - mn[i]);
+
     for (auto [x,y] : shop){
-        cout << max({melhor, best[y+1] - mn[y+1] + x, x}) << " ";
+        int ans = max(melhor, x + pfx[y+1]);
+        cout << ans << " ";
     }
    
     cout << endl;
