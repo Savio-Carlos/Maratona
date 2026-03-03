@@ -54,9 +54,60 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int MAX = 2e5+7;
+vector<int> graph[MAX];
+int a[MAX], subsum[MAX], cost[MAX], mxdp[MAX], ans[MAX], bg[MAX], maxcs[MAX];
+
+void dfs(int v, int p) {
+    subsum[v] = a[v];
+    cost[v] = 0;
+    mxdp[v] = 0;
+    bg[v] = 0;
+    maxcs[v] = 0;
+
+    vector<pair<int,int>> ch;
+    for (auto u : graph[v]){
+        if (u == p) continue;
+        dfs(u, v);
+        subsum[v] += subsum[u];
+        cost[v] += cost[u] + subsum[u];
+        mxdp[v] = max(mxdp[v], mxdp[u] + 1);
+        maxcs[v] = max(maxcs[v], subsum[u]);
+        ch.push_back({mxdp[u]+1, subsum[u]});
+    }
+    int d1 = 0, d2 = 0;
+    for (auto& [d, s] : ch) {
+        if (d >= d1) { d2 = d1; d1 = d; }
+        else if (d > d2) { d2 = d; }
+    }
+    for (auto u : graph[v]){
+        if (u == p) continue;
+        int dc = mxdp[u] + 1;
+        int ec = (dc == d1) ? d2 : d1;
+        bg[v] = max(bg[v], subsum[u] * ec);
+        bg[v] = max(bg[v], max(0LL, ec - 1) * maxcs[u]);
+        bg[v] = max(bg[v], bg[u]);
+    }
+
+    ans[v] = cost[v] + bg[v];
+}
 
 void solve(){
-
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        graph[i].clear();
+    }
+    for (int i = 0; i < n-1; i++) {
+        int a, b;
+        cin >> a >> b;
+        graph[--a].push_back(--b);
+        graph[b].push_back(a);
+    }
+    dfs(0, -1);
+    for (int i = 0; i < n; i++) cout << ans[i] << " ";
+    cout << endl;
 }
 
 signed main(){
