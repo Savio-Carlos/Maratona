@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -53,21 +53,42 @@ using namespace dbg;
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
- 
+
+
+const int INF = 1e18;
+
+int cost(int lado){
+    if (lado == 0) return 0;
+    if (lado <= 4) return 1;
+    return 2;
+}
+
 signed main(){
     winton;
-    string s;
-    cin >> s;
-    int n = s.size();
-    ld ans = 0;
-    for (int i = 0; i < n; i++){
-        ld cur = 0;
-        for (int j = n-i-1; j >= 0; j--){
-            cur = cur/10.0 + (s[j] - '0');
+    vector<string> lines(6);
+    for (auto &s : lines) cin >> s;
+    debug(lines);
+    vector<int> dp(6,0);
+    for (int i = 0; i < 6; i++) dp[i] = cost(i);
+
+    for (int i = 1; i < 16; i++){
+        vector<int> ndp(6,INF);
+        for (int j = 0; j < 6; j++){
+            char cur = lines[j][i];
+            debug(i,j, cur);
+            for (int k = 0; k < 6; k++){
+                if (dp[k] >= INF) continue;
+                char prev = lines[k][i-1];
+                if (prev == 'Q') prev = 'U'; 
+                debug(prev);
+                if (prev <= cur) ndp[j] = min(ndp[j], dp[k] + cost(j));
+            }
         }
-        debug(cur);
-        if (!i) ans += cur;
-        else ans += (cur * 0.9);
+        debug(ndp);
+        dp = ndp;
     }
-    cout << fixed << setprecision(7) << ans << endl;
+
+    int ans = *min_element(all(dp));
+    if (ans >= INF) cout << "impossible" << endl;
+    else cout << ans << endl;
 }
