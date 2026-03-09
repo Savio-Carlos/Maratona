@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -53,8 +53,6 @@ using namespace dbg;
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
-
-
 
 signed main(){
     winton;
@@ -66,22 +64,35 @@ signed main(){
     for (auto &u : a) cin >> u;
     if (a[0] != 0){
         cout << -1 << endl;
-        return;
+        return 0;
     }
     for (int i = 0; i < (1 << n); i++) losers[a[i]].push_back(i);
-    
-    winners.push_back(1);
-    for (int i = 1; i <= n; i++){
-        vector<int> temp;
-        int l = 0, r = 0;
+    winners.push_back(0);
+    debug(losers);
+    for (int i = n; i >= 1; i--){
         
+        auto rem = winners;
+        sort(all(rem));
+        sort(all(losers[i]));
+        
+        map<int,int> order;
+        int idx = 0;
+        while (idx < losers[i].size()){
+            if (rem[idx] > losers[i][idx]){
+                cout << -1 << endl;
+                return 0;
+            }
+            order[rem[idx]] = losers[i][idx];
+            idx++;
+        }
+        vector<int> newwin;
+        for (auto u : winners){
+            newwin.push_back(u);
+            newwin.push_back(order[u]);
+        }
+
+        debug(newwin);
+        winners = newwin;
     }
-
-
-
-
-
-
-    debug(a);
-
+    for (auto u : winners) cout << u+1 << " ";
 }
