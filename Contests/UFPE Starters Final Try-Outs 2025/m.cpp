@@ -54,89 +54,46 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int INF = 1e18;
 
-const int MOD = 1e9+7;
+void solve(){
+    int n;
+    cin >> n;
+    if (n == 1) {
+        int x; cin >> x;
+        cout << 0 << endl;
+        return;
+    }
+    vector<vector<int>> city (n, vector<int>(n));
+    for (auto &l : city){
+        for (auto &u : l) cin >> u;
+    } 
 
-// Matriz
+    int tot = (1 << n) - 1;
+    vector<vector<int>> dp(1 << n, vector<int>(n, INF));
+    dp[1][0] = 0;
 
-#define MODULAR true
-template<typename T> struct matrix : vector<vector<T>> {
-    int n, m;
-    
-	void print() {
+    for (int mask = 1; mask <= tot; mask++) {
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) cout << (*this)[i][j] << " ";
-			cout << endl;
-		}
-	}
-    
-	matrix(int n_, int m_, bool ident = false) :
-
-    vector<vector<T>>(n_, vector<T>(m_, 0)), n(n_), m(m_) {
-        if (ident) {
-            assert(n == m);
-			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
-		}
-	}
-	matrix(const vector<vector<T>>& c) : vector<vector<T>>(c),
-    n(c.size()), m(c[0].size()) {}
-	matrix(const initializer_list<initializer_list<T>>& c) {
-        vector<vector<T>> val;
-		for (auto& i : c) val.push_back(i);
-		*this = matrix(val);
-	}
-    
-	matrix<T> operator*(matrix<T>& r) {
-        assert(m == r.n);
-		matrix<T> M(n, r.m);
-		for (int i = 0; i < n; i++) for (int k = 0; k < m; k++)
-        for (int j = 0; j < r.m; j++) {
-            T add = (*this)[i][k] * r[k][j];
-            #if MODULAR
-            #warning Usar matrix<ll> e soh colocar valores em [0, MOD) na matriz!
-            M[i][j] += add%MOD;
-            if (M[i][j] >= MOD) M[i][j] -= MOD;
-            #else
-            M[i][j] += add;
-            #endif
+            if (dp[mask][i] == INF) continue;
+            if (!(mask & (1 << i))) continue;
+            for (int j = 0; j < n; j++) {
+                if (mask & (1 << j)) continue;
+                int nmask = mask | (1 << j);
+                dp[nmask][j] = min(dp[nmask][j], dp[mask][i] + city[i][j]);
+            }
         }
-		return M;
-	}
-	matrix<T> operator^(int e){
-		matrix<T> M(n, n, true), at = *this;
-		while (e) {
-			if (e&1) M = M*at;
-			e >>= 1;
-			at = at*at;
-		}
-		return M;
-	}
-	void apply_transform(matrix M, int e){
-        auto& v = *this;
-		while (e) {
-            if (e&1) v = M*v;
-			e >>= 1;
-			M = M*M;
-		}
-	}
-};
+    }
 
+    int ans = INF;
+    for (int i = 0; i < n; i++) {
+        if (dp[tot][i] == INF) continue;
+        ans = min(ans, dp[tot][i] + city[i][0]);
+    }
+    cout << ans << endl;
+}
 
 signed main(){
     winton;
-    int n, a, b;
-    cin >> n >> a >> b;
-    
-    if (n&1) cout << "Samuell" << endl;
-    else cout << "Lleumas" << endl;
-
-    if (n <= 2){ 
-        cout << (n == 1 ? a : b) << endl;
-        return 0;
-    }
-    
-    matrix<int> m = {{1LL, 1LL}, {1LL, 0LL}};
-    matrix<int> base = {{b}, {a}};
-    m = (m ^ (n-2)) * base;
-    cout << m[0][0] % MOD << endl;
+    solve();
 }

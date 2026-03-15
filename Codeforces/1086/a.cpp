@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -55,88 +55,23 @@ using namespace dbg;
 #endif
 
 
-const int MOD = 1e9+7;
-
-// Matriz
-
-#define MODULAR true
-template<typename T> struct matrix : vector<vector<T>> {
-    int n, m;
-    
-	void print() {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) cout << (*this)[i][j] << " ";
-			cout << endl;
-		}
-	}
-    
-	matrix(int n_, int m_, bool ident = false) :
-
-    vector<vector<T>>(n_, vector<T>(m_, 0)), n(n_), m(m_) {
-        if (ident) {
-            assert(n == m);
-			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
-		}
-	}
-	matrix(const vector<vector<T>>& c) : vector<vector<T>>(c),
-    n(c.size()), m(c[0].size()) {}
-	matrix(const initializer_list<initializer_list<T>>& c) {
-        vector<vector<T>> val;
-		for (auto& i : c) val.push_back(i);
-		*this = matrix(val);
-	}
-    
-	matrix<T> operator*(matrix<T>& r) {
-        assert(m == r.n);
-		matrix<T> M(n, r.m);
-		for (int i = 0; i < n; i++) for (int k = 0; k < m; k++)
-        for (int j = 0; j < r.m; j++) {
-            T add = (*this)[i][k] * r[k][j];
-            #if MODULAR
-            #warning Usar matrix<ll> e soh colocar valores em [0, MOD) na matriz!
-            M[i][j] += add%MOD;
-            if (M[i][j] >= MOD) M[i][j] -= MOD;
-            #else
-            M[i][j] += add;
-            #endif
-        }
-		return M;
-	}
-	matrix<T> operator^(int e){
-		matrix<T> M(n, n, true), at = *this;
-		while (e) {
-			if (e&1) M = M*at;
-			e >>= 1;
-			at = at*at;
-		}
-		return M;
-	}
-	void apply_transform(matrix M, int e){
-        auto& v = *this;
-		while (e) {
-            if (e&1) v = M*v;
-			e >>= 1;
-			M = M*M;
-		}
-	}
-};
-
+void solve(){
+    int n;
+    cin >> n;
+    map<int,int> mp;
+    string ans = "YES";
+    for (int i = 0; i < n*n; i++){
+        int c;
+        cin >> c;
+        mp[c]++;
+        if (mp[c] > n*n-n) ans = "NO";
+    }
+    cout << ans << endl;
+}
 
 signed main(){
     winton;
-    int n, a, b;
-    cin >> n >> a >> b;
-    
-    if (n&1) cout << "Samuell" << endl;
-    else cout << "Lleumas" << endl;
-
-    if (n <= 2){ 
-        cout << (n == 1 ? a : b) << endl;
-        return 0;
-    }
-    
-    matrix<int> m = {{1LL, 1LL}, {1LL, 0LL}};
-    matrix<int> base = {{b}, {a}};
-    m = (m ^ (n-2)) * base;
-    cout << m[0][0] % MOD << endl;
+    int t;
+    cin >> t;
+    while(t--) solve();
 }
