@@ -1,13 +1,27 @@
+long long ans = 0;
 
+auto lambda_padrao = [&](int x, int y) -> int {
+    return x + y;
+};
 
-auto reduce = [&](multiset<string> ms){
+auto lambda_generica = [&](const auto &v) {
+    return (int)v.size();
+};
+
+auto lambda_recursiva = [&](auto &&self, int x) -> int {
+    if (x <= 1) return 1;
+    return x * self(self, x - 1);
+};
+
+auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
     multiset<int> mi;
-    for (auto &s : ms) {
+    for (const auto &s : ms) {
         if (s.size() > 1) {
-            mi.insert(s.size());
+            mi.insert((int)s.size());
             ans++;
-        } 
-        else mi.insert(s[0] - '0');
+        } else {
+            mi.insert(s[0] - '0');
+        }
     }
     return mi;
 };
