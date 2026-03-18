@@ -82,6 +82,8 @@ signed main(){
         return c;
     };  
 
+    ld x = max<ld>(5, 6);
+
     while(n) {
         if (n & 1) {   
             b = multiply(b,a);

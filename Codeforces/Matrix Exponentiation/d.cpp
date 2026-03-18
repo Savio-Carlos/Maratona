@@ -54,25 +54,65 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+const int MOD = 1e9+7;
 
-void solve(){
-    int n, k;
-    cin >> n >> k;
-    if (!(n&1) || k != (n/2)){
-        cout << -1 << endl;
-        return;
-    }
-    int wins = n/2;
-    for (int i = 0; i < n; i++){
-        for (int j = 1; j <= wins; j++){
-            cout << i+1 << " " << ((i+j)%n)+1 << endl;
+struct matrix : vector<vector<int>> {
+    int n, m;
+
+    matrix(int n_, int m_, bool ident = false) : vector<vector<int>>(n_, vector<int>(m_, 0)), n(n_), m(m_) {
+        if (ident) {
+            assert(n == m);
+			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
+		}
+	}
+
+    matrix(const vector<vector<int>>& c) : vector<vector<int>>(c),
+    n(c.size()), m(c[0].size()) {}
+
+    matrix operator*(const matrix &a){
+        assert(m == a.n);
+        matrix res(n, a.m);
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < m; j++){
+                for (int k = 0; k < a.m; k++){
+                    res[i][j] = (res[i][j] + ((*this)[i][k] * a[k][j]) % MOD) % MOD;
+                }
+            }
         }
+        return res;
     }
-}
+
+    matrix operator^(int e) const {
+        matrix res(n,n,true);
+        matrix base = *this;
+        while (e) {
+            if (e&1) res = res * base;
+            base = base * base;
+            e >>= 1;
+        }
+        return res;
+    }
+};
+
 
 signed main(){
     winton;
-    int t = 1;
-    // cin >> t;
-    while(t--) solve();
+    int n, m, k;
+    cin >> n >> m >> k;
+    vector<vector<int>> con(n, vector<int>(n));
+    for (int i = 0; i < m; i++){
+        int a, b;
+        cin >> a >> b;
+        con[--a][--b] = 1;
+    }
+    matrix mt(con);
+    
+    mt = mt^k;
+
+    int ans = 0;
+    
+    for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++) ans = (ans + mt[i][j]) % MOD;
+
+    cout << ans << endl;
 }
