@@ -11,12 +11,12 @@ struct matrix : vector<vector<int>> {
     matrix(const vector<vector<int>>& c) : vector<vector<int>>(c),
     n(c.size()), m(c[0].size()) {}
 
-    matrix operator*(const matrix &a){
+    matrix operator*(const matrix &a) const {
         assert(m == a.n);
         matrix res(n, a.m);
         for (int i = 0; i < n; i++){
-            for (int j = 0; j < m; j++){
-                for (int k = 0; k < a.m; k++){
+            for (int j = 0; j < a.m; j++){
+                for (int k = 0; k < m; k++){
                     res[i][j] = (res[i][j] + ((*this)[i][k] * a[k][j]) % MOD) % MOD;
                 }
             }

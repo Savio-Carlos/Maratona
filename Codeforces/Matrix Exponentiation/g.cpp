@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+// #define DEBUG 
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -55,38 +55,39 @@ using namespace dbg;
 #endif
 
 const int INF = LLONG_MAX;
+const int MOD = 1e9+7;
+
+int p, q, r;
 
 struct matrix : vector<vector<int>> {
     int n, m;
 
-    matrix(int n_, int m_, bool ident = false) : vector<vector<int>>(n_, vector<int>(m_, INF)), n(n_), m(m_) {
+    matrix(int n_, int m_, bool ident = false) : vector<vector<int>>(n_, vector<int>(m_, 0)), n(n_), m(m_) {
         if (ident) {
             assert(n == m);
-			for (int i = 0; i < n; i++) (*this)[i][i] = 0;
+			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
 		}
 	}
 
     matrix(const vector<vector<int>>& c) : vector<vector<int>>(c),
     n(c.size()), m(c[0].size()) {}
 
-    matrix operator*(const matrix &a){
+    matrix operator*(const matrix &a) const {
         assert(m == a.n);
         matrix res(n, a.m);
         for (int i = 0; i < n; i++){
-            for (int j = 0; j < m; j++){
-                res[i][j] = INF;
-                for (int k = 0; k < a.m; k++){
-                    if ((*this)[i][k] == INF || a[k][j] == INF) continue;
-                    res[i][j] = min(res[i][j], (*this)[i][k] + (a[k][j]));
+            for (int j = 0; j < a.m; j++){
+                for (int k = 0; k < m; k++){
+                    res[i][j] = (res[i][j] + ((*this)[i][k] * a[k][j]) % MOD) % MOD;
                 }
             }
         }
-        debug(res);
+
         return res;
     }
 
     matrix operator^(int e) const {
-        matrix res(n,n,1);
+        matrix res(n,n,true);
         matrix base = *this;
         while (e) {
             if (e&1) res = res * base;
@@ -97,28 +98,55 @@ struct matrix : vector<vector<int>> {
     }
 };
 
+
 signed main(){
     winton;
-    int n, m, k;
-    cin >> n >> m >> k;
-    vector<vector<int>> con(n, vector<int>(n, INF));
-    for (int i = 0; i < m; i++){
-        int a, b, c;
-        cin >> a >> b >> c;
-        con[--a][--b] = c;
-    }
-    matrix mt(con);
+    int n, k;
+    cin >> n >> k;
+    vector<int> c(n), a(n);
+
+    for (auto &u : a) cin >> u;
+    for (auto &u : c) cin >> u;
+    cin >> p >> q >> r;
+
+    if(k < n) {
+	    cout << a[k] << endl;
+		return 0;
+	}
+
+    vector<vector<int>> cm(n+3, vector<int>(n+3));
+    for (int i = 0; i < n - 1; i++) cm[i][i+1] = 1;
+    for (int j = 0; j < n; j++) cm[n-1][j] = c[n-1-j];
+
+    cm[n-1][n] = p;
+    cm[n-1][n+1] = q;
+    cm[n-1][n+2] = r;
+
+    //1* p
+    cm[n][n] = 1;
     
+    //i* q
+    cm[n+1][n] = 1;
+    cm[n+1][n+1] = 1;
 
-    debug(mt);
-    mt = mt^k;
-    debug(mt);
+    //i²* r
+    cm[n+2][n] = 1;
+    cm[n+2][n+1] = 2;
+    cm[n+2][n+2] = 1;
 
-    int ans = INF;
+    matrix mcm(cm);
+    debug(mcm);
+    mcm = mcm ^ (k-n+1);
     
-    for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++) ans = min(ans, mt[i][j]);  
+    vector<vector<int>> ca(n+3, vector<int>(1));
+    for (int i = 0; i < n; i++) ca[i][0] = a[i];
+    ca[n][0] = 1;
+    ca[n+1][0] = n;
+    ca[n+2][0] = (n * n);
 
-    if (ans == INF) cout << "IMPOSSIBLE" << endl;
-    else cout << ans << endl;
+    matrix mca(ca);
+    debug(mca);
+    mca = mcm * mca;
+    debug(mca);
+    cout << mca[n-1][0] << endl;
 }
