@@ -59,41 +59,47 @@ using namespace dbg;
 void solve(){
     int r, g, b;
     cin >> r >> g >> b;
+    vector<pair<int, char>> a = {{r, 'R'}, {g, 'G'}, {b, 'B'}};
+    sort(all(a));
     
-    vector<pair<int, char>> v = {{r, 'R'}, {g, 'G'}, {b, 'B'}};
-    sort(all(v));
+    auto& [cnt0, ch0] = a[0];
+    auto& [cnt1, ch1] = a[1];
+    auto& [cnt2, ch2] = a[2];
+    debug(cnt0,cnt1,cnt2);
     
-    if (v[2].first > v[0].first + v[1].first + 1) {
-        v[2].first = v[0].first + v[1].first + 1;
-    }
+    if (cnt2 > cnt0 + cnt1 + 1) cnt2 = cnt0 + cnt1 + 1;
     
-    int n = v[0].first + v[1].first + v[2].first;
-    int odd_cnt = (n + 1) / 2;
-    int even_cnt = n / 2;
+    int n = cnt0 + cnt1 + cnt2;
+    int odd = (n+1)/2;
+    int even = n/2;
     
     string ans(n, ' ');
     
-    int ptr_odd = 0;
-    int ptr_even = (even_cnt - 1) * 2 + 1;
+    int idxo = 0;
+    int idxe = (even - 1) * 2 + 1;
+
+    for (int i = 0; i < odd - cnt2; i++) {
+        debug(odd-cnt2);
+        ans[idxo] = ch0;
+        idxo += 2;
+    }
+    debug(idxo);
+    debug(ans);
+    for (int i = 0; i < cnt2; i++) {
+        ans[idxo] = ch2;
+        idxo += 2;
+    }
+    debug(ans);
     
-    for (int k = 0; k < odd_cnt - v[2].first; k++) {
-        ans[ptr_odd] = v[0].second;
-        ptr_odd += 2;
+    for (int i = 0; i < even - cnt1; i++) {
+        ans[idxe] = ch0;
+        idxe -= 2;
     }
-    for (int k = 0; k < v[2].first; k++) {
-        ans[ptr_odd] = v[2].second;
-        ptr_odd += 2;
+    debug(ans);
+    for (int i = 0; i < cnt1; i++) {
+        ans[idxe] = ch1;
+        idxe -= 2;
     }
-    
-    for (int k = 0; k < even_cnt - v[1].first; k++) {
-        ans[ptr_even] = v[0].second;
-        ptr_even -= 2;
-    }
-    for (int k = 0; k < v[1].first; k++) {
-        ans[ptr_even] = v[1].second;
-        ptr_even -= 2;
-    }
-    
     cout << ans << endl;
 }
 
