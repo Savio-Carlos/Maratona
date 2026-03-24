@@ -23,29 +23,21 @@ void dbg_out(H h, T... t) { cerr << ' ' << h; dbg_out(t...); }
 
 const int MOD = 998244353;
 
-int fastexpo(int a, int b){
-    int res = 1;
-    while(b > 0){
-        if(b&1) res = (res*a)%MOD;
-        a = (a*a)%MOD;
-        b >>=1;
-    }
-    return res;
-}
-
 signed main(){
     fastio;
-    int n; cin >> n;
-    map<int, int> freq;
-    for(int i = 0; i < n; i++){
-        int x; cin >> x;
-        freq[x]++;
+    int n; 
+    cin >> n;
+    // map<int,int> sum;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    vector<int> sum(1e5+2);
+    vector<int> dp(n+1, 0);
+    dp[0] = 1;
+    for(int i = 1; i <= n; i++){
+        auto &s = sum[a[i-1]];
+        dp[i] = dp[i-1];
+        dp[i] = (dp[i] + s) % MOD;
+        s = (s + dp[i-1]) % MOD;
     }
-
-    int ans = 1;
-    for(auto [u, cnt] : freq){
-        int v = (fastexpo(2, cnt) - (cnt+1) + MOD)%MOD;
-        ans = (ans + v)%MOD;
-    }
-    cout << ans << endl;
+    cout << dp[n] << endl;
 }
