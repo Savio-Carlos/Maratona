@@ -187,3 +187,17 @@ int inpol(vector<point>& v, point p) { // O(n)
 	}
 	return qt != 0;
 }
+
+ld angle(const point &p, const point &ref) { // angulo do ponto p em relacao ao ponto ref
+    point v = p - ref;
+    ld ang = atan2(v.y, v.x);
+    if (ang < 0) ang += 2*pi;
+    return ang;
+}
+
+//ordena os pontos de acordo com o angulo
+void polarSort(vector<point> &v, point &ref) {
+    sort(v.begin(), v.end(), [&ref](point a, point b) { 
+        return angle(a, ref) < angle(b, ref);
+    });
+}
