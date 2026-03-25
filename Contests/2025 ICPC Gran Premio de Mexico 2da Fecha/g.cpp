@@ -2,182 +2,153 @@
 using namespace std;
 
 #define all(x) x.begin(), x.end()
-#define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
 #define ll long long
-#define ld long double
 
-namespace dbg {
-    const char* const RESET     = "\033[0m";
-    const char* const BOLD_BLUE = "\033[1;34m";
-    const char* const YELLOW    = "\033[33m";
-    const char* const BOLD_WHITE= "\033[1;37m";
-
-    template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
-
-    template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
-    ostream& operator<<(ostream& os, const T_container& v) {
-        os << '{';
-        bool first = true;
-        for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
-        return os << '}';
-    }
-
-    template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
-    void debug_out(string_view) { cerr << endl; }
-    template<typename H, typename... T>
-    void debug_out(string_view s, H h, T... t) {
-        auto cpos = s.find(',');
-        cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
-        cerr << BOLD_WHITE << h << RESET;
-        if constexpr (sizeof...(t) > 0) {
-            cerr << ", ";
-            auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
-            debug_out(s.substr(nx), t...);
-        } else {
-            cerr << endl;
-        }
-    }
-} 
-using namespace dbg;
-
-// #define DEBUG
-
-#if defined(DEBUG)
-    #define winton (void)0
-    #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
-#else
-    #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
-    #define debug(...) (void)0
-#endif
-
-//Geometria Double
-const ld DINF = 1e18;
-const ld pi = acos(-1.0);
-const ld eps = 1e-12;
-
-#define sq(x) ((x)*(x))
+typedef double ld;
+const ld eps = 1e-9;
 
 bool eq(ld a, ld b) {
-	return fabs(a - b) <= eps;
+    return abs(a - b) <= eps;
 }
 
-ll to_cents(ld v) {
-    return llround(v * 100.0L);
-}
-
-struct point { // ponto
-	ld x, y, h;
-	point(ld x_ = 0, ld y_ = 0, ld h_ = 0) : x(x_), y(y_), h(h_) {}
-	bool operator < (const point p) const {
-		if (!eq(x, p.x)) return x < p.x;
-		if (!eq(y, p.y)) return y < p.y;
-		return 0;
-	}
-	bool operator == (const point p) const {
-		return eq(x, p.x) and eq(y, p.y);
-	}
-	point operator + (const point p) const { return point(x+p.x, y+p.y); }
-	point operator - (const point p) const { return point(x-p.x, y-p.y); }
-	point operator * (const ld c) const { return point(x*c  , y*c  ); }
-	point operator / (const ld c) const { return point(x/c  , y/c  ); }
-	ld operator * (const point p) const { return x*p.x + y*p.y; }
-	ld operator ^ (const point p) const { return x*p.y - y*p.x; }
-	friend istream& operator >> (istream& in, point& p) {
-		return in >> p.x >> p.y >> p.h;
-	}
-    friend ostream& operator << (ostream& os, const point& p) { return os << "(" << p.x << ", " << p.y << ", h: " << p.h << ")"; }
+struct pt { // ponto
+    ld x, y;
+    pt(ld x_ = 0, ld y_ = 0) : x(x_), y(y_) {}
+    bool operator < (const pt p) const {
+        if (!eq(x, p.x)) return x < p.x;
+        if (!eq(y, p.y)) return y < p.y;
+        return 0;
+    }
+    bool operator == (const pt p) const {
+        return eq(x, p.x) and eq(y, p.y);
+    }
+    pt operator + (const pt p) const { return pt(x + p.x, y + p.y); }
+    pt operator - (const pt p) const { return pt(x - p.x, y - p.y); }
+    pt operator * (const ld c) const { return pt(x * c, y * c); }
+    pt operator / (const ld c) const { return pt(x / c, y / c); }
+    ld operator * (const pt p) const { return x * p.x + y * p.y; }
+    ld operator ^ (const pt p) const { return x * p.y - y * p.x; }
 };
 
-ld angle(const point &p, const point &ref) { // angulo do ponto p em relacao ao ponto ref
-    point v = p - ref;
-    ld ang = atan2(v.y, v.x);
-    if (ang < 0) ang += 2*pi;
-    return ang;
+ld sarea(pt p, pt q, pt r) { // area com sinal (cross product / 2)
+    return ((q - p) ^ (r - q)) / 2;
 }
 
-//ordena os pontos de acordo com o angulo
-void polarSort(vector<point> &v, point &ref) {
-    sort(v.begin(), v.end(), [&ref](point a, point b) { 
-        ld aa = angle(a, ref);
-        ld ab = angle(b, ref);
-        if (!eq(aa, ab)) return aa < ab;
-        point da = a - ref;
-        point db = b - ref;
-        return (da * da) < (db * db);
-    });
+bool col(pt p, pt q, pt r) { // se p, q e r sao colineares
+    return eq(sarea(p, q, r), 0);
 }
 
-signed main(){
-    winton;
+bool ccw(pt p, pt q, pt r) { // se p, q, r sao counter-clockwise
+    return sarea(p, q, r) > eps;
+}
+
+// Retorna 0 se ta fora, 1 se ta no interior e 2 se ta na borda
+int inpol(vector<pt>& v, pt p) { 
+    int qt = 0;
+    for (int i = 0; i < (int)v.size(); i++) {
+        if (p == v[i]) return 2;
+        int j = (i + 1) % v.size();
+        if (eq(p.y, v[i].y) and eq(p.y, v[j].y)) {
+            if ((v[i] - p) * (v[j] - p) < eps) return 2;
+            continue;
+        }
+        bool baixo = v[i].y + eps < p.y;
+        if (baixo == (v[j].y + eps < p.y)) continue;
+        auto t = (p - v[i]) ^ (v[j] - v[i]);
+        if (eq(t, 0)) return 2;
+        if (baixo == (t > eps)) qt += baixo ? 1 : -1;
+    }
+    return qt != 0;
+}
+
+vector<pt> convex_hull(vector<pt> v) { 
+    sort(v.begin(), v.end());
+    v.erase(unique(v.begin(), v.end()), v.end());
+    if (v.size() <= 1) return v;
+    vector<pt> l, u;
+    for (int i = 0; i < (int)v.size(); i++) {
+        while (l.size() > 1 and !ccw(l.end()[-2], l.end()[-1], v[i]))
+            l.pop_back();
+        l.push_back(v[i]);
+    }
+    for (int i = (int)v.size() - 1; i >= 0; i--) {
+        while (u.size() > 1 and !ccw(u.end()[-2], u.end()[-1], v[i]))
+            u.pop_back();
+        u.push_back(v[i]);
+    }
+    l.pop_back(); u.pop_back();
+    for (pt i : u) l.push_back(i);
+    return l;
+}
+
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     cout << fixed << setprecision(10);
 
-    int n; 
-    ld hh;
-    cin >> n >> hh;  
-    map<pair<ll,ll>, ld> best;
-    for (int i = 0; i < n; i++){
-        ld x, y, h;
-        cin >> x >> y >> h;
-        pair<ll, ll> key = {to_cents(x), to_cents(y)};
-        if (best.count(key)) best[key] = max(best[key], h);
-        else best[key] = h;
-    }
-    
-    point cookie;
-    cin >> cookie.x >> cookie.y;
-    pair<ll, ll> cookie_key = {to_cents(cookie.x), to_cents(cookie.y)};
-    debug(cookie);
+    int n;
+    long double h_in;
+    cin >> n >> h_in;
 
-    vector<point> points;
-    for (auto [pt,h] : best){
-        auto [x, y] = pt;
-        if (pt == cookie_key) continue;
-        point p(x,y,h);
-        p.x = (ld)x / 100.0L;
-        p.y = (ld)y / 100.0L;
-        points.push_back(p);
-    }
-    debug(points);
-
-    auto polar = points;
-    polarSort(polar, cookie);
-    debug(polar);
-
-    vector<pair<ld, ld>> islands;
-
-    for (auto u : polar){
-        debug(u, angle(u,cookie));
-        islands.emplace_back(angle(u,cookie), u.h);
+    map<pair<ll, ll>, ll> best;
+    for (int i = 0; i < n; i++) {
+        long double x, y, z;
+        cin >> x >> y >> z;
+        ll X = llround(x * 100.0L);
+        ll Y = llround(y * 100.0L);
+        ll Z = llround(z * 100.0L);
+        
+        if (best.count({X, Y})) best[{X, Y}] = max(best[{X, Y}], Z);
+        else best[{X, Y}] = Z;
     }
 
-    vector<ld> zes;
-    for (const auto &p : points) zes.push_back(p.h);
+    long double cx, cy;
+    cin >> cx >> cy;
+    pt cookie(cx, cy);
+    ll CX = llround(cx * 100.0L);
+    ll CY = llround(cy * 100.0L);
+
+    vector<pair<pt, ll>> islands;
+    vector<ll> zes;
+
+    for (auto [coords, Z] : best) {
+        if (coords.first == CX && coords.second == CY) continue; 
+        
+        pt p((ld)coords.first / 100.0, (ld)coords.second / 100.0);
+        islands.push_back({p, Z});
+        zes.push_back(Z);
+    }
+
     sort(all(zes));
     zes.erase(unique(all(zes)), zes.end());
 
-    auto check = [&](ld mid) -> bool {
-        vector<ld> angles;
-        for (auto [ang, hh] : islands) {
-            if (hh + eps >= mid) angles.push_back(ang);
+    auto check = [&](ll mid) -> bool {
+        vector<pt> ativos;
+        for (const auto& [p, z] : islands) {
+            if (z >= mid) ativos.push_back(p);
         }
-        int m = angles.size();
 
-        if (m < 3) return false;
+        if (ativos.size() < 3) return false;
 
-        ld max_gap = 0.0L;
-        for (int j = 1; j < m; j++) {
-            ld ang1 = angles[j];
-            ld ang2 = angles[j-1];
+        vector<pt> hull = convex_hull(ativos);
+        bool pode = (inpol(hull, cookie) == 1);
 
-            ld diff = fabs(ang1-ang2);
-            max_gap = max(diff, max_gap);
+        if (hull.size() == 4 && pode) {
+            pode = false;
+            if (!col(cookie, hull[0], hull[2]) || !col(cookie, hull[1], hull[3])) {
+                pode = true;
+            } else {
+                for (auto x : ativos) {
+                    if (!col(x, hull[0], hull[2]) && !col(x, hull[1], hull[3])) {
+                        pode = true;
+                        break;
+                    }
+                }
+            }
         }
-        max_gap = max(max_gap, angles[0] + 2.0L * pi - angles.back());
-        return max_gap + eps < pi - eps;
+
+        return pode;
     };
 
     if (zes.empty()) {
@@ -185,7 +156,7 @@ signed main(){
         return 0;
     }
 
-    int l = 0, r = zes.size() - 1;
+    int l = 0, r = (int)zes.size() - 1;
     int best_idx = -1;
 
     while (l <= r) {
@@ -194,15 +165,16 @@ signed main(){
             best_idx = mid;
             l = mid + 1;
         } else {
-            r = mid - 1;
+            r = mid - 1; 
         }
     }
 
     if (best_idx == -1) {
         cout << -1 << endl;
-        return 0;
+    } else {
+        long double best_mid = (long double)zes[best_idx] / 100.0L;
+        cout << max<long double>(0.0L, h_in - best_mid) << endl;
     }
 
-    ld best_mid = zes[best_idx];
-    cout << max<ld>(0.0L, hh - best_mid) << endl;
+    return 0;
 }
