@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -88,23 +88,37 @@ void solve(){
     debug(tot);
 
     vector<vector<int>> dp(n+1, vector<int>(tot));
-    for (int i = 1; i <= n; i++){
 
+    for (int i = 1; i <= n; i++){
+        
         for (int mask = 0; mask < tot; mask++){//check all masks
+            if (__popcount(mask) > i) continue;//if mask has more occupied positions than could have been filled, not valid
 
             for (int pos = 0; pos < p; pos++){ // where person i will be placed
-                if ((1 << pos) & mask) continue; //cant place person i here, already occupied
-                int nmask = mask | (1 << pos);
+                if (!((1 << pos) & mask)) continue; //cant place person i here, already occupied
                 
-                //i can replace the max strength found for dp[i-1][nmask]
-                // for the new strength found for dp[i][mask] + s[i][pos]
-                dp[i][nmask] = max(dp[i-1][nmask], s[i-1][pos] + dp[i-1][mask]);
-                // debug(i,mask,pos,nmask,s[i-1][pos]);
+                int pmask = mask ^ (1 << pos);
+                //i can replace the max strength found for dp[i][mask]
+                // for the new strength found for dp[i-1][pmask] + s[i][pos]
+
+                dp[i][mask] = max(dp[i][mask], s[i-1][pos] + dp[i-1][pmask]);
+                debug(i,mask,pos,pmask,s[i-1][pos]);
             }
+                
+            //actually i can place person i in the andience, if there is room
+            //number of people in the andience is i - popcount(mask), beaceuse i ordered by biggest strength in the audience
+            //if i have available seats in the audience, i must add a[i]
+
+            int not_chosen = i - __popcount(mask);
+            debug(a[i-1], mask, not_chosen, k); 
+            if (not_chosen <= k && not_chosen) dp[i][mask] = max(dp[i][mask], dp[i-1][mask] + a[i-1]);
+            else dp[i][mask] = max(dp[i][mask], dp[i-1][mask]);
+            
         }
+        debug(dp);
     }
     debug(dp);
-
+    cout << dp[n][tot-1] << endl;
 }
 
 signed main(){
