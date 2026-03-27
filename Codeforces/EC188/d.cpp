@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -55,19 +55,55 @@ using namespace dbg;
 #endif
 
 
-
 void solve(){
     int n, m;
-    cin >> n >> m;
+    cin >>  n >> m;
     vector<vector<int>> graph(n);
 
     for (int i = 0; i < m; i++){
         int a, b;
         cin >> a >> b;
-        graph[--a].push_back()
+        graph[--a].push_back(--b);
+        graph[b].push_back(a);
     }
 
+    if(m == 0){
+        cout << n << endl;
+        return;
+    }
 
+    vector<bool> visited(n, 0);
+    vector<int> color(n, -1);
+    
+    int ans = 0;
+    int cur1 = 0, cur2 = 0;
+    bool bi = true;
+
+    function<void(int, int)> dfs = [&](int v, int dir) {
+        if (color[v] == -1) color[v] = dir;
+        if (dir) cur1++;
+        else cur2++;
+
+        visited[v] = 1;
+        for (auto u :graph[v]){
+            if (color[u] == color[v]) bi = false;
+            if (visited[u])  continue;
+
+            dfs(u,!dir);
+        }
+    };
+
+    for (int i = 0; i < n; i++){
+        if (visited[i]) continue;
+        cur1 = 0;
+        cur2 = 0;
+        bi = true;
+        dfs(i, 1);
+        debug(bi, cur1, cur2);
+        if (bi) ans += max(cur1, cur2);
+    }
+    debug(color);
+    cout << ans << endl;
     
 }
 

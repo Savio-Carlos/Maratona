@@ -13,6 +13,20 @@ auto lambda_recursiva = [&](auto &&self, int x) -> int {
     return x * self(self, x - 1);
 };
 
+function<void(int, int)> dfs = [&](int v, int dir) {
+    if (color[v] == -1) color[v] = dir;
+    if (dir) cur1++;
+    else cur2++;
+
+    visited[v] = 1;
+    for (auto u :graph[v]){
+        if (color[u] == color[v]) bi = false;
+        if (visited[u])  continue;
+
+        dfs(u,!dir);
+    }
+};
+
 auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
     multiset<int> mi;
     for (const auto &s : ms) {
@@ -25,3 +39,4 @@ auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
     }
     return mi;
 };
+
