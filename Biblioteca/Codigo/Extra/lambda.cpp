@@ -13,17 +13,10 @@ auto lambda_recursiva = [&](auto &&self, int x) -> int {
     return x * self(self, x - 1);
 };
 
-function<void(int, int)> dfs = [&](int v, int dir) {
-    if (color[v] == -1) color[v] = dir;
-    if (dir) cur1++;
-    else cur2++;
-
-    visited[v] = 1;
+function<void(int, int)> dfs = [&](int v, int p) {
     for (auto u :graph[v]){
-        if (color[u] == color[v]) bi = false;
-        if (visited[u])  continue;
-
-        dfs(u,!dir);
+        if (u == v) continue;
+        dfs(u,v);
     }
 };
 
