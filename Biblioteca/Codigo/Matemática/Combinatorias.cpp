@@ -28,8 +28,8 @@ void build(){
     for (int i = MAX - 2; i >= 0; i--) invfat[i] = (invfat[i+1] * (i+1)) % MOD;
 }
 int comb(int a, int b){
-    if (a > b || a < 0 || b < 0) return 0;
-    return (((fat[b] * invfat[a]) % MOD) * invfat[b-a]) % MOD;
+    if (b > a || b < 0 || a < 0) return 0;
+    return (((fat[a] * invfat[b]) % MOD) * invfat[a-b]) % MOD;
 }
 
 int combinations(int n, int k) {

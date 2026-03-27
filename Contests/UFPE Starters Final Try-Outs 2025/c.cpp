@@ -1,51 +1,140 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define endl '\n'
 #define int long long
 #define ld long double
-#define endl '\n'
-#define fastio ios_base::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+
+namespace dbg {
+    const char* const RESET     = "\033[0m";
+    const char* const BOLD_BLUE = "\033[1;34m";
+    const char* const YELLOW    = "\033[33m";
+    const char* const BOLD_WHITE= "\033[1;37m";
+
+    template<typename T1, typename T2>
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+
+    template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
+    ostream& operator<<(ostream& os, const T_container& v) {
+        os << '{';
+        bool first = true;
+        for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
+        return os << '}';
+    }
+
+    template<typename T1, typename T2>
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+
+    void debug_out(string_view) { cerr << endl; }
+    template<typename H, typename... T>
+    void debug_out(string_view s, H h, T... t) {
+        auto cpos = s.find(',');
+        cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
+        cerr << BOLD_WHITE << h << RESET;
+        if constexpr (sizeof...(t) > 0) {
+            cerr << ", ";
+            auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
+            debug_out(s.substr(nx), t...);
+        } else {
+            cerr << endl;
+        }
+    }
+} 
+using namespace dbg;
+
+// #define DEBUG
+
+#if defined(DEBUG)
+    #define winton (void)0
+    #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
+#else
+    #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
+    #define debug(...) (void)0
+#endif
 
 const int MOD = 1e9+7;
-const int MAXN = 1e5+7;
-int arr[MAXN];
-int n;
 
-
-
-signed main(){
-    fastio;
-    cin >> n;
-    int ans = 1, f = -1, lst = -1, val = 0, cnt = 0, cur = 1;
-    for(int i = 0; i < n; i++) cin >> arr[i];
-    
-    for(int i = 0; i < n; i++){
-        if(arr[i] == 0){
-            f = -1;
-            lst = -1;
-            val = 0;
-            cnt = 0;
-            cur = 1;
-            continue;
-        }
-        if(arr[i] < 0){
-            cnt++;
-            if(f == -1) f = i;
-            lst = i;
-        }
-
-        if(!(cnt&1)){
-            cur = max(cur, arr[i]*cur);
-            ans = max(ans, cur);
-        }else{
-            int cur2 = arr[i]*cur/arr[f];
-            int cur3 = arr[i]*cur/arr[lst];
-            cur = max({cur, cur2, cur3});
-            ans = max(ans, cur);
-        }
-
+int fastexpo(int base, int exp){
+    int res = 1;
+    while(exp){
+        if (exp&1) res = res * base % MOD;
+        base = base * base % MOD;
+        exp >>= 1;
     }
-    cout << ans << endl;
+    return res%MOD;
+}
+
+signed main(){  
+    winton;
+    int n;
+    cin >> n;
+    vector<int> a(n), p;   
+    for (auto &u : a) cin >> u;
+    vector<vector<int>> intervalos;
+
+    vector<int> temp;
+    for (auto u : a){
+        if (!u){
+            intervalos.push_back(temp);
+            temp.clear();
+        }
+        else temp.push_back(u);
+    }
+    if (temp.size()) intervalos.push_back(temp);
+    debug(intervalos);
+
+    auto func = [&](vector<int> intervalo) -> int{
+        int mx = 0; //maximo alcancado
+        int tot = 0; //total de todos os valores no intervalo (sempre que cnt for par eu quero isso)
+        int cnt = 0; //numero de negativos
+        int first = -1;
+        int second = -1; //primeiro numero depois de um negativo
+        int last = 0; //ultimo negativo visto
+        int n = intervalo.size();
+
+        vector<int> p(n);
+        for(int i = 0; i < n; i++){
+            int x = abs(intervalo[i]);
+            p[i] = log2(x);
+        }
+
+        vector<int> pfx(n+1, 0);
+        int cur = 0;
+        for (int i = 1; i <= n; i++){
+            if (intervalo[i-1] < 0) cur = cur * -1;
+            if (cur < 0) cur -= p[i-1];
+            else cur += p[i-1];
+            pfx[i] = cur;
+        }
+        debug(pfx);
+
+        for (int i = 0; i < n; i++){
+            if (first != -1 && second == -1) second = i;
+            if (intervalo[i] < 0 && first == -1) first = i; 
+            tot += p[i];
+            if (intervalo[i] < 0)cnt++;
+        
+            debug(i,cnt,first, second);
+            if (!(cnt&1)) mx = max(mx, tot);
+
+            if (cnt&1 && i != first) mx = max(mx, abs(pfx[i+1]) - abs(pfx[first]));
+            if (cnt&1) mx = max(mx, abs(pfx[i]));   
+            if (cnt&1 && second != -1) mx = max(mx, abs(pfx[i+1]) - abs(pfx[second]));
+                
+            if (intervalo[i] < 0) last = i;
+            debug(mx);
+        }
+        debug(pfx, mx);
+
+        return mx;
+    };
+    
+    int ans = 0;
+    for(auto v : intervalos){
+        ans = max(ans, func(v));
+    }
+    cout << fastexpo(2LL, ans) % MOD << endl;
 
 }
