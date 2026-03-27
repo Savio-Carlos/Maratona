@@ -110,7 +110,8 @@ void solve(){
             //if i have available seats in the audience, i must add a[i]
 
             int not_chosen = i - __popcount(mask);
-            debug(a[i-1], mask, not_chosen, k); 
+            debug(a[i-1],
+                 mask, not_chosen, k); 
             if (not_chosen <= k && not_chosen) dp[i][mask] = max(dp[i][mask], dp[i-1][mask] + a[i-1]);
             else dp[i][mask] = max(dp[i][mask], dp[i-1][mask]);
             
