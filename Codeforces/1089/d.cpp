@@ -54,78 +54,14 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MOD = 1e9+7;
 
-int fastexpo(int base, int exp){
-    int res = 1;
-    while(exp){
-        if (exp&1) res = res * base % MOD;
-        base = base * base % MOD;
-        exp >>= 1;
-    }
-    return res%MOD;
+void solve(){
+   
 }
 
-int func(const vector<int> & intervalo){
-    int mx = 0; //maximo alcancado
-    int tot = 0; //total de todos os valores no intervalo (sempre que cnt for par eu quero isso)
-    int cnt = 0; //numero de negativos
-    int first = -1;
-    int last = 0; //ultimo negativo visto
-    int n = intervalo.size();
-
-    vector<int> p(n);
-    for(int i = 0; i < n; i++){
-        int x = abs(intervalo[i]);
-        p[i] = log2(x);
-    }
-
-    for (int i = 0; i < n; i++){
-        tot += p[i];
-        if (intervalo[i] < 0){
-            if (first == -1) first = i;
-            last = i;
-            cnt++;
-        } 
-    }
-
-    if (!(cnt&1)) return tot;
-
-    vector<int> pfx(n+1, 0);
-    for (int i = 0; i < n; i++) pfx[i+1] = pfx[i] + p[i];
-
-    int depois = pfx[n] - pfx[first+1];
-    int antes = pfx[last];
-    mx = max(depois, antes);
-
-    debug(cnt, first, last, depois, antes, mx);
-
-    return mx;
-}
-
-signed main(){  
+signed main(){
     winton;
-    int n;
-    cin >> n;
-    vector<int> a(n), p;   
-    for (auto &u : a) cin >> u;
-    vector<vector<int>> intervalos;
-
-    vector<int> temp;
-    for (auto u : a){
-        if (!u){
-            intervalos.push_back(temp);
-            temp.clear();
-        }
-        else temp.push_back(u);
-    }
-    if (temp.size()) intervalos.push_back(temp);
-    debug(intervalos);
-    
-    int ans = 0;
-    for(auto v : intervalos){
-        ans = max(ans, func(v));
-    }
-    cout << fastexpo(2LL, ans) % MOD << endl;
-
+    int t;
+    cin >> t;
+    while(t--) solve();
 }
