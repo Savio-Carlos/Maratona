@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -75,12 +75,10 @@ int modiv(int a, int b){
     return a * modinv(b) % MOD;
 }
 
-
 struct BIT {
 	int n;
 	vector<int> bit;
 	BIT(int _n = 0) : n(_n), bit(n + 1) {}
-
 	BIT(vector<int>& v) : n(v.size()), bit(n + 1,1) {
 		for (int i = 1; i <= n; i++) {
 			bit[i] = (bit[i] * v[i-1]) %MOD;
@@ -88,17 +86,43 @@ struct BIT {
 			if (j <= n) bit[j] = (bit[j] * bit[i]) %MOD;
 		}
 	}
-	// void update(int i, int x) { // soma x na posicao i
-	// 	for (i++; i <= n; i += i & -i) bit[i] += x;
-	// }
-
-	int pref(int i) { // soma [0, i]
+	int pref(int i) {
 		int ret = 1;
 		for (i++; i; i -= i & -i) ret = (ret * bit[i]) % MOD;
 		return ret;
 	}
 	int query(int l, int r) {  // soma [l, r]
 		return modiv(pref(r), pref(l - 1)) % MOD; 
+	}
+	void update(int i, int x) {
+		for (i++; i <= n; i += i & -i) bit[i] = (bit[i] * x) % MOD;
+	}
+};
+
+struct BITS {
+	int n;
+	vector<int> bit;
+	BITS(int _n = 0) : n(_n), bit(n + 1) {}
+
+	BITS(vector<int>& v) : n(v.size()), bit(n + 1, 0) {
+		for (int i = 1; i <= n; i++) {
+			bit[i] = (bit[i] + v[i - 1]) % MOD;
+			int j = i + (i & -i);
+			if (j <= n) bit[j] = (bit[j] + bit[i]) % MOD;
+		}
+	}
+	void update(int i, int x) { // soma x na posicao i
+		x = (x % MOD + MOD) % MOD;
+		for (i++; i <= n; i += i & -i) bit[i] = (bit[i] + x) % MOD;
+	}
+
+	int pref(int i) { // soma [0, i]
+		int ret = 0;
+		for (i++; i; i -= i & -i) ret = (ret + bit[i]) % MOD;
+		return ret;
+	}
+	int query(int l, int r) {  // soma [l, r]
+		return (pref(r) - pref(l - 1) + MOD) % MOD; 
 	}
 };
 
@@ -116,7 +140,14 @@ signed main(){
     BIT bit_inversa(pi);
     debug(pi);
     debug(bit_inversa.bit);
-
+    
+    vector<int> pk(n);
+    for (int i = n-1; i >= 0; i--){
+        pk[i] = modiv(p[i], pi[i]) % MOD;
+    }
+    BITS bit2(pk);
+    debug(pk);
+    
     while(q--){
         int t;
         cin >> t;
@@ -124,11 +155,24 @@ signed main(){
             int x;
             cin >> x;
             int p0 = bit_inversa.query(x, n-1);
+            int p1 = bit2.query(x, n-1);
             debug(p0);
+            cout << (p0 * (1+p1)) % MOD << endl;
         }
         else {
-            int p;
-            cin >> p;
+            int x, pp;
+            cin >> x >> pp;
+            x--;
+            int np = modiv(pp, 100);
+            int npi = modiv(100 - pp, 100);
+            int mult = modiv(npi, pi[x]);
+            bit_inversa.update(x, mult);
+            pi[x] = npi;
+            
+            int npk = modiv(np, npi);
+            int diff = (npk - pk[x]) % MOD;
+            bit2.update(x, diff);
+            pk[x] = npk;
         }
     }
     
@@ -152,6 +196,15 @@ na hora de fazer update eu preciso tirar a probabilidade antiga fazendo modiv no
 na hora de fazer a query eu preciso isolar e pegar so o produtorio a partir de x
 entao eu faco modiv de todo o prefixo ate x na resposta
 mas tem muita coisa se repetindo ai
+
+ans = probabilidade de ser 0 + todas as probabilidades de parar so no cara i
+ans = probabilidade de parar 0 vezes + probabilidade de parar so 1 vez de x+1 ate n
+
+a probabbilidade dele parar exatamente em cada cara, e a chance dele parar * produtorio dele nao parar em nenhum outro
+se K e o cara atual, pK e a probabilidade dele parar no cara K, e 1-pK e a probabilidade dele nao parar no cara K
+entao seria pK * todos os outros 1-Pi, com excessao do 1-Pk, e todos os 1-Pi e o produtorio  dele nao parar em nenhum lugar
+ou seja a probabilidade dele parar  exatamente no cara K, e p0 * (pK/1-pK)
+
 
 
 
