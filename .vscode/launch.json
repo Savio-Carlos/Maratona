@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Atcoder/450",
-      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Atcoder/450/build/Debug/outDebug",
+      "cwd": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Maratona da VI Escola de Inverno",
+      "program": "c:/Users/Usuario/OneDrive/Documentos/Carlos/Unioeste/Maratona/Contests/Maratona da VI Escola de Inverno/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

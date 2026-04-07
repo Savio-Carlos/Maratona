@@ -1,0 +1,22 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define all(x) x.begin(), x.end()
+#define rall(x) x.rbegin(), x.rend()
+#define int long long
+#define ld long double
+#define endl '\n'
+#define winton ios_base::sync_with_stdio(false),cin.tie(0),cout.tie(0)
+
+signed main(){
+    winton;
+    int a, b, k;
+    cin >> a >> b >> k;
+    vector<int> f(k+1);
+    f[1] = a;
+    f[2] = b;
+    for (int i = 3; i <= k; i++){
+        f[i] = (f[i-1]+1) ^ f[i-2];
+    }
+    cout << f[k] << endl;
+}

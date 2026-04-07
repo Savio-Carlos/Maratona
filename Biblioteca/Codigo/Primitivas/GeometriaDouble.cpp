@@ -31,6 +31,9 @@ struct point { // ponto
 	friend istream& operator >> (istream& in, point& p) {
 		return in >> p.x >> p.y;
 	}
+	friend ostream& operator << (ostream& os, const pt& p) {
+		return os << "(" << p.x << ", " << p.y << ")"; 
+	}
 };
 
 struct line { // reta
