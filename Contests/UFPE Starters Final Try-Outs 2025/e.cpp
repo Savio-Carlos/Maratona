@@ -205,7 +205,4 @@ se K e o cara atual, pK e a probabilidade dele parar no cara K, e 1-pK e a proba
 entao seria pK * todos os outros 1-Pi, com excessao do 1-Pk, e todos os 1-Pi e o produtorio  dele nao parar em nenhum lugar
 ou seja a probabilidade dele parar  exatamente no cara K, e p0 * (pK/1-pK)
 
-
-
-
 */
