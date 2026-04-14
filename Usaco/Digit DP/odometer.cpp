@@ -61,91 +61,68 @@ void setIO(string name = "") {
     }
 }
 
-int dp[20][20][2][2][20]; // [index][cnt][above][under][leadingzeros]
+int dp[20][20][2][20]; // [index][cnt][tight][ldz]
 int n;
- 
-int DIGITO = 5;
+string s;
 
-string l,r;
+int DIGITO;
+int MODE;
+int OTHER;
 
-int pd(int index, int cnt, int above, int under, int ldz, int m){
+int pd(int index, int cnt, int tight, int ldz){
     if(index == n){
-        // debug(cnt, n, ldz);
-        if (m) return (2*cnt >= (n-ldz));
-        else return (2*cnt == (n-ldz));
+        int len = n - ldz;
+        if (len == 0) return 0;
+        if (MODE == 0) return (2*cnt >= len);
+        else return (len % 2 == 0 && cnt == len / 2);
     } 
  
-    if (dp[index][cnt][above][under][ldz] != -1) return dp[index][cnt][above][under][ldz];
+    if (dp[index][cnt][tight][ldz] != -1) return dp[index][cnt][tight][ldz];
  
-    int ub = above ? r[index] - '0' : 9;
-    int lb = under ? l[index] - '0' : 0;
-
+    int ub = tight ? s[index] - '0' : 9;
     int ans = 0;
 
-    for (int digit = lb; digit <= ub; digit++){
- 
-        int new_above = above && (digit == ub);
-        int new_under = under && (digit == lb);
+    for (int digit = 0; digit <= ub; digit++){
+        int new_tight = tight && (digit == ub);
+        bool is_leading_zero = (digit == 0 && ldz == index);
+        int new_ldz = ldz + is_leading_zero;
 
-        int new_ldz = ldz + ((digit == 0) && (ldz == index));
-        
-        int next = digit;
-        if (next == DIGITO && !(digit == 0 && ldz == index)) ans += pd(index + 1, cnt+1, new_above, new_under, new_ldz, m);
-        else ans += pd(index + 1, cnt, new_above, new_under, new_ldz, m);
+        if (MODE == 1 && !is_leading_zero && digit != DIGITO && digit != OTHER) continue;
+
+        if (digit == DIGITO && !is_leading_zero) ans += pd(index + 1, cnt+1, new_tight, new_ldz);
+        else ans += pd(index + 1, cnt, new_tight, new_ldz);
     }
-    return dp[index][cnt][above][under][ldz] = ans; 
- 
+    return dp[index][cnt][tight][ldz] = ans; 
+}
+
+int count(int x){
+    s = to_string(x);
+    n = s.size();
+
+    int ans = 0;
+    MODE = 0;
+    for (DIGITO = 0; DIGITO <= 9; DIGITO++){
+        memset(dp,-1, sizeof(dp));
+        ans += pd(0,0,1,0);
+    }
+
+    int dup = 0;
+    MODE = 1;
+    for (DIGITO = 0; DIGITO <= 9; DIGITO++){
+        for (OTHER = DIGITO + 1; OTHER <= 9; OTHER++){
+            memset(dp,-1, sizeof(dp));
+            dup += pd(0,0,1,0);
+        }
+    }
+    
+    debug(ans, dup);
+    return ans - dup;
 }
 
 signed main(){
     winton;
-    // setIO("odometer");
+    setIO("odometer");
+    int l, r;
     cin >> l >> r;
-    if (l.size() < r.size()){
-        int diff = r.size() - l.size();
-        string temp(diff, '0');
-        l = temp + l;
-    }
-    n = r.size();
-    int ans = 0;
-    for (int i = 0; i <= 9; i++){
-        memset(dp,-1, sizeof(dp));
-        DIGITO = i;
-        ans += pd(0,0,1,1,0,1);
-    }
-    int dup = 0;
-    for (int i = 0; i <= 9; i++){
-        memset(dp,-1, sizeof(dp));
-        DIGITO = i;
-        dup += pd(0,0,1,1,0,0);
-    }
-    debug(ans, dup);
-    cout << ans - (dup/2) << endl;
+    cout << count(r) - count(l-1) << endl;
 }
-
-/*
-count the amount of each digit up to each position of the number
-dp[n][3] = 3 should mean that i can get to index N with 3 3's
-but what if i can get with 4 or 2 3's as well?
-
-de tamanho impar sempre vai ter um sobresalente (33322, 33122 nao e valido)
-de tamanho impar temos (8+7+6+5+4+3+2+1)55 casos em que rola um empate - 9
-10 -> inverter pra 01 entao nao rola isso
-11 -> nao e recontado
-12
-13
-14
-23
-34
-45
-89
-
-entao para cada possibilidade de tamanho par da string tiramos 55?
-para numeros de 2 digitos podemos ter xy (que e recontado como yx)
-para numeros de 4 digitos podemos ter xxyy
-para numeros de 6 digitos podemos ter xxxyyy
-..assim por diante
-
-
-
-*/
