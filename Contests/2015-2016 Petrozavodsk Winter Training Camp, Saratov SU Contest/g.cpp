@@ -14,7 +14,7 @@ namespace dbg {
     const char* const BOLD_WHITE= "\033[1;37m";
 
     template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
 
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
@@ -23,9 +23,6 @@ namespace dbg {
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
         return os << '}';
     }
-
-    template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
 
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
@@ -54,14 +51,55 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
+pair<int, string> dp[25][2][2][2]; // [index][above][under][ldz]
+bool visited[25][2][2][2];
 
-void solve(){
+int n;
+string l, r;
+
+pair<int, string> pd(int index, int above, int under, int ldz){
+    if(index == n) return {1, ""};
     
+    if (visited[index][above][under][ldz]) return dp[index][above][under][ldz];
+
+    int ub = above ? r[index] - '0' : 9;
+    int lb = under ? l[index] - '0' : 0;
+    
+    int max_prod = -1;
+    string best_str = "";
+
+    for (int digit = lb; digit <= ub; digit++){
+
+        int new_above = above && (digit == ub);
+        int new_under = under && (digit == lb);
+        int new_ldz = ldz && (digit == 0);
+
+        auto [resn, ress] = pd(index + 1, new_above, new_under, new_ldz);
+        
+        int cur_prod = new_ldz ? resn : resn * digit;
+
+        if (cur_prod > max_prod) {
+            max_prod = cur_prod;
+            if (new_ldz) best_str = ress;
+            else best_str = to_string(digit) + ress;
+        }
+    }
+    
+    visited[index][above][under][ldz] = true;
+    return dp[index][above][under][ldz] = {max_prod, best_str}; 
 }
 
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    memset(visited, false, sizeof(visited));
+    cin >> l >> r;
+    n = r.size();
+    if (l.size() < r.size()){
+        int diff = r.size() - l.size();
+        string temp(diff, '0');
+        l = temp + l;
+    }
+    
+    auto [_,ans] = pd(0, 1, 1, 1);
+    cout << ans << endl;
 }

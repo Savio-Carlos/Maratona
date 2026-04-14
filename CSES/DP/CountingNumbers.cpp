@@ -8,13 +8,8 @@ using namespace std;
 #define ld long double
 
 namespace dbg {
-    const char* const RESET     = "\033[0m";
-    const char* const BOLD_BLUE = "\033[1;34m";
-    const char* const YELLOW    = "\033[33m";
-    const char* const BOLD_WHITE= "\033[1;37m";
-
     template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
 
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
@@ -24,15 +19,11 @@ namespace dbg {
         return os << '}';
     }
 
-    template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
     void debug_out(string_view s, H h, T... t) {
         auto cpos = s.find(',');
-        cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
-        cerr << BOLD_WHITE << h << RESET;
+        cerr << s.substr(0, cpos) << " = " << h;
         if constexpr (sizeof...(t) > 0) {
             cerr << ", ";
             auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
@@ -44,24 +35,51 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
-    #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
+    #define debug(...) cerr << "[" << __func__ << ":" << __LINE__ << "]" << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
 #else
     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
     #define debug(...) (void)0
 #endif
 
+int dp[20][11][2][20]; // [index][last][tight][ldz]
+int n;
+string s;
 
-void solve(){
-    
+int pd(int index, int last, int tight, int ldz){
+    if(index == n) return 1;
+ 
+    if (dp[index][last][tight][ldz] != -1) return dp[index][last][tight][ldz];
+ 
+    int ub = tight ? s[index] - '0' : 9;
+    int ans = 0;
+
+    for (int digit = 0; digit <= ub; digit++){
+        if (!ldz && last == digit) continue;
+        
+        int new_tight = tight && (digit == ub);
+        int new_ldz = (digit == 0) && ldz;
+        
+        int next = new_ldz ? 10 : digit;
+
+        ans += pd(index + 1, next, new_tight, new_ldz);
+    }
+    return dp[index][last][tight][ldz] = ans; 
+}
+
+int count(int x){
+    memset(dp, -1, sizeof(dp));
+    s = to_string(x);
+    n = s.size();
+    return pd(0,10,1,1);
 }
 
 signed main(){
     winton;
-    int t;
-    cin >> t;
-    while(t--) solve();
+    int l, r;
+    cin >> l >> r;
+    cout << count(r) - count(l-1) << endl;
 }
