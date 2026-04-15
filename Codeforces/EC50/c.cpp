@@ -82,7 +82,7 @@ int pd(int index, int cnt, int tight){
 int count(int x){
     s = to_string(x);
     
-    int pad = 18 - s.size();
+    int pad = 19 - s.size();
     if (pad > 0) s = string(pad, '0') + s;
     
     n = s.size();
@@ -92,12 +92,12 @@ int count(int x){
 void solve(){
     int l, r;
     cin >> l >> r;
+    memset(dp, -1, sizeof(dp));
     cout << count(r) - count(l-1) << endl;
 }
 
 signed main(){
     winton;
-    memset(dp, -1, sizeof(dp));
     int t;
     cin >> t;
     while(t--) solve();
