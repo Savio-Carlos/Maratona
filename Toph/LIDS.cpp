@@ -45,7 +45,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -55,18 +55,20 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-// L e inutil nesse caso?
 
-pair<int,int> dp[20][11][20][2];
-bool visited[20][11][20][2];
+pair<int,int> dp[20][11][2];
+bool visited[20][11][2];
 int n, k;
+
 vector<int> v; 
 vector<int> v2; 
 
-pair<int,int> pd(int index, int above, int under, int last, int seq, int ldz){
-    if (index == -1) return {seq, 1LL};
+pair<int,int> pd(int index, int above, int under, int last, int ldz){
+    if (index == -1){
+        return {0LL, 1LL};
+    } 
     
-    if (!above && !under && visited[index][last][seq][ldz]) return dp[index][last][seq][ldz];
+    if (!above && !under && visited[index][last][ldz]) return dp[index][last][ldz];
 
     int ub = above ? v[index] : 9;
     int lb = under ? v2[index] : 0;
@@ -81,26 +83,34 @@ pair<int,int> pd(int index, int above, int under, int last, int seq, int ldz){
         
         int next = new_ldz ? 10 : digit;    
         
-        pair<int,int> res;
+        auto [best, bways] = pd(index - 1, new_above, new_under, last, new_ldz);
 
-        if (!new_ldz && digit > last || (last == 10 && !seq)) res = pd(index - 1, new_above, new_under, next, seq + 1, new_ldz);
-        else res = pd(index - 1, new_above, new_under, next, seq, new_ldz);
 
-        auto [mx,w] = res;
+        if (!new_ldz && ((digit > last) || (last == 10))){
+            auto [b2, w2] = pd(index - 1, new_above, new_under, next, new_ldz);
 
-        debug(index, last, digit, mx, w);
+            b2++;
+            if (b2 > best){
+                best = b2;
+                bways = w2;
+            }
+            else if (b2 == best) bways += w2;
 
-        if (mx > ans){
-            ans = mx;
-            ways = w;
+        } 
+
+        debug(index, last, digit, best, bways);
+
+        if (best > ans){
+            ans = best;
+            ways = bways;
         }
-        else if(mx == ans) ways += w;
-
+        else if(best == ans) ways += bways;
     }
     
-    visited[index][last][seq][ldz] = 1;
-    
-    if (!above && !under) dp[index][last][seq][ldz] = {ans,ways}; 
+    if (!above && !under) {
+        dp[index][last][ldz] = {ans,ways}; 
+        visited[index][last][ldz] = 1;
+    }
     return {ans,ways};
 }
 
@@ -120,13 +130,14 @@ pair<int,int> count(int x, int y){
     debug(v2,v);
 
     n = v.size();
-    return pd(n-1,1,1,10,0,1);
+    return pd(n-1,1,1,10,1);
 }
 
 void solve(){
     int l, r;
     cin >> l >> r;
     auto [mx, ways] = count(l,r); 
+  
     cout << mx << " " << ways << endl;
 }
 
@@ -135,5 +146,8 @@ signed main(){
     memset(dp, -1, sizeof(dp));
     int t;
     cin >> t;
-    while(t--) solve();
+    for (int i = 1; i <= t; i++){
+        cout << "Case " << i << ": ";
+        solve();
+    }
 }
