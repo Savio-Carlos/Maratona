@@ -1,8 +1,8 @@
 //Combinatoria
 
 const int MOD = 1e9+7;
-
 const int MOD = 998244353;
+
 const int MAX = 1e6+7;
 
 int fat[MAX], invfat[MAX];
@@ -19,6 +19,10 @@ int fastExpo(int base, int exp) {
 
 int modinv(int n) {
     return fastExpo(n, MOD - 2);
+}
+
+int modiv(int a, int b) {
+    return (a * modinv(b)) % MOD;
 }
 
 void build(){
