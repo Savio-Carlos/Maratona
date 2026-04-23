@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -58,25 +58,32 @@ signed main(){
     winton;
     int n;
     cin >> n;
-    map<int, vector<int>> food;
-    vector<int> xs;
+    vector<pair<int,int>> food;
     for (int i = 0; i < n; i++){
         int x, y;
         cin >> x >> y;
         if (y >= x){
-            food[x].push_back(y);
-            xs.push_back(x);
+            food.push_back({y,x});
         } 
     }
-    xs.push_back(1e9);
-    int cur = 0;
-    int ans = 0;
-    for (int i = 0; i < xs.size(); x++){
-        auto &[x, v] = food[xs[i]];
-        sort(all(v));
-        int nxt = xs[i+1];
+    food.push_back({0,0});
+    sort(all(food));
+    
+    int m = food.size();
 
+    vector<int> dp(m, 1);
+    dp[0] = 0;
+    int ans = 0;
+    for (int i = 0; i < m; i++){
+        for (int j = i + 1; j < m; j++){
+            if (food[j].first - food[i].first >= abs(food[j].second - food[i].second)){
+                dp[j] = max(dp[j], dp[i] + 1);
+            }
+        }
+        ans = max(ans, dp[i]);
     }
+    
+    cout << ans << endl;
 
 }
 
@@ -85,4 +92,8 @@ se y < x entao e impossivel
 os pontos sao todos positivos entao se resume a pegar ou nao pegar esse proximo ponto
 mas eu posso voltar 
 talvez seja uma dp de pegar ou nao pegar o mais proximo no instante atual, ja q da pra fazer n^2
+ordenar pelo y
+sempre vou pegar um cara num y menor antes
+para cada cara vejo se consigo ir pra o proximo
+posso montar um grafo com todas as conexoes e ver qual a maior profundidade que alcanco
 */

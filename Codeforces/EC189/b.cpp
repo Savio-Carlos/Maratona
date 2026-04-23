@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -58,7 +58,11 @@ using namespace dbg;
 void solve(){
     string s;
     cin >> s;
-
+    int cnt = 0;
+    for (int i = 0; i < s.size(); i++){
+        if (s[i] == s[i-1]) cnt++;
+    }
+    cout << (cnt > 2 ? "NO" : "YES") << endl;
 }
 
 signed main(){
