@@ -14,13 +14,29 @@ namespace dbg {
     const char* const BOLD_WHITE= "\033[1;37m";
 
     template<typename T1, typename T2>
-    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+
+    template<typename... T>
+    ostream& operator<<(ostream& os, const tuple<T...>& t);
 
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
         os << '{';
         bool first = true;
         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
+        return os << '}';
+    }
+
+    template<typename T1, typename T2>
+    ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+
+    template<typename... T>
+    ostream& operator<<(ostream& os, const tuple<T...>& t) {
+        os << '{';
+        apply([&os](auto const&... args) {
+            size_t n = 0;
+            ((os << args << (++n != sizeof...(T) ? ", " : "")), ...);
+        }, t);
         return os << '}';
     }
 
@@ -51,67 +67,43 @@ using namespace dbg;
     #define debug(...) (void)0
 #endif
 
-const int MAX = 2e5+7;
-const int INF = 1e18;
-
-int a[MAX];
-
-namespace SegTree {
-	int tree[4*MAX], lazy[4*MAX];
-	int n, *v;
-
-	int build(int node=1, int l=0, int r=n-1) {
-		lazy[node] = 0;
-		if (l == r) return tree[node] = v[l];
-		int m = (l+r)/2;
-		return tree[node] = min(build(2*node, l, m), build(2*node+1, m+1, r));
-	}
-
-	void build(int n2, int* v2) {
-		n = n2, v = v2;
-		build();
-	}
-
-	void prop(int node, int l, int r) {
-		tree[node] += lazy[node];
-		if (l != r) lazy[2*node] += lazy[node], lazy[2*node+1] += lazy[node];
-		lazy[node] = 0;
-	}
-	int query(int a, int b, int node=1, int l=0, int r=n-1) {
-		prop(node, l, r);
-		if (a <= l and r <= b) return tree[node];
-		if (b < l or r < a) return INF;
-		int m = (l+r)/2;
-		return min(query(a, b, 2*node, l, m), query(a, b, 2*node+1, m+1, r));
-	}
-	int update(int a, int b, int x, int node=1, int l=0, int r=n-1) {
-		prop(node, l, r);
-		if (a <= l and r <= b) {
-			lazy[node] += x;
-			prop(node, l, r);
-			return tree[node];
-		}
-		if (b < l or r < a) return tree[node];
-		int m = (l+r)/2;
-		return tree[node] = min(update(a, b, x, 2*node, l, m), update(a, b, x, 2*node+1, m+1, r));
-	}
-}
 
 signed main(){
     winton;
     int n, k;
     cin >> n >> k;
-    for (int i = 0; i < n; i++) cin >> a[i];
-    SegTree::build(n, a);
-    int ans = 0;
-    for (int i = 0; i < n; i++){
-        int l = max(0LL, i-k);
-        debug(l);
-        SegTree::update(i, i, k);
-        SegTree::update(l, i-1, -1);
-        debug((int)SegTree::query(0, n-1));
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
 
-        ans = max(ans, (int)SegTree::query(0, n-1));
+    set<pair<int,int>> in, out;
+    for (int i = 0; i < n; i++) out.insert({a[i], i});
+    int ans = 0;
+
+    for (int i = 0; i < n; i++){
+        in.insert({a[i] + i, i});
+        out.erase({a[i], i});
+
+        if (i >= k){
+            out.insert({a[i-k], i-k});
+            in.erase({a[i-k] + i-k , i-k});
+        } 
+        
+        int mn_out = (out.empty() ? 1e18 : out.begin()->first);
+        auto [mn_in, j] = *in.begin();
+        mn_in += k-i;
+
+        debug(mn_out, mn_in);
+        debug(in);
+        ans = max(ans, min(mn_out, mn_in));
     }
     cout << ans << endl;
+    
 }
+
+/*
+because for my current interval, the value of element at idx j will be a[j] + k - (i-j)
+which is a[j] + j + k - i
+because k and i are constants (for the interval that ends at i)
+the the equation is just a[j] + j, because i will remove k - i from all elements,
+so to discover the minimum in current interval i cand just sort them by (a[j] + j)
+*/
