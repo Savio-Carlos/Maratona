@@ -40,7 +40,7 @@ int lca(int v, int u){
 }
 
 struct LCA {
-    //one indexed shit
+    //one indexed
     int n, l, cur;
     vector<vector<int>> adj, up;
     vector<int> h, entry;

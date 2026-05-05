@@ -16,9 +16,6 @@ namespace dbg {
     template<typename T1, typename T2>
     ostream& operator<<(ostream& os, const pair<T1, T2>& p);
 
-    template<typename... T>
-    ostream& operator<<(ostream& os, const tuple<T...>& t);
-
     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
     ostream& operator<<(ostream& os, const T_container& v) {
         os << '{';
@@ -29,16 +26,6 @@ namespace dbg {
 
     template<typename T1, typename T2>
     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
-
-    template<typename... T>
-    ostream& operator<<(ostream& os, const tuple<T...>& t) {
-        os << '{';
-        apply([&os](auto const&... args) {
-            size_t n = 0;
-            ((os << args << (++n != sizeof...(T) ? ", " : "")), ...);
-        }, t);
-        return os << '}';
-    }
 
     void debug_out(string_view) { cerr << endl; }
     template<typename H, typename... T>
@@ -68,13 +55,61 @@ using namespace dbg;
 #endif
 
 
+/*
+se eu tiver um numero par de folhas na minha subarvore(v), sempre e otimo conectar elas agora
+se tiver um impar, ela vai passar pela edge Paiv - v, entao conta +1
+mas se tiver um nuymero impar de folhas entao uma nao vai ser usada
+qual e a melhor pra remover?
+
+
+*/
+
+const int MAX = 2e5+7;
+
+int ans = 0;
+vector<int> graph[MAX];
+int fol[MAX];
+
+void dfs(int v, int p){
+    if (graph[v].size() == 1 && p != 0) fol[v] = 1;
+
+    for (auto u : graph[v]){
+        if (u == p) continue;
+        dfs(u,v);
+    }
+
+    for (auto u : graph[v]){
+        if (u == p) continue;
+        fol[v] = (fol[v] + fol[u]) % 2;
+    }
+    if (fol[v] && v != 1) ans++;
+    debug(v, fol[v]);
+
+}
+
 void solve(){
+    int n;
+    cin >> n;
+    for (int i = 1; i <= n; i++){
+        fol[i] = 0; 
+        graph[i].clear();
+    } 
     
+    for (int i = 1; i < n; i++){
+        int u, v;
+        cin >> u >> v;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+    ans = 0;
+    dfs(1,0);
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
-    int t;
+    int t = 1;
     cin >> t;
     while(t--) solve();
 }
+
