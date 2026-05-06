@@ -26,8 +26,8 @@ struct point { // ponto
 	point operator - (const point p) const { return point(x-p.x, y-p.y); }
 	point operator * (const ld c) const { return point(x*c  , y*c  ); }
 	point operator / (const ld c) const { return point(x/c  , y/c  ); }
-	ld operator * (const point p) const { return x*p.x + y*p.y; }
-	ld operator ^ (const point p) const { return x*p.y - y*p.x; }
+	ld operator * (const point p) const { return x*p.x + y*p.y; }//dot
+	ld operator ^ (const point p) const { return x*p.y - y*p.x; }//cross
 	friend istream& operator >> (istream& in, point& p) {
 		return in >> p.x >> p.y;
 	}
@@ -133,6 +133,16 @@ ld segseg(point a, point b, point c, point d) {
 	return min({segpoint(ab,c), segpoint(ab,d), segpoint(cd,a), segpoint(cd,b)});
 }
 
+//angulo interno entre duas linhas, mid e o ponto de intersecao entre elas
+ld inner_angle(point p, point q, point mid){ 
+    point p1 = (p-mid);
+    point p2 = (q-mid);
+    ld rad = atan2(abs(p1 ^ p2), p1 * p2);//angulo em rad
+    ld deg = rad* 180.0 / M_PI;
+    return deg;
+}
+
+
 //linha que corta o segmento AB no meio perpendicularmente
 line mediatriz(point p, point q) {
     point mid = (p + q) / 2.0;
@@ -204,3 +214,29 @@ void polarSort(vector<point> &v, point &ref) {
         return angle(a, ref) < angle(b, ref);
     });
 }
+
+
+
+vector<pt> convex_hull(vector<pt> v) { // convex hull - O(n log(n))
+	sort(v.begin(), v.end());
+	v.erase(unique(v.begin(), v.end()), v.end());
+	if (v.size() <= 1) return v;
+	vector<pt> l, u;
+	for (int i = 0; i < v.size(); i++) {
+		while (l.size() > 1 and !ccw(l.end()[-2], l.end()[-1], v[i]))
+			l.pop_back();
+		l.push_back(v[i]);
+	}
+	for (int i = v.size() - 1; i >= 0; i--) {
+		while (u.size() > 1 and !ccw(u.end()[-2], u.end()[-1], v[i]))
+			u.pop_back();
+		u.push_back(v[i]);
+	}
+	l.pop_back(); u.pop_back();
+	for (pt i : u) l.push_back(i);
+	return l;
+}
+//comprimento do arco dado o raio e o angulo
+double comprimento = (graus * M_PI * raio) / 180.0;
+double comprimento = rad * raio;
+
