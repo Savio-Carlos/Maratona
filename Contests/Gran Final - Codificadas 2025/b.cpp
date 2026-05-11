@@ -3,7 +3,7 @@ using namespace std;
 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
-#define endl '\n'
+// #define endl '\n'
 #define int long long
 #define ld long double
 
@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,46 +108,74 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-const int MOD = 998244353;
+void solve(){
+    int n;
+    cin >> n;
+    int x = n/2;
+    int y = n/2;
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base % MOD;
-        base = base * base % MOD;
-        exp >>= 1;
+    char up;
+    cout << "? U" << endl << flush;
+    cin >> up;
+    debug(up);
+    if (up == '-'){
+        debug("entrou no up");
+        while(y + 1 < n && up == '-'){
+            cout << "? U" << endl << flush;
+            cin >> up;
+            if (up == '-'){
+                y++;
+                cout << "M U" << endl << flush;
+            } 
+        }
+        debug(y);
     }
-    return res%MOD;
-}
-int modiv(int a, int b){
-    return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+    else{
+        char down = '-';
+        while(y - 1 >= 0 && down == '-'){
+            cout << "? D" << endl << flush;
+            cin >> down;
+            if (down == '-'){
+                y--;
+                cout << "M D" << endl << flush;
+            } 
+        }
+        debug(y);
+    }
+    
+    char right;
+    cout << "? R" << endl << flush;
+    cin >> right;
+    if (right == '-'){
+        while(x + 1 < n && right == '-'){
+            cout << "? R" << endl << flush;
+            cin >> right;
+            if (right == '-'){
+                x++;
+                cout << "M R" << endl << flush;
+            } 
+        }
+        debug(x);
+    }
+    else{
+        char left = '-';
+        while(x - 1 >= 0 && left == '-'){
+            cout << "? L" << endl << flush;
+            cin >> left;
+            if (left == '-') {
+                x--;
+                cout << "M L" << endl << flush;
+            }
+        }
+        debug(x);
+    }
+    debug(x,y);
+    cout << "!" << endl << flush;
 }
 
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    
-    int mn = min(n, m);
-    int mx = max(n, m);
-    int c = mx - mn; 
-    
-    auto sum1 = [&](int x) {
-        x %= MOD;
-        return modiv(x * (x + 1LL) % MOD, 2LL);
-    };
-    auto sum2 = [&](int x) {
-        x %= MOD;
-        return modiv((x * (x + 1LL) % MOD) * (2LL * x + 1LL) % MOD, 6LL);
-    };
-
-    int retangulos = sum1(n) * sum1(m) % MOD;
-    int sum_sq_diff = (sum2(mx) - sum2(c) + MOD) % MOD;
-    int sum_lin_diff = (sum1(mx) - sum1(c) + MOD) % MOD;
-    
-    int quadrados = (sum_sq_diff - (c % MOD * sum_lin_diff) % MOD + MOD) % MOD;
-    
-    int ans = (retangulos - quadrados + MOD) % MOD;
-    
-    cout << ans << endl;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }

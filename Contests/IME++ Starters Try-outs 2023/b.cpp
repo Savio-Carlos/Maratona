@@ -44,7 +44,7 @@ namespace dbg {
 } 
 using namespace dbg;
 
-// #define DEBUG
+#define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0

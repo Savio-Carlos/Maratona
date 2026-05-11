@@ -108,46 +108,13 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-const int MOD = 998244353;
-
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base % MOD;
-        base = base * base % MOD;
-        exp >>= 1;
-    }
-    return res%MOD;
-}
-int modiv(int a, int b){
-    return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+void solve(){
+    
 }
 
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    
-    int mn = min(n, m);
-    int mx = max(n, m);
-    int c = mx - mn; 
-    
-    auto sum1 = [&](int x) {
-        x %= MOD;
-        return modiv(x * (x + 1LL) % MOD, 2LL);
-    };
-    auto sum2 = [&](int x) {
-        x %= MOD;
-        return modiv((x * (x + 1LL) % MOD) * (2LL * x + 1LL) % MOD, 6LL);
-    };
-
-    int retangulos = sum1(n) * sum1(m) % MOD;
-    int sum_sq_diff = (sum2(mx) - sum2(c) + MOD) % MOD;
-    int sum_lin_diff = (sum1(mx) - sum1(c) + MOD) % MOD;
-    
-    int quadrados = (sum_sq_diff - (c % MOD * sum_lin_diff) % MOD + MOD) % MOD;
-    
-    int ans = (retangulos - quadrados + MOD) % MOD;
-    
-    cout << ans << endl;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }

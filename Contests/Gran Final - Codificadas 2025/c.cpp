@@ -3,7 +3,7 @@ using namespace std;
 
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
-#define endl '\n'
+// #define endl '\n'
 #define int long long
 #define ld long double
 
@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,46 +108,53 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-const int MOD = 998244353;
+void solve(){
+    int n;
+    cin >> n;
+    string s, t;
+    cin >> s >> t;
 
-int fastExpo(int base, int exp) {
-    int res = 1;
-    while(exp) {
-        if (exp & 1) res = res * base % MOD;
-        base = base * base % MOD;
-        exp >>= 1;
+    auto check = [&](vector<string> n1, vector<string> n2) -> bool{
+        sort(all(n1));
+        sort(all(n2));
+        return n1 == n2;
+    };
+
+    for (int i = 1; i <= n-2; i++){
+        //tamanho da primeira string
+        for (int j = 1; j + i < n; j++){
+            //tamanho da segunda string
+            int k = n - (i+j);//tamanho da 3 string
+            
+            vector<string> p1(3);
+            p1[0] = s.substr(0,i);
+            p1[1] = s.substr(i,j);
+            p1[2] = s.substr(j+i,k);
+            debug(p1);
+
+            vector<int> todos = {i,j,k};
+
+            do {
+                vector<string> p2(3);
+                p2[0] = t.substr(0,todos[0]);
+                p2[1] = t.substr(todos[0],todos[1]);
+                p2[2] = t.substr(todos[0] + todos[1],todos[2]);
+                debug(p2);
+                if (check(p1,p2)){
+                    cout << "YES" << endl;
+                    cout << p1[0] << " " << p1[1] << " " << p1[2] << endl;;
+                    cout << p2[0] << " " << p2[1] << " " << p2[2] <<endl;; 
+                    return;
+                }
+            } while (next_permutation(all(todos)));
+        }
     }
-    return res%MOD;
-}
-int modiv(int a, int b){
-    return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+    cout << "NO" << endl;
 }
 
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    
-    int mn = min(n, m);
-    int mx = max(n, m);
-    int c = mx - mn; 
-    
-    auto sum1 = [&](int x) {
-        x %= MOD;
-        return modiv(x * (x + 1LL) % MOD, 2LL);
-    };
-    auto sum2 = [&](int x) {
-        x %= MOD;
-        return modiv((x * (x + 1LL) % MOD) * (2LL * x + 1LL) % MOD, 6LL);
-    };
-
-    int retangulos = sum1(n) * sum1(m) % MOD;
-    int sum_sq_diff = (sum2(mx) - sum2(c) + MOD) % MOD;
-    int sum_lin_diff = (sum1(mx) - sum1(c) + MOD) % MOD;
-    
-    int quadrados = (sum_sq_diff - (c % MOD * sum_lin_diff) % MOD + MOD) % MOD;
-    
-    int ans = (retangulos - quadrados + MOD) % MOD;
-    
-    cout << ans << endl;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }
