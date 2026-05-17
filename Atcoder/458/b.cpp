@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,91 +108,39 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+int dx[] = {-1,1,0,0};
+int dy[] = {0,0,-1,1};
 
-struct BIT {
-	int n;
-	vector<int> bit;
-	BIT(int _n = 0) : n(_n), bit(n + 1) {}
-	BIT(vector<int>& v) : n(v.size()), bit(n + 1) {
-		for (int i = 1; i <= n; i++) {
-			bit[i] += v[i - 1];
-			int j = i + (i & -i);
-			if (j <= n) bit[j] += bit[i];
-		}
-	}
-	void update(int i, int x) { // soma x na posicao i
-		for (i++; i <= n; i += i & -i) bit[i] += x;
-	}
+void solve(){
+    int h, w;
+    cin >> h >> w;
 
-	int pref(int i) { // soma [0, i]
-		int ret = 0;
-		for (i++; i; i -= i & -i) ret += bit[i];
-		return ret;
-	}
-	int query(int l, int r) {  // soma [l, r]
-		return pref(r) - pref(l - 1); 
-	}
-};
+    auto check = [&](int x, int y) -> bool{
+        return x >= 0 && x < h && y >= 0 && y < w;
+    };
+
+    vector<vector<int>> grid(h, vector<int>(w));
+    for (int i = 0; i < h; i++){
+        for (int j = 0; j < w; j++){
+            for (int d = 0; d < 4; d++){
+                int nx = i+dx[d];
+                int ny = j+dy[d];
+                grid[i][j] += check(nx,ny);
+            }
+        }
+    }
+
+    for (int i = 0; i < h; i++){
+        for (int j = 0; j < w; j++){
+            cout << grid[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
 
 signed main(){
     winton;
-    int n, k;
-    cin >> n >> k;
-
-    vector<int> a(n);
-    for (auto &u : a) cin >> u;
-
-    auto check = [&](int mid) -> bool{
-        vector<int> t(n), pfx(n+1);
-        debug(mid);
-        for (int i = 0; i < n; i++){
-            t[i] = (a[i] <= mid ? 1 : -1);
-            pfx[i+1] = pfx[i] + t[i];
-        }
-        
-        auto todos = pfx;
-        debug(t);
-        sort(all(todos));
-        todos.erase(unique(all(todos)), todos.end());
-        int m = todos.size();
-        
-        debug(m);
-        auto getId = [&](int v) {
-            return lower_bound(all(todos), v) - todos.begin();
-        };
-        
-        BIT bit(m);
-        bit.update(getId(pfx[0]), 1);
-        
-        debug(pfx,todos);
-        
-        int cnt = 0;
-        for (int i = 1; i <= n; i++){
-            int idx = getId(pfx[i]);
-            debug(i, pfx[i], idx);
-
-            cnt += bit.pref(idx);
-            bit.update(idx, 1);
-        }
-        
-        debug(mid, cnt);
-        debug("=======================");
-        return cnt >= k;
-    };
-    
-    int l = 1, r = *max_element(all(a));
-    int ans = r;
-    while (l <= r){
-        //contar quantos subarrays tem mediana <= mid
-        int mid = l + (r - l) / 2;
-
-        if (check(mid)){
-            ans = mid;
-            r = mid - 1;
-        }
-        else{
-            l = mid + 1;
-        } 
-    }
-    cout << ans << endl;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }

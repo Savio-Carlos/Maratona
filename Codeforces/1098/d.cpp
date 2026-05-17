@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,91 +108,77 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+const int MAX = 2e6+7;
 
-struct BIT {
-	int n;
-	vector<int> bit;
-	BIT(int _n = 0) : n(_n), bit(n + 1) {}
-	BIT(vector<int>& v) : n(v.size()), bit(n + 1) {
-		for (int i = 1; i <= n; i++) {
-			bit[i] += v[i - 1];
-			int j = i + (i & -i);
-			if (j <= n) bit[j] += bit[i];
-		}
-	}
-	void update(int i, int x) { // soma x na posicao i
-		for (i++; i <= n; i += i & -i) bit[i] += x;
-	}
+int esquerda[MAX], direita[MAX];
+int mp[MAX], nxt[MAX], yv[MAX];
 
-	int pref(int i) { // soma [0, i]
-		int ret = 0;
-		for (i++; i; i -= i & -i) ret += bit[i];
-		return ret;
-	}
-	int query(int l, int r) {  // soma [l, r]
-		return pref(r) - pref(l - 1); 
-	}
-};
+void solve(){
+    int n;
+    cin >> n;
+
+    for (int i = 1; i <= n; i++){
+        mp[i] = 0;
+        esquerda[i] = 0; 
+        direita[i] = 0;
+    } 
+    vector<int> todos_y;
+
+    for (int i = 1; i <= n; i++){
+        int x, y;
+        cin >> x >> y;
+        nxt[i] = mp[x];
+        yv[i] = y;
+        mp[x] = i;
+        todos_y.push_back(y);
+    }
+
+    sort(all(todos_y));
+    todos_y.erase(unique(all(todos_y)), todos_y.end());
+
+    int tot = 0;
+    for (int i = 1; i <= n; i++){
+        if (!mp[i]) continue;
+        tot++;
+        for (int p = mp[i]; p; p = nxt[p]) direita[yv[p]]++;
+    }
+
+    int mnl = n+1, mxl = 0;
+    int mnr = 1, mxr = n;
+    while (mnr <= n && !direita[mnr]) mnr++;
+    while (mxr >= 1 && !direita[mxr]) mxr--;
+
+    int ans = 0;
+    int i = 0;
+    for (int x = 1; x <= n; x++){
+        if (!mp[x]) continue;
+        for (int i = mp[x]; i; i = nxt[i]){
+            int y = yv[i];
+            direita[y]--; 
+            esquerda[y]++;
+            if (y < mnl) mnl = y;
+            if (y > mxl) mxl = y;
+        }
+        while (mnr <= n && !direita[mnr]) mnr++;
+        while (mxr >= 1 && !direita[mxr]) mxr--;
+
+        if (++i == tot) break;
+
+        int baixo = max(mnl, mnr);
+        int alto = min(mxl, mxr);
+        if (baixo >= alto) continue;
+
+        auto it1 = lower_bound(all(todos_y), baixo);
+        auto it2 = lower_bound(all(todos_y), alto);
+        ans += (it2 - it1);
+    }
+
+    cout << ans << endl;
+}
 
 signed main(){
     winton;
-    int n, k;
-    cin >> n >> k;
-
-    vector<int> a(n);
-    for (auto &u : a) cin >> u;
-
-    auto check = [&](int mid) -> bool{
-        vector<int> t(n), pfx(n+1);
-        debug(mid);
-        for (int i = 0; i < n; i++){
-            t[i] = (a[i] <= mid ? 1 : -1);
-            pfx[i+1] = pfx[i] + t[i];
-        }
-        
-        auto todos = pfx;
-        debug(t);
-        sort(all(todos));
-        todos.erase(unique(all(todos)), todos.end());
-        int m = todos.size();
-        
-        debug(m);
-        auto getId = [&](int v) {
-            return lower_bound(all(todos), v) - todos.begin();
-        };
-        
-        BIT bit(m);
-        bit.update(getId(pfx[0]), 1);
-        
-        debug(pfx,todos);
-        
-        int cnt = 0;
-        for (int i = 1; i <= n; i++){
-            int idx = getId(pfx[i]);
-            debug(i, pfx[i], idx);
-
-            cnt += bit.pref(idx);
-            bit.update(idx, 1);
-        }
-        
-        debug(mid, cnt);
-        debug("=======================");
-        return cnt >= k;
-    };
-    
-    int l = 1, r = *max_element(all(a));
-    int ans = r;
-    while (l <= r){
-        //contar quantos subarrays tem mediana <= mid
-        int mid = l + (r - l) / 2;
-
-        if (check(mid)){
-            ans = mid;
-            r = mid - 1;
-        }
-        else{
-            l = mid + 1;
-        } 
-    }
-    cout << ans << endl;
+    int t = 1;
+    cin >> t;
+    while(t--) solve();
 }

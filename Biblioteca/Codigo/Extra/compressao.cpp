@@ -11,6 +11,10 @@ sort(all(todos));
 todos.erase(unique(all(todos)), todos.end());
 int m = todos.size();
 
+auto comp = [&](int x) {
+    return (lower_bound(all(todos), x) - todos.begin());
+};
+
 vector<int> comp(n);
 for (int i = 0; i < n; i++){
     comp[i] = lower_bound(all(todos), v[i]) - todos.begin();

@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,91 +108,33 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+void solve(){
+    int x;
+    int q;
+    cin >> x >> q;
 
-struct BIT {
-	int n;
-	vector<int> bit;
-	BIT(int _n = 0) : n(_n), bit(n + 1) {}
-	BIT(vector<int>& v) : n(v.size()), bit(n + 1) {
-		for (int i = 1; i <= n; i++) {
-			bit[i] += v[i - 1];
-			int j = i + (i & -i);
-			if (j <= n) bit[j] += bit[i];
-		}
-	}
-	void update(int i, int x) { // soma x na posicao i
-		for (i++; i <= n; i += i & -i) bit[i] += x;
-	}
+    multiset<int> ms;
+    ms.insert(x);
+    auto med = ms.begin();
 
-	int pref(int i) { // soma [0, i]
-		int ret = 0;
-		for (i++; i; i -= i & -i) ret += bit[i];
-		return ret;
-	}
-	int query(int l, int r) {  // soma [l, r]
-		return pref(r) - pref(l - 1); 
-	}
-};
+    while(q--){
+        int a, b;
+        cin >> a >> b;
+        int m = *med;
+        ms.insert(a);
+        ms.insert(b);
+
+        int left = (a < m) + (b < m);
+        if (left == 2) --med;
+        else if (left == 0) ++med;
+
+        cout << *med << endl;
+    }
+}
 
 signed main(){
     winton;
-    int n, k;
-    cin >> n >> k;
-
-    vector<int> a(n);
-    for (auto &u : a) cin >> u;
-
-    auto check = [&](int mid) -> bool{
-        vector<int> t(n), pfx(n+1);
-        debug(mid);
-        for (int i = 0; i < n; i++){
-            t[i] = (a[i] <= mid ? 1 : -1);
-            pfx[i+1] = pfx[i] + t[i];
-        }
-        
-        auto todos = pfx;
-        debug(t);
-        sort(all(todos));
-        todos.erase(unique(all(todos)), todos.end());
-        int m = todos.size();
-        
-        debug(m);
-        auto getId = [&](int v) {
-            return lower_bound(all(todos), v) - todos.begin();
-        };
-        
-        BIT bit(m);
-        bit.update(getId(pfx[0]), 1);
-        
-        debug(pfx,todos);
-        
-        int cnt = 0;
-        for (int i = 1; i <= n; i++){
-            int idx = getId(pfx[i]);
-            debug(i, pfx[i], idx);
-
-            cnt += bit.pref(idx);
-            bit.update(idx, 1);
-        }
-        
-        debug(mid, cnt);
-        debug("=======================");
-        return cnt >= k;
-    };
-    
-    int l = 1, r = *max_element(all(a));
-    int ans = r;
-    while (l <= r){
-        //contar quantos subarrays tem mediana <= mid
-        int mid = l + (r - l) / 2;
-
-        if (check(mid)){
-            ans = mid;
-            r = mid - 1;
-        }
-        else{
-            l = mid + 1;
-        } 
-    }
-    cout << ans << endl;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }

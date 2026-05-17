@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,91 +108,119 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+string s;
+int sz;
+bool dp[10];
+int mxd, mnd, mxz, mnz;
 
-struct BIT {
-	int n;
-	vector<int> bit;
-	BIT(int _n = 0) : n(_n), bit(n + 1) {}
-	BIT(vector<int>& v) : n(v.size()), bit(n + 1) {
-		for (int i = 1; i <= n; i++) {
-			bit[i] += v[i - 1];
-			int j = i + (i & -i);
-			if (j <= n) bit[j] += bit[i];
-		}
-	}
-	void update(int i, int x) { // soma x na posicao i
-		for (i++; i <= n; i += i & -i) bit[i] += x;
-	}
+bool pd1(int index, bool above, string& res){
+    if (index == sz) return 1;
 
-	int pref(int i) { // soma [0, i]
-		int ret = 0;
-		for (i++; i; i -= i & -i) ret += bit[i];
-		return ret;
-	}
-	int query(int l, int r) {  // soma [l, r]
-		return pref(r) - pref(l - 1); 
-	}
-};
+    int ub = above ? s[index] - '0' : 9;
+
+    for (int digit = ub; digit >= 0; digit--){
+        if (!dp[digit]) continue;
+        if (index == 0 && digit == 0 && sz > 1) continue;
+
+        bool new_above = above && (digit == ub);
+        res.push_back(digit + '0');
+
+        if (new_above){
+            if (pd1(index + 1, 1, res)) return 1;
+        } 
+        else{
+            for (int j = index + 1; j < sz; j++) res.push_back('0' + mxd);
+            return 1;
+        }
+        res.pop_back();
+    }
+    return 0;
+}
+
+bool pd2(int index, bool under, string& res){
+    if (index == sz) return 1;
+
+    int lb = under ? s[index] - '0' : 0;
+
+    for (int digit = lb; digit <= 9; digit++){
+        if (!dp[digit]) continue;
+        if (index == 0 && digit == 0 && sz > 1) continue;
+
+        bool new_under = under && (digit == lb);
+        res.push_back(digit + '0');
+
+        if (new_under){
+            if (pd2(index + 1, 1, res)) return 1;
+        } else {
+            for (int j = index + 1; j < sz; j++) res.push_back(mnd + '0');
+            return 1;
+        }
+        res.pop_back();
+    }
+    return false;
+}
+
+void solve(){
+    int a, n;
+    cin >> a >> n;
+
+    memset(dp, 0, sizeof(dp));
+    for (int i = 0; i < n; i++){ 
+        int x; 
+        cin >> x; 
+        dp[x] = 1; 
+    }
+
+    mxd = -1; mnd = -1; 
+    mxz = -1; mnz = -1;
+
+    for (int i = 0; i <= 9; i++){
+        if (dp[i]){ 
+            if (mnd < 0) mnd = i; 
+            mxd = i; 
+        }
+    } 
+    for (int i = 1; i <= 9; i++){
+        if (dp[i]){
+            if (mnz < 0) mnz = i;
+            mxz = i;
+        }
+    }
+
+    s = to_string(a);
+    sz = s.size();
+
+    int mx = -1;
+    string res1;
+    if (pd1(0, true, res1)) mx = stoll(res1);
+    else if (sz > 1 && mxz > 0){
+        string r(1, mxz + '0');
+        r.append(sz - 2, mxd + '0');
+        mx = stoll(r);
+    }
+    
+
+    int mn = -1;
+    string res2;
+    if (pd2(0, true, res2)) mn = stoll(res2);
+    else if (mnz > 0){
+        string r(1, '0' + mnz);
+        r.append(sz, '0' + mnd);
+        mn = stoll(r);
+    }
+
+    int ans = 1e18;
+    if (dp[0]) ans = min(ans, a);
+    if (mx >= 0) ans = min(ans, llabs(a - mx));
+    if (mn >= 0) ans = min(ans, llabs(a - mn));
+    cout << ans << endl;
+}
 
 signed main(){
     winton;
-    int n, k;
-    cin >> n >> k;
-
-    vector<int> a(n);
-    for (auto &u : a) cin >> u;
-
-    auto check = [&](int mid) -> bool{
-        vector<int> t(n), pfx(n+1);
-        debug(mid);
-        for (int i = 0; i < n; i++){
-            t[i] = (a[i] <= mid ? 1 : -1);
-            pfx[i+1] = pfx[i] + t[i];
-        }
-        
-        auto todos = pfx;
-        debug(t);
-        sort(all(todos));
-        todos.erase(unique(all(todos)), todos.end());
-        int m = todos.size();
-        
-        debug(m);
-        auto getId = [&](int v) {
-            return lower_bound(all(todos), v) - todos.begin();
-        };
-        
-        BIT bit(m);
-        bit.update(getId(pfx[0]), 1);
-        
-        debug(pfx,todos);
-        
-        int cnt = 0;
-        for (int i = 1; i <= n; i++){
-            int idx = getId(pfx[i]);
-            debug(i, pfx[i], idx);
-
-            cnt += bit.pref(idx);
-            bit.update(idx, 1);
-        }
-        
-        debug(mid, cnt);
-        debug("=======================");
-        return cnt >= k;
-    };
-    
-    int l = 1, r = *max_element(all(a));
-    int ans = r;
-    while (l <= r){
-        //contar quantos subarrays tem mediana <= mid
-        int mid = l + (r - l) / 2;
-
-        if (check(mid)){
-            ans = mid;
-            r = mid - 1;
-        }
-        else{
-            l = mid + 1;
-        } 
-    }
-    cout << ans << endl;
+    int t = 1;
+    cin >> t;
+    while(t--) solve();
 }
+
+
