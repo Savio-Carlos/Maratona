@@ -31,8 +31,8 @@ struct point { // ponto
 	friend istream& operator >> (istream& in, point& p) {
 		return in >> p.x >> p.y;
 	}
-	friend ostream& operator << (ostream& os, const pt& p) {
-		return os << "(" << p.x << ", " << p.y << ")"; 
+	friend ostream& operator << (ostream& os, const point& p) {
+		return os << "(" << p.x << ", " << p.y << ")";
 	}
 };
 
@@ -84,14 +84,13 @@ point rotate90(point p) { // rotaciona 90 graus
 }
 
 // retorna t tal que t*v pertence a reta r
-ld get_t(point a, line r) { 
+ld get_t(point a, line r) {
 	return (r.p^r.q) / ((r.p-r.q)^a);
 }
 
 bool isvert(line r) { // se r eh vertical
 	return eq(r.p.x, r.q.x);
 }
-
 
 point proj(point p, line r) { // projecao do ponto p na reta r
 	if (r.p == r.q) return r.p;
@@ -129,19 +128,18 @@ ld segpoint(line r, point p) { // distancia do ponto ao seg
 ld segseg(point a, point b, point c, point d) {
 	line ab(a,b);
 	line cd(c,d);
-    if (interseg(ab, cd)) return 0; 
+    if (interseg(ab, cd)) return 0;
 	return min({segpoint(ab,c), segpoint(ab,d), segpoint(cd,a), segpoint(cd,b)});
 }
 
 //angulo interno entre duas linhas, mid e o ponto de intersecao entre elas
-ld inner_angle(point p, point q, point mid){ 
+ld inner_angle(point p, point q, point mid){
     point p1 = (p-mid);
     point p2 = (q-mid);
     ld rad = atan2(abs(p1 ^ p2), p1 * p2);//angulo em rad
     ld deg = rad* 180.0 / M_PI;
     return deg;
 }
-
 
 //linha que corta o segmento AB no meio perpendicularmente
 line mediatriz(point p, point q) {
@@ -177,7 +175,7 @@ ld polarea(vector<point> v){ // area do poligono
 	ld ret = 0;
 	for (int i = 0; i < v.size(); i++){
 		ret += sarea(point(0, 0), v[i], v[(i + 1) % v.size()]);
-	}	
+	}
 	return abs(ret);
 }
 
@@ -210,18 +208,16 @@ ld angle(const point &p, const point &ref) { // angulo do ponto p em relacao ao 
 
 //ordena os pontos de acordo com o angulo
 void polarSort(vector<point> &v, point &ref) {
-    sort(v.begin(), v.end(), [&ref](point a, point b) { 
+    sort(v.begin(), v.end(), [&ref](point a, point b) {
         return angle(a, ref) < angle(b, ref);
     });
 }
 
-
-
-vector<pt> convex_hull(vector<pt> v) { // convex hull - O(n log(n))
+vector<point> convex_hull(vector<point> v) { // convex hull - O(n log(n))
 	sort(v.begin(), v.end());
 	v.erase(unique(v.begin(), v.end()), v.end());
 	if (v.size() <= 1) return v;
-	vector<pt> l, u;
+	vector<point> l, u;
 	for (int i = 0; i < v.size(); i++) {
 		while (l.size() > 1 and !ccw(l.end()[-2], l.end()[-1], v[i]))
 			l.pop_back();
@@ -233,10 +229,10 @@ vector<pt> convex_hull(vector<pt> v) { // convex hull - O(n log(n))
 		u.push_back(v[i]);
 	}
 	l.pop_back(); u.pop_back();
-	for (pt i : u) l.push_back(i);
+	for (point i : u) l.push_back(i);
 	return l;
 }
-//comprimento do arco dado o raio e o angulo
-double comprimento = (graus * M_PI * raio) / 180.0;
-double comprimento = rad * raio;
 
+//comprimento do arco dado o raio e o angulo
+//double comprimento = (graus * M_PI * raio) / 180.0;
+//double comprimento = rad * raio;
