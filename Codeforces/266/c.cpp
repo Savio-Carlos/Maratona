@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -109,35 +109,44 @@ using namespace dbg;
 #endif
 
 void solve(){
+    int n;
+    cin >> n;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    int tot = accumulate(all(a), 0LL);
+    if (tot%3){
+        cout << 0 << endl;
+        return;
+    }
+    vector<int> sfx(n+1);
     
+    int x1 = 0;
+    int x2 = 0;
+    debug(tot/3,tot/3*2);
+    int sum = 0;
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        sum += a[i];
+        if (sum == tot/3) x1++;
+        if (sum == tot/3 * 2) x2++;
+        if (sum == tot/3 * 2) sfx[i]++;
+    }
+    sum = 0;
+    for (int i = n-1; i>=0; i--) sfx[i]+=sfx[i+1];
+    for (int i = 0; i < n; i++){
+        sum += a[i];
+        if (sum == tot/3) ans += sfx[i];
+    }
+    debug(x1,x2);
+    if (!tot){
+        cout << (x1-2)*(x1-1) / 2 << endl;
+    }
+    else cout << ans << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--) solve();
-}
-
-template <typename T, typename U>
-ostream& operator<<(ostream& os, const std::pair<T, U>& p) {
-	return os << "{" << p.first << ", " << p.second << "}";
-}
-
-template <typename T>
-concept IterableContainer = requires(T t) {
-	begin(t);
-	end(t);
-} && !same_as<T, string> && !same_as<T, string_view>;
-
-template<IterableContainer Container>
-ostream& operator<<(ostream& os, const Container& c) {
-	os << "[";
-	bool first = true;
-	for(const auto& elem : c){
-	if(!first) os << ", ";
- 		os << elem;
-		first = false;
-	}
-	return os << "]";
 }

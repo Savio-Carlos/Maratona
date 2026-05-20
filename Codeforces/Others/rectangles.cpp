@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -109,35 +109,58 @@ using namespace dbg;
 #endif
 
 void solve(){
+    int n, m;
+    cin >> n >> m;
+    int um = 0, dois = 0;
+    vector<vector<int>> grid(n, vector<int>(m));
+    for (auto &v : grid){
+        for (auto &u : v){
+            cin >> u;
+            if (u) um++;
+            else dois++;
+        } 
+    }
+
+    vector<int> l0(m), l1(m), c0(n), c1(n);
     
+    for (int i = 0; i < n; i++){
+        int cnt1 = 0, cnt0 = 0;
+        for (int j = 0; j < m; j++){
+            if (grid[i][j] == 1) cnt1++;
+            if (grid[i][j] == 0) cnt0++;
+        }
+        c0[i] = cnt0;
+        c1[i] = cnt1;
+    }
+    for (int j = 0; j < m; j++){
+        int cnt1 = 0, cnt0 = 0;
+        for (int i = 0; i < n; i++){
+            if (grid[i][j] == 1) cnt1++;
+            if (grid[i][j] == 0) cnt0++;
+        }
+        l0[j] = cnt0;
+        l1[j] = cnt1;
+    }
+    debug(c0,c1,l0,l1);
+    debug(um,dois);
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        ans += ((1LL << (c0[i])) - 1) - c0[i];
+        ans += ((1LL << (c1[i])) - 1) - c1[i];
+    } 
+    debug(ans);
+    for (int i = 0; i < m; i++){
+        ans += ((1LL << (l0[i])) - 1) - l0[i];
+        ans += ((1LL << (l1[i])) - 1) - l1[i];
+    } 
+    debug(ans);
+    ans += um + dois;
+    cout << ans << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--) solve();
-}
-
-template <typename T, typename U>
-ostream& operator<<(ostream& os, const std::pair<T, U>& p) {
-	return os << "{" << p.first << ", " << p.second << "}";
-}
-
-template <typename T>
-concept IterableContainer = requires(T t) {
-	begin(t);
-	end(t);
-} && !same_as<T, string> && !same_as<T, string_view>;
-
-template<IterableContainer Container>
-ostream& operator<<(ostream& os, const Container& c) {
-	os << "[";
-	bool first = true;
-	for(const auto& elem : c){
-	if(!first) os << ", ";
- 		os << elem;
-		first = false;
-	}
-	return os << "]";
 }

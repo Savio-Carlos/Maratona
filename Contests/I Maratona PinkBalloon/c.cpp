@@ -98,7 +98,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -108,36 +108,41 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    
-}
 
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
-}
+    int x, y, z, m, n;
+    string s;
+    cin >> x >> y >> z >> m >> n >> s;
 
-template <typename T, typename U>
-ostream& operator<<(ostream& os, const std::pair<T, U>& p) {
-	return os << "{" << p.first << ", " << p.second << "}";
-}
+    vector<int> t(1, m);
 
-template <typename T>
-concept IterableContainer = requires(T t) {
-	begin(t);
-	end(t);
-} && !same_as<T, string> && !same_as<T, string_view>;
+    auto getNxt = [&](int idx, int goal) -> int{
+        for (int i = idx; i < t.size(); i++){
+            if (t[i] >= goal) return i;
+        }
+        t.push_back(m);
+        return (int)(t.size() - 1);
+    };
 
-template<IterableContainer Container>
-ostream& operator<<(ostream& os, const Container& c) {
-	os << "[";
-	bool first = true;
-	for(const auto& elem : c){
-	if(!first) os << ", ";
- 		os << elem;
-		first = false;
-	}
-	return os << "]";
+    int a = 0;
+    int r = 0;
+    int f = 0;
+    for (int i = 0; i < n; i++){
+        auto &c = s[i];
+        if (c == 'A'){
+            if(t[a] < y) a = getNxt(a, y);
+            t[a] -= y;
+        }
+        if (c == 'F'){
+            if(t[f] < x) f = getNxt(f, x);
+            t[f] -= x;
+        }
+        if (c == 'R'){
+            if(t[r] < z) r = getNxt(r, z);
+            t[r] -= z;
+        }
+        debug(t);
+    }
+    cout << t.size() << endl;
 }
