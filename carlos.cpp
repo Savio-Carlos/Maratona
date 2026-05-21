@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -119,25 +124,3 @@ signed main(){
     while(t--) solve();
 }
 
-template <typename T, typename U>
-ostream& operator<<(ostream& os, const std::pair<T, U>& p) {
-	return os << "{" << p.first << ", " << p.second << "}";
-}
-
-template <typename T>
-concept IterableContainer = requires(T t) {
-	begin(t);
-	end(t);
-} && !same_as<T, string> && !same_as<T, string_view>;
-
-template<IterableContainer Container>
-ostream& operator<<(ostream& os, const Container& c) {
-	os << "[";
-	bool first = true;
-	for(const auto& elem : c){
-	if(!first) os << ", ";
- 		os << elem;
-		first = false;
-	}
-	return os << "]";
-}

@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,93 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
 
-    
-}
+struct BIT {
+	int n;
+	vector<int> bit;
+	BIT(int _n = 0) : n(_n), bit(n + 1) {}
+	BIT(vector<int>& v) : n(v.size()), bit(n + 1) {
+		for (int i = 1; i <= n; i++) {
+			bit[i] += v[i - 1];
+			int j = i + (i & -i);
+			if (j <= n) bit[j] += bit[i];
+		}
+	}
+	void update(int i, int x) { // soma x na posicao i
+		for (i++; i <= n; i += i & -i) bit[i] += x;
+	}
+
+	int pref(int i) { // soma [0, i]
+		int ret = 0;
+		for (i++; i; i -= i & -i) ret += bit[i];
+		return ret;
+	}
+	int query(int l, int r) {  // soma [l, r]
+		return pref(r) - pref(l - 1); 
+	}
+};
 
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int n, k;
+    cin >> n >> k;
+
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+
+    vector<int> pfx(n+1);
+    for (int i = 0; i < n; i++){
+        pfx[i+1] = pfx[i] + a[i];
+    }
+    
+    auto todos = pfx;
+    sort(all(todos));
+    todos.erase(unique(all(todos)), todos.end());
+    int m = todos.size();
+    
+    debug(m);
+    auto getId = [&](int v) {
+        return lower_bound(all(todos), v) - todos.begin();
+    };
+    debug(pfx,todos);
+
+    int tot = (n*(n+1)) / 2 - k + 1;
+
+    auto check = [&](int mid) -> bool{
+        //quantos subarrays com soma <= mid
+        BIT bit(m);
+        bit.update(getId(pfx[0]), 1);
+        
+        int cnt = 0;
+        for (int i = 1; i <= n; i++){
+            //procurar quantos pfx[i] antes deu tinham valor <= pfx[i] - mid
+            // um subarray tem soma <= mid se pfx[l] <= pfx[r] - mid
+            int idx = (lower_bound(all(todos), pfx[i] - mid) - todos.begin());
+            int lt = (idx > 0 ? bit.pref(idx - 1) : 0);
+
+            cnt += i - lt;
+
+            debug(i, pfx[i], idx, cnt);
+            bit.update(getId(pfx[i]), 1);
+        }
+        
+        debug(mid, cnt);
+        debug("=======================");
+        return cnt >= tot;
+    };
+    
+    int l = -1e18, r = 1e18;
+    int ans = r;
+    while (l <= r){
+        int mid = l + (r - l) / 2;
+
+        if (check(mid)){
+            ans = mid;
+            r = mid - 1;
+        }
+        else{
+            l = mid + 1;
+        } 
+    }
+    cout << ans << endl;
 }

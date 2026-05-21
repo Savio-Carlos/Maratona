@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,50 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
+/*
+G
 
-    
-}
+primeiro eu vo perder
+e depois ganhar
+
+pra ganhar eu sempre vou ordenar pelo menor pi primeiro
+pra perder eu tenho que maximizar o quanto eu perco
+entao e bom eu pegar os maiores P primeiro
+
+-4 -3
+-2 -1
+se meu score = 0
+quero pegar o -3 primeiro
+
+mas se
+-2 -3
+-4 -1
+se meu score = 0
+quero pegar o -1 primeiro
+
+
+
+*/
 
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int n, x;
+    cin >> n >> x;
+
+    vector<pair<int,int>> win, lose;
+    for (int i = 0; i < n; i++){
+        int p, q;
+        cin >> p >> q;
+        if (q >= 0) win.push_back({p, q});
+        else lose.push_back({p, q});
+    }
+
+    sort(all(lose), [](const pair<int,int>& a, const pair<int,int>& b){
+        return b.first > b.second;
+    });
+    sort(all(win));
+
+    for (auto& [p, q] : lose) x = min(p, x + q);
+    for (auto& [p, q] : win) x = min(p, x + q);
+    cout << x << endl;
 }

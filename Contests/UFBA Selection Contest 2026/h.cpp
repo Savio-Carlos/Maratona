@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,56 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
-
-    
-}
-
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int n, m;
+    cin >> n >> m;
+
+    vector<vector<int>> graph(n+1);
+    vector<int> indeg(n+1);
+
+    for (int i = 0; i < m; i++){
+        int a, b;
+        cin >> a >> b;
+        graph[a].push_back(b);
+        indeg[b]++;
+    }
+
+    int k;
+    cin >> k;
+
+    vector<set<int>> restricao(n+1);
+    for (int i = 0; i < k; i++){
+        int j, x;
+        cin >> j >> x;
+        restricao[x].insert(j);
+    }
+    vector<int> semester(n+1);
+
+    queue<int> q;
+    for (int i = 1; i <= n; i++){
+        if (indeg[i] == 0) q.push(i);
+    }
+
+    int done = 0;
+    int ans = 0;
+    while (!q.empty()){
+        auto v = q.front();
+        q.pop();
+        done++;
+        int s = semester[v] + 1;
+        while (restricao[v].count(s)) s++;
+        semester[v] = s;
+        ans = max(ans, s);
+
+        debug(v, s);
+        for (auto u : graph[v]){
+            semester[u] = max(semester[u], s);
+            indeg[u]--;
+            if (indeg[u] == 0) q.push(u);
+        }
+    }
+
+    if (done < n) cout << -1 << endl;
+    else cout << ans << endl;
 }

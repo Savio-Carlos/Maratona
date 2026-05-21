@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,48 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
-
-    
-}
-
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int n;
+    cin >> n;
+    vector<vector<int>> intervals;
+    vector<int> cur;
+    for (int i = 0; i < n; i++){
+        int x;
+        cin >> x;
+        if (x > 1) cur.push_back(x);
+        else {
+            intervals.push_back(cur);
+            cur.clear();
+        }
+    }
+    if (cur.size()) intervals.push_back(cur);
+
+    auto solve = [&](const vector<int>& intervalo) -> int {
+        int m = intervalo.size();
+        vector<int> dp(m+1);
+        vector<int> pfx(m+1);
+        
+        for (int i = 0; i < m; i++) {
+            pfx[i+1] = pfx[i] + intervalo[i];
+        }
+
+        for (int i = 1; i <= m; i++){
+            dp[i] = dp[i-1];
+            for (int j = 1; j <= i; j++){
+                int sum = pfx[i] - pfx[j-1];
+                int len = i - j + 1;
+                int prev = (j >= 2) ? dp[j-2] : 0; 
+                debug(i,j,prev,sum,len);
+                dp[i] = max(dp[i], prev + sum - (len * len));
+            }
+        }
+        debug(dp);
+        return dp[m];
+    };
+
+    int ans = 0;
+    for (auto v : intervals) ans += solve(v);
+    cout << ans << endl;
 }
+

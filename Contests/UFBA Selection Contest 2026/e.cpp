@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,39 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
-
-    
-}
 
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int ax, ay, bx, by, m;
+    cin >> ax >> ay >> bx >> by >> m;
+    int ans = abs(ax-bx) + abs(ay-by);
+    int save = 0;
+    debug(ans);
+    for (int i = 0; i < m; i++){
+        int k, d;
+        cin >> k >> d;
+        if (d == -1){
+            //slope pra baixo
+            if (ax > bx && ay < by){
+                int l = min(ax, k - ay) - max(bx, k - by);
+                save = max(save, max(0LL, l));
+            }
+            if (ax < bx && ay > by){
+                int l = min(bx, k - by) - max(ax, k - ay);
+                save = max(save, max(0LL, l));
+            }
+        }
+        else {
+            //slope pra cima
+            if (ax < bx && ay < by){
+                int l = min(bx, by - k) - max(ax, ay - k);
+                save = max(save, max(0LL, l));
+            }
+            if (ax > bx && ay > by){
+                int l = min(ax, ay - k) - max(bx, by - k);
+                save = max(save, max(0LL, l));                
+            }
+        }
+    } 
+    cout << ans - save << endl;
 }

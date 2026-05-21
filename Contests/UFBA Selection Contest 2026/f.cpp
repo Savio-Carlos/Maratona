@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,33 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    int n;
-    cin >> n;
-    vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
-
-    
-}
-
 signed main(){
     winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    int n;
+    cin >> n;
+    vector<pair<int,int>> p(n);
+    vector<int> oo, ee, oe, eo;
+    for (int i = 0; i < n; i++){
+        int x, y;
+        cin >> x >> y;
+        p[i] = {x,y};
+        if (((x&1)) && ((y&1))) oo.push_back(i+1);
+        if (((x&1)) && (!(y&1))) oe.push_back(i+1);
+        if ((!(x&1)) && (!(y&1))) ee.push_back(i+1);
+        if ((!(x&1)) && ((y&1))) eo.push_back(i+1);
+    }
+    if (oo.size() > 1){
+        cout << oo[0] << " " << oo[1] << endl; 
+    }
+    else if (oe.size() > 1){
+        cout << oe[0] << " " << oe[1] << endl; 
+    }
+    else if (ee.size() > 1){
+        cout << ee[0] << " " << ee[1] << endl; 
+    }
+    else if (eo.size() > 1){
+        cout << eo[0] << " " << eo[1] << endl; 
+    }
+    else cout << -1 << endl;
 }
+

@@ -7,6 +7,11 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -108,19 +113,35 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
+signed main(){
+    winton;
     int n;
     cin >> n;
     vector<int> a(n), b(n);
-    for (auto &u : a) cin >> u;
-    for (auto &u : b) cin >> u;
+    cin >> a >> b;  
+    // map<int, int> mp;
+    vector<int> mp(2e6+7);
+    int ans = 1e9;
+    int best = 0;
+    vector<int> minimos(2e6+7);
+    for (int i = 0; i < n; i++){
+        int x = a[i] + b[i];
+        mp[x]++;
+        minimos[min(a[i], b[i])]++;
+    }  
+    auto pfx = minimos;
+    auto sfx = minimos;
+    int m = minimos.size();
+    for (int i = 1; i < m; i++) pfx[i] += pfx[i-1];
+    for (int i = m-1; i >= 0; i--) sfx[i] += sfx[i+1];
 
-    
+    for (int c = 2; c <= 2e6; c++){
+        int pos = pfx[c] + 2*sfx[c] - mp[c];
+        if (pos < ans){
+            debug(c, ans, pos, sfx[c], pfx[c]);
+        }
+        ans = min(pos, ans);
+    }
+    cout << ans << endl;
 }
 
-signed main(){
-    winton;
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
-}
