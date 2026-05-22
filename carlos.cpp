@@ -113,6 +113,16 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+#define tcT template<class T
+#define tcTU tcT, class U
+#define tcTUU tcT, class ...U
+
+tcT> void re(T& x) { cin >> x; }
+tcTUU> void re(T& t, U&... u) { re(t); re(u...); }
+tcTU> void re(pair<T,U>& p) { re(p.first,p.second); }
+tcT> void re(vector<T>& x) { for(auto& a:x) re(a); }
+
+
 void solve(){
     
 }

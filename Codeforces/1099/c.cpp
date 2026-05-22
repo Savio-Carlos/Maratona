@@ -6,6 +6,8 @@ using namespace std;
 #define endl '\n'
 #define int long long
 #define ld long double
+#define f first
+#define s second
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -112,38 +114,28 @@ void solve(){
     int n;
     cin >> n;
     vector<int> a(n);
+    map<int,pair<int,int>> freq;
     for (auto &u : a) cin >> u;
-
-    bool ready = true;
-    for (int i = 1; i < n; i++){
-        if (a[i] != a[i-1]) { 
-            ready = false; 
-            break; 
+    sort(all(a));
+    for (int i = 0; i < n; i++){
+        int cnt = 0;
+        freq[a[i]].f++;
+        if (a[i] == 1){
+            freq[2].f++;
+            freq[2].s++;
+        }
+        while (a[i] != 1){
+            cnt++;
+            if (a[i]&1) a[i]++;
+            else a[i] /= 2;
+            freq[a[i]].f++;
+            freq[a[i]].s += cnt;
         }
     }
-    if (ready) { 
-        cout << 0 << endl; 
-        return; 
-    }
-
-    unordered_map<int, int> freq, sum;
-    int ans = 1e18;
-
-    auto add = [&](int x, int c) {
-        freq[x]++;
-        sum[x] += c;
-        if (freq[x] == n) ans = min(ans, sum[x]);
-    };
-
-    for (int i = 0; i < n; i++) {
-        int x = a[i], cnt = 0;
-        add(x, 0);
-        if (x == 1) add(2, 1);
-        while (x > 1) {
-            if (x & 1) x++; 
-            else x /= 2;
-            cnt++;
-            add(x, cnt);
+    int ans = 1e9+7;
+    for (auto [valor, qt] : freq){
+        if (qt.f == n) {
+            ans = min(ans, qt.s);
         }
     }
     cout << ans << endl;

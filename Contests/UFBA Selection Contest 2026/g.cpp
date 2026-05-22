@@ -134,6 +134,8 @@ mas se
 se meu score = 0
 quero pegar o -1 primeiro
 
+R = min(Pi, min(Pj, Qj + X) + Qi)
+L = min(Pj, min(Pi, Qi + X) + Qj)
 
 
 */
@@ -152,7 +154,7 @@ signed main(){
     }
 
     sort(all(lose), [](const pair<int,int>& a, const pair<int,int>& b){
-        return b.first > b.second;
+        return min(b.first, a.first + b.second) >  min(a.first, b.first + a.second);
     });
     sort(all(win));
 
