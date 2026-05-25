@@ -10,7 +10,8 @@ using namespace std;
 template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
 template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
 template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
-template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -103,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -115,66 +116,53 @@ using namespace dbg;
 
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    int mn = n+1LL;
+    string s, t;
+    cin >> s >> t;
+    vector<vector<int>> freq(2, vector<int>(26,0));
+    for (auto c : s) freq[0][c - 'a']++;
+    for (auto c : t) freq[1][c - 'a']++;
+    
+    string res[3] = {"EMPATE", "ADA", "PY"};
 
-    int cnt = __popcount(mn);
-    if (cnt == m){
-        cout << mn << endl;
-        return 0;
-    }
-    if (cnt < m){
-        for (int i = 0; i < 62; i++){  
-            if ((1LL<<i) & mn) continue;
-            else {
-                if (cnt < m){
-                    mn |= (1LL<<i);
-                    cnt++;
-                }
-            }
-            if (cnt == m) break;
+    int q;
+    cin >> q;
+    while(q--){
+        int op;
+        cin >> op;
+        if (op <= 2){
+            op--;
+            string r;
+            int k;
+            cin >> k >> r;
+            for (auto c : r) freq[op][c - 'a'] += k;
         }
-        cout << mn << endl;
-    }
-    else {
-        while (cnt > m){
-            int seq = 0;
-            for (int i = 0; i < 62; i++){  
-                if (cnt <= m) break;
-                if ((1LL<<i) & mn){
-                    seq++;
-                    mn ^= (1LL<<i);
-                } 
-                else if (seq){
-                    mn ^= (1LL<<i);
-                    cnt -= seq - 1;
-                    seq = 0;
-                    i = 0;
-                    debug(cnt, mn);
-                }
-                debug(seq);
-            }
-        }
-        debug(mn);
-        if (cnt == m){
-            cout << mn << endl;
-            return 0;
-        }
+        else {
+            int ans = 0;
+            auto& ada = freq[0];
+            auto& py = freq[1];
+            int tot1 = 0, tot2 = 0;
 
-        if (cnt < m){
-            for (int i = 0; i < 62; i++){  
-                if ((1LL<<i) & mn) continue;
-                else {
-                    if (cnt < m){
-                        mn |= (1LL<<i);
-                        cnt++;
-                    }
-                }
-                if (cnt == m) break;
+            for (int i = 0; i < 26; i++){
+                tot1 += ada[i];
+                tot2 += py[i];
             }
+                           
+            for (int i = 0; i < 26; i++){
+                if (ada[i] == py[i]){
+                    tot1 -= ada[i];
+                    tot2 -= py[i];
+                    continue;
+                }
+                int mn = min(ada[i], py[i]);
+                int rem1 = tot1 - mn;
+                int rem2 = tot2 - mn;
+                
+                if (ada[i] > py[i]) ans = (rem2 == 0) ? 2 : 1;
+                else ans = (rem1 == 0) ? 1 : 2;
+                break;
+            }
+            cout << res[ans] << endl;
         }
-        cout << mn << endl;
     }
 }
 

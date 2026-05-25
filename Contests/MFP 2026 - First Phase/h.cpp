@@ -10,7 +10,7 @@ using namespace std;
 template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
 template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
 template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
-template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -103,7 +103,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -113,68 +113,57 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+const int MOD = 1e9+7;
+
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    int mn = n+1LL;
+    int n, q;
+    cin >> n >> q;
+    vector<vector<int>> graph(n+1);
+    vector<int> sub(n+1);
+    vector<pair<int,int>> edges(n);
+    vector<int> cost(n+1);
+    vector<int> par(n+1);
 
-    int cnt = __popcount(mn);
-    if (cnt == m){
-        cout << mn << endl;
-        return 0;
+    for (int i = 1; i < n; i++){
+        int a, b, c;
+        cin >> a >> b >> c;
+        edges[i] = {a,b};
+        cost[i] = c;
+        graph[a].push_back(b);
+        graph[b].push_back(a);
     }
-    if (cnt < m){
-        for (int i = 0; i < 62; i++){  
-            if ((1LL<<i) & mn) continue;
-            else {
-                if (cnt < m){
-                    mn |= (1LL<<i);
-                    cnt++;
-                }
-            }
-            if (cnt == m) break;
-        }
-        cout << mn << endl;
-    }
-    else {
-        while (cnt > m){
-            int seq = 0;
-            for (int i = 0; i < 62; i++){  
-                if (cnt <= m) break;
-                if ((1LL<<i) & mn){
-                    seq++;
-                    mn ^= (1LL<<i);
-                } 
-                else if (seq){
-                    mn ^= (1LL<<i);
-                    cnt -= seq - 1;
-                    seq = 0;
-                    i = 0;
-                    debug(cnt, mn);
-                }
-                debug(seq);
-            }
-        }
-        debug(mn);
-        if (cnt == m){
-            cout << mn << endl;
-            return 0;
-        }
 
-        if (cnt < m){
-            for (int i = 0; i < 62; i++){  
-                if ((1LL<<i) & mn) continue;
-                else {
-                    if (cnt < m){
-                        mn |= (1LL<<i);
-                        cnt++;
-                    }
-                }
-                if (cnt == m) break;
-            }
+    function <void(int, int)> dfs = [&] (int v, int p){
+        sub[v] = 1;
+        par[v] = p;
+        for (auto u :graph[v]){
+            if (u == p) continue;
+            dfs(u,v);
+            sub[v] += sub[u];
         }
-        cout << mn << endl;
+    };
+
+    dfs(1,0);
+    debug("dfs passa");
+    int tot = 0;
+    for (int i = 1; i < n; i++){
+        auto [u,v] = edges[i];
+        if (v != par[u]) swap(u,v);
+        tot = (tot + ((sub[u] * (n - sub[u]) % MOD) * cost[i] % MOD)) % MOD;
+        debug(u,v,sub[u],sub[v],cost[i],tot);
+    }
+    debug(tot);
+    
+    while(q--){
+        int j, x;
+        cin >> j >> x;
+        auto [u,v] = edges[j];
+        if (v != par[u]) swap(u,v);
+        tot = (tot - ((sub[u] * (n - sub[u]) % MOD) * cost[j] % MOD) + MOD) % MOD;
+        cost[j] = x;
+        tot = (tot + ((sub[u] * (n - sub[u]) % MOD) * cost[j] % MOD)) % MOD;
+        cout << tot << endl;
     }
 }
 
