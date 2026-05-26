@@ -10,7 +10,8 @@ using namespace std;
 template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
 template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
 template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
-template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -113,68 +114,97 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-signed main(){
-    winton;
+vector<int> manacher(const vector<int>& s) {
+    int n = s.size();
+    vector<int> t(2 * n + 1, -1);
+    for (int i = 0; i < n; i++) t[2 * i + 1] = s[i];
+
+    int m = t.size();
+    vector<int> u(m + 2);
+    u[0] = -2;
+    u[m + 1] = -3;
+    for (int i = 0; i < m; i++) u[i + 1] = t[i];
+ 
+    vector<int> p(m + 2, 0);
+    int l = 0, r = 1;
+    for (int i = 1; i <= m; i++) {
+        if (i < r) p[i] = min((r - i), p[l + (r - i)]);
+        while (u[i - p[i]] == u[i + p[i]]) p[i]++;
+        if (i + p[i] > r) { 
+            l = i - p[i]; 
+            r = i + p[i]; 
+        }
+    }
+    return vector<int>(p.begin() + 1, p.begin() + m + 1);
+}
+ 
+void solve() {
     int n, m;
     cin >> n >> m;
-    int mn = n+1LL;
-
-    int cnt = __popcount(mn);
-    if (cnt == m){
-        cout << mn << endl;
-        return 0;
-    }
-    if (cnt < m){
-        for (int i = 0; i < 62; i++){  
-            if ((1LL<<i) & mn) continue;
-            else {
-                if (cnt < m){
-                    mn |= (1LL<<i);
-                    cnt++;
-                }
+    vector<vector<int>> grid(n, vector<int>(m));
+    cin >> grid;
+ 
+    int l = 2 * m;
+    vector<vector<vector<int>>> w(n, vector<vector<int>>(n, vector<int>(l - 1)));
+ 
+    for (int a = 0; a < n; a++) {
+        for (int b = 0; b < n; b++) {
+            vector<int> d;
+            for (int k = 0; k < m; k++) {
+                d.push_back(grid[a][k]);
+                d.push_back(grid[b][k]);
             }
-            if (cnt == m) break;
-        }
-        cout << mn << endl;
-    }
-    else {
-        while (cnt > m){
-            int seq = 0;
-            for (int i = 0; i < 62; i++){  
-                if (cnt <= m) break;
-                if ((1LL<<i) & mn){
-                    seq++;
-                    mn ^= (1LL<<i);
-                } 
-                else if (seq){
-                    mn ^= (1LL<<i);
-                    cnt -= seq - 1;
-                    seq = 0;
-                    i = 0;
-                    debug(cnt, mn);
-                }
-                debug(seq);
+            vector<int> p = manacher(d);
+           
+            for (int c = 0; c <= l - 2; c++) {
+                int half_t = p[2*c+2];
+                int half_d = half_t / 2;
+ 
+                int max_w = min({half_d, (c + 1), (l - 1 - c)});
+                if (((c + max_w) & 1) == 0) max_w--;
+                max_w = max(0LL, max_w);
+                w[a][b][c] = max_w;
             }
         }
-        debug(mn);
-        if (cnt == m){
-            cout << mn << endl;
-            return 0;
-        }
-
-        if (cnt < m){
-            for (int i = 0; i < 62; i++){  
-                if ((1LL<<i) & mn) continue;
-                else {
-                    if (cnt < m){
-                        mn |= (1LL<<i);
-                        cnt++;
-                    }
-                }
-                if (cnt == m) break;
+    }
+ 
+    int ans = 0;
+ 
+    for (int i = 0; i < n; i++) {
+        vector<int> cur_w(l - 1);
+        for (int c = 0; c <= l - 2; c++) cur_w[c] = w[i][i][c];
+        for (int c = 0; c <= l - 2; c++) ans = max(ans, cur_w[c]);
+        
+        for (int k = 1; i - k >= 0 && i + k < n; k++) {
+            int a = i - k, b = i + k;
+            int height = 2 * k + 1;
+            for (int c = 0; c <= l - 2; c++) {
+                cur_w[c] = min(cur_w[c], w[a][b][c]);
+                ans = max(ans, height * cur_w[c]);
             }
         }
-        cout << mn << endl;
     }
+    for (int i = 0; i + 1 < n; i++) {
+        vector<int> cur_w(l - 1);
+        for (int c = 0; c <= l - 2; c++) cur_w[c] = w[i][i+1][c];
+        for (int c = 0; c <= l - 2; c++) ans = max(ans, 2 * cur_w[c]);
+        
+        for (int k = 2; i - k + 1 >= 0 && i + k < n; k++) {
+            int a = i - k + 1, b = i + k;
+            int height = 2 * k;
+            for (int c = 0; c <= l - 2; c++) {
+                cur_w[c] = min(cur_w[c], w[a][b][c]);
+                ans = max(ans, height * cur_w[c]);
+            }
+        }
+    }
+ 
+    cout << ans << endl;
+}
+signed main(){
+    winton;
+    int t = 1;
+    // cin >> t;
+    while(t--) solve();
 }
 

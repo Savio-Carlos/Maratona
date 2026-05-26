@@ -10,7 +10,8 @@ using namespace std;
 template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
 template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
 template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
-template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -103,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -115,66 +116,44 @@ using namespace dbg;
 
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    int mn = n+1LL;
+    int n, p, s;
+    cin >> n >> p >> s;
+    array<int, 3> t, d;
+    cin >> t >> d;
 
-    int cnt = __popcount(mn);
-    if (cnt == m){
-        cout << mn << endl;
-        return 0;
-    }
-    if (cnt < m){
-        for (int i = 0; i < 62; i++){  
-            if ((1LL<<i) & mn) continue;
-            else {
-                if (cnt < m){
-                    mn |= (1LL<<i);
-                    cnt++;
-                }
-            }
-            if (cnt == m) break;
-        }
-        cout << mn << endl;
-    }
-    else {
-        while (cnt > m){
-            int seq = 0;
-            for (int i = 0; i < 62; i++){  
-                if (cnt <= m) break;
-                if ((1LL<<i) & mn){
-                    seq++;
-                    mn ^= (1LL<<i);
-                } 
-                else if (seq){
-                    mn ^= (1LL<<i);
-                    cnt -= seq - 1;
-                    seq = 0;
-                    i = 0;
-                    debug(cnt, mn);
-                }
-                debug(seq);
-            }
-        }
-        debug(mn);
-        if (cnt == m){
-            cout << mn << endl;
-            return 0;
-        }
+    auto solve = [&](int k) -> int {
+        int ret = 1e9;
+        int segs = k+1;//quantos segmentos eu tenho
+        vector<int> tires(segs);//qual pneu para cada segmento
 
-        if (cnt < m){
-            for (int i = 0; i < 62; i++){  
-                if ((1LL<<i) & mn) continue;
-                else {
-                    if (cnt < m){
-                        mn |= (1LL<<i);
-                        cnt++;
-                    }
+        function<void(int)> brute = [&](int seg) {
+            if (seg == segs){
+                int rem = n; 
+                int cost = k * p; //pitstops
+
+                for (int i = 0; i < segs; i++){
+                    auto cur = tires[i];
+                    int used = min(rem, d[cur]);
+                    rem -= used;
+                    cost += used * t[cur];
                 }
-                if (cnt == m) break;
+                if (!rem) ret = min(ret, cost);
+                return;
             }
-        }
-        cout << mn << endl;
-    }
+
+
+            for (int ti = 0; ti < 3; ti++){
+                tires[seg] = ti;
+                brute(seg+1);
+            }
+        };
+
+        brute(0);
+        return ret;
+    };
+
+    int ans = 1e12;
+    for (int i = 0; i <= s; i++) ans = min(ans, solve(i));
+    cout << ans << endl;
 }
 

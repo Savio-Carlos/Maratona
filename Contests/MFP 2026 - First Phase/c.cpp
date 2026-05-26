@@ -10,7 +10,8 @@ using namespace std;
 template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
 template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
 template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
-template<typename T, size_t N> istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
 
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
@@ -103,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -113,68 +114,11 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
+
 signed main(){
     winton;
-    int n, m;
-    cin >> n >> m;
-    int mn = n+1LL;
-
-    int cnt = __popcount(mn);
-    if (cnt == m){
-        cout << mn << endl;
-        return 0;
-    }
-    if (cnt < m){
-        for (int i = 0; i < 62; i++){  
-            if ((1LL<<i) & mn) continue;
-            else {
-                if (cnt < m){
-                    mn |= (1LL<<i);
-                    cnt++;
-                }
-            }
-            if (cnt == m) break;
-        }
-        cout << mn << endl;
-    }
-    else {
-        while (cnt > m){
-            int seq = 0;
-            for (int i = 0; i < 62; i++){  
-                if (cnt <= m) break;
-                if ((1LL<<i) & mn){
-                    seq++;
-                    mn ^= (1LL<<i);
-                } 
-                else if (seq){
-                    mn ^= (1LL<<i);
-                    cnt -= seq - 1;
-                    seq = 0;
-                    i = 0;
-                    debug(cnt, mn);
-                }
-                debug(seq);
-            }
-        }
-        debug(mn);
-        if (cnt == m){
-            cout << mn << endl;
-            return 0;
-        }
-
-        if (cnt < m){
-            for (int i = 0; i < 62; i++){  
-                if ((1LL<<i) & mn) continue;
-                else {
-                    if (cnt < m){
-                        mn |= (1LL<<i);
-                        cnt++;
-                    }
-                }
-                if (cnt == m) break;
-            }
-        }
-        cout << mn << endl;
-    }
+    int a, b;
+    cin >> a >> b;
+    cout << max(a/7LL * b, b/7LL * a) << endl;
 }
 
