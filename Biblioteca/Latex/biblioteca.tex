@@ -194,6 +194,43 @@ eeb         int right = (h2) % MOD;
 7ef         return left == right;
 c7c     }
 e94 };
+
+//double mod hashing
+803 struct hashing {
+ac0     string s;
+1a8     int n;
+7b9     vector<int> h1, h2;
+11e     vector<int> p1, p2;
+    
+502     hashing(const string &_s) : s(_s) {
+40c         n = (int)s.size();
+d13         h1.assign(n+1, 0);
+667         h2.assign(n+1, 0);
+918         p1.assign(n+1, 0);
+ef0         p2.assign(n+1, 0);
+138     }
+    
+0a8     void build() {
+c4b         p1[0] = 1;
+bf6         p2[0] = 1;
+78a         for (int i = 1; i <= n; i++) {
+382             p1[i] = (p1[i-1] * P1) % MOD1;
+7c1             p2[i] = (p2[i-1] * P2) % MOD2;
+3c9         }
+603         for (int i = 0; i < n; i++) {
+f06             int val = (s[i] - 'a' + 1);
+420             h1[i+1] = (h1[i] + val * p1[i]) % MOD1;
+6fe             h2[i+1] = (h2[i] + val * p2[i]) % MOD2;
+9e2         }
+231     }
+    
+67d     pair<int,int> get_hash(int l, int len) {
+488         int r = l + len;
+a93         int x1 = ((h1[r] - h1[l]) + MOD1) % MOD1;
+436         int x2 = ((h2[r] - h2[l]) + MOD2) % MOD2;
+199         return {x1, x2};
+9cc     }
+d3b };
 \end{lstlisting}
 
 \subsection{implementacao do cp-algorithms}
@@ -337,6 +374,55 @@ da4         debug(pref(r), pref(l-1));
 872 		return pref(r) ^ pref(l - 1); 
 10d 	}
 3d4 };
+\end{lstlisting}
+
+\subsection{ruct BIT{}
+\begin{lstlisting}
+1a8     int n;
+5c7     void init(int _n){
+8fd         n = _n;
+175         bit.assign(n+1, 0);
+683     }
+
+d15     int sum(int x){
+37f         int s = 0;
+ca3         for(; x > 0; x -= x&(-x)){
+3ef             s += bit[x];
+b24         }
+047         return s;
+e1f     }
+
+57c     void upd(int x, int v){
+529         for(; x <= n; x += x&(-x)){
+175             bit[x] += v;
+5cb         }
+a17     }
+214 };
+    
+8eb struct Bit {
+1a8 	int n;
+116 	vector<int> bit;
+e86 	Bit(int _n = 0) : n(_n), bit(n + 1) {}
+70f 	Bit(vector<int>& v) : n(v.size()), bit(n + 1) {
+78a 		for (int i = 1; i <= n; i++) {
+671 			bit[i] += v[i - 1];
+edf 			int j = i + (i & -i);
+b8a 			if (j <= n) bit[j] += bit[i];
+806 		}
+e89 	}
+cf6 	void update(int i, int x) { // soma x na posicao i
+b64 		for (i++; i <= n; i += i & -i) bit[i] += x;
+850 	}
+
+cdb 	int pref(int i) { // soma [0, i]
+7c9 		int ret = 0;
+4d3 		for (i++; i; i -= i & -i) ret += bit[i];
+edf 		return ret;
+065 	}
+9e3 	int query(int l, int r) {  // soma [l, r]
+89b 		return pref(r) - pref(l - 1); 
+e97 	}
+0ee };
 \end{lstlisting}
 
 \subsection{SegTree Add}
@@ -602,6 +688,60 @@ eca 	}
 d1a }
 
 
+//struct
+383 struct SegTree {
+d18     int tree[4*MAX], lazy[4*MAX];
+1a8     int n;
+    
+037     void build(int node, int l, int r) {
+131         lazy[node] = 0;
+c91         tree[node] = 0;
+8ce         if (l == r) return;
+ee4         int m = (l+r)/2;
+d58         build(2*node, l, m);
+537         build(2*node+1, m+1, r);
+bb1     }
+    
+5c7     void init(int _n) {
+8fd         n = _n;
+224         build(1, 0, n-1);
+2e4     }
+    
+dd7     void prop(int node, int l, int r) {
+996         if (lazy[node]) {
+3d0             tree[node] = lazy[node];
+579             if (l != r) {
+479                 lazy[2*node] = lazy[node];
+8d6                 lazy[2*node+1] = lazy[node];
+98e             }
+131             lazy[node] = 0;
+9c8         }
+f1d     }
+    
+7b9     void update(int a, int b, int x, int node=1, int l=0, int r=MAX-1) {
+967         if (node == 1) r = n-1;
+020         prop(node, l, r);
+656         if (a > r || b < l) return;
+02b         if (a <= l && r <= b) {
+12e             lazy[node] = x;
+020             prop(node, l, r);
+505             return;
+34c         }
+ee4         int m = (l+r)/2;
+c7a         update(a, b, x, 2*node, l, m);
+d1f         update(a, b, x, 2*node+1, m+1, r);
+7cf         tree[node] = max(tree[2*node], tree[2*node+1]);
+20d     }
+    
+2e7     int query(int a, int b, int node=1, int l=0, int r=MAX-1) {
+967         if (node == 1) r = n-1;
+020         prop(node, l, r);
+d9e         if (a > r || b < l) return 0;
+675         if (a <= l && r <= b) return tree[node];
+ee4         int m = (l+r)/2;
+1e7         return max(query(a, b, 2*node, l, m), query(a, b, 2*node+1, m+1, r));
+c35     }
+5df };
 \end{lstlisting}
 
 \subsection{SegTree Update}
@@ -666,6 +806,54 @@ ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
 dc3 		return min(m[j][a], m[j][b-(1<<j)+1]);
 fba 	}
 3e1 }
+
+67a template <typename T>
+7e9 struct SparseTable {
+5a6 	vector<vector<T>> m;
+    	
+407 	SparseTable(vector<T>& v) {
+3d2 		int n = v.size();
+a12 		int max_log = 32 - __builtin_clz(n);
+d47 		m.assign(max_log, vector<T>(n));
+78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
+0de 		for (int j = 1; j < max_log; j++) {
+ed9 			for (int i = 0; i + (1<<j) <= n; i++) {
+5d5 				m[j][i] = min(m[j-1][i], m[j-1][i+(1<<(j-1))]);
+642 			}
+a87 		}
+319 	}
+    	
+0ad 	T query(int a, int b) {
+ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
+dc3 		return min(m[j][a], m[j][b-(1<<j)+1]);
+c89 	}
+4a5 };
+
+// Sparse Table para Bitmasks
+// Utiliza OR bit a bit (|) para combinar conjuntos ou atributos de um intervalo.
+// Muito util para problemas com restricoes pequenas (ex: K <= 64), permitindo
+// substituir K Sparse Tables por apenas 1 (ex: usando unsigned long long).
+67a template <typename T>
+0ff struct SparseTableMask {
+5a6 	vector<vector<T>> m;
+    	
+b3e 	SparseTableMask(vector<T>& v) {
+3d2 		int n = v.size();
+a12 		int max_log = 32 - __builtin_clz(n);
+d47 		m.assign(max_log, vector<T>(n));
+78e 		for (int i = 0; i < n; i++) m[0][i] = v[i];
+0de 		for (int j = 1; j < max_log; j++) {
+ed9 			for (int i = 0; i + (1<<j) <= n; i++) {
+f66 				m[j][i] = (m[j-1][i] | m[j-1][i+(1<<(j-1))]);
+776 			}
+e71 		}
+7f1 	}
+    	
+0ad 	T query(int a, int b) {
+ee5 		int j = __builtin_clz(1) - __builtin_clz(b-a+1);
+8df 		return (m[j][a] | m[j][b-(1<<j)+1]);
+7ed 	}
+991 };
 \end{lstlisting}
 
 
@@ -782,12 +970,15 @@ ed0 		return eq(x, p.x) and eq(y, p.y);
 a2f 	point operator - (const point p) const { return point(x-p.x, y-p.y); }
 807 	point operator * (const ld c) const { return point(x*c  , y*c  ); }
 669 	point operator / (const ld c) const { return point(x/c  , y/c  ); }
-986 	ld operator * (const point p) const { return x*p.x + y*p.y; }
-d94 	ld operator ^ (const point p) const { return x*p.y - y*p.x; }
+986 	ld operator * (const point p) const { return x*p.x + y*p.y; }//dot
+d94 	ld operator ^ (const point p) const { return x*p.y - y*p.x; }//cross
 b2b 	friend istream& operator >> (istream& in, point& p) {
 e37 		return in >> p.x >> p.y;
 d70 	}
-70a };
+f70 	friend ostream& operator << (ostream& os, const point& p) {
+d80 		return os << "(" << p.x << ", " << p.y << ")";
+322 	}
+e09 };
 
 b3a struct line { // reta
 b1f 	point p, q;
@@ -837,14 +1028,13 @@ fa7 	return sarea(p, q, r) > eps;
 c3b }
 
 // retorna t tal que t*v pertence a reta r
-849 ld get_t(point a, line r) { 
+849 ld get_t(point a, line r) {
 ac5 	return (r.p^r.q) / ((r.p-r.q)^a);
 0cf }
 
 edc bool isvert(line r) { // se r eh vertical
 87d 	return eq(r.p.x, r.q.x);
 0fb }
-
 
 9d8 point proj(point p, line r) { // projecao do ponto p na reta r
 bea 	if (r.p == r.q) return r.p;
@@ -882,9 +1072,18 @@ e86 }
 ccc ld segseg(point a, point b, point c, point d) {
 102 	line ab(a,b);
 001 	line cd(c,d);
-05c     if (interseg(ab, cd)) return 0; 
+05c     if (interseg(ab, cd)) return 0;
 494 	return min({segpoint(ab,c), segpoint(ab,d), segpoint(cd,a), segpoint(cd,b)});
 3d6 }
+
+//angulo interno entre duas linhas, mid e o ponto de intersecao entre elas
+b29 ld inner_angle(point p, point q, point mid){
+ac0     point p1 = (p-mid);
+325     point p2 = (q-mid);
+7a8     ld rad = atan2(abs(p1 ^ p2), p1 * p2);//angulo em rad
+370     ld deg = rad* 180.0 / M_PI;
+816     return deg;
+7ec }
 
 //linha que corta o segmento AB no meio perpendicularmente
 a8a line mediatriz(point p, point q) {
@@ -920,7 +1119,7 @@ a39 ld polarea(vector<point> v){ // area do poligono
 9c5 	ld ret = 0;
 f14 	for (int i = 0; i < v.size(); i++){
 d0f 		ret += sarea(point(0, 0), v[i], v[(i + 1) % v.size()]);
-8cb 	}	
+8cb 	}
 d03 	return abs(ret);
 22a }
 
@@ -943,6 +1142,44 @@ e38 		if (eq(p.y, v[i].y) and eq(p.y, v[j].y)) {
 d13 	}
 b84 	return qt != 0;
 1c7 }
+
+603 ld angle(const point &p, const point &ref) { // angulo do ponto p em relacao ao ponto ref
+f5b     point v = p - ref;
+587     ld ang = atan2(v.y, v.x);
+6f8     if (ang < 0) ang += 2*pi;
+19c     return ang;
+220 }
+
+//ordena os pontos de acordo com o angulo
+34e void polarSort(vector<point> &v, point &ref) {
+0f8     sort(v.begin(), v.end(), [&ref](point a, point b) {
+9dd         return angle(a, ref) < angle(b, ref);
+17a     });
+060 }
+
+971 vector<point> convex_hull(vector<point> v) { // convex hull - O(n log(n))
+fca 	sort(v.begin(), v.end());
+d76 	v.erase(unique(v.begin(), v.end()), v.end());
+52d 	if (v.size() <= 1) return v;
+ce1 	vector<point> l, u;
+f14 	for (int i = 0; i < v.size(); i++) {
+fb2 		while (l.size() > 1 and !ccw(l.end()[-2], l.end()[-1], v[i]))
+364 			l.pop_back();
+c35 		l.push_back(v[i]);
+58e 	}
+3e9 	for (int i = v.size() - 1; i >= 0; i--) {
+f19 		while (u.size() > 1 and !ccw(u.end()[-2], u.end()[-1], v[i]))
+7a8 			u.pop_back();
+a95 		u.push_back(v[i]);
+0b8 	}
+cfc 	l.pop_back(); u.pop_back();
+2e4 	for (point i : u) l.push_back(i);
+792 	return l;
+9e5 }
+
+//comprimento do arco dado o raio e o angulo
+//double comprimento = (graus * M_PI * raio) / 180.0;
+//double comprimento = rad * raio;
 \end{lstlisting}
 
 \subsection{Geometria Int}
@@ -962,20 +1199,20 @@ d74 		return x == p.x and y == p.y;
     
 7af     pt operator + (const pt& p) const { return pt(x + p.x, y + p.y); }
 b23     pt operator - (const pt& p) const { return pt(x - p.x, y - p.y); }
-477     template<typename U>
+477     template<typename U> 
 60f     pt operator * (const U c) const { return pt(x * c, y * c); }
-818     auto operator * (const pt& p) const { return (int)x * p.x + (int)y * p.y; }
-9a6     auto operator ^ (const pt& p) const { return (int)x * p.y - (int)y * p.x; }
+abb     int operator * (const pt& p) const { return x * p.x + y * p.y; }
+476     int operator ^ (const pt& p) const { return x * p.y - y * p.x; }
     
 e45     friend istream& operator >> (istream& in, pt& p) { return in >> p.x >> p.y; }
 03c     friend ostream& operator << (ostream& os, const pt& p) { return os << "(" << p.x << ", " << p.y << ")"; }
-df0 };
+b4a };
 
 b3a struct line {
 730 	pt p, q;
 0d6 	line() {}
 4b8 	line(pt p_, pt q_) : p(p_), q(q_) {}
-        
+    
 8d7     friend istream& operator >> (istream& in, line& r) {
 4cb 		return in >> r.p >> r.q;
 858 	}
@@ -988,10 +1225,6 @@ bbb 	}
 46d int sq(pt p){
 8a7     return p.x*p.x + p.y*p.y;
 b0e }
-
-f20 int abs(pt p){
-61f     return sqrt(sq(p));
-9b3 }
 
 //checa se dois vetores sao perpendiculares
 6b8 bool perpendicular(pt v, pt w){
@@ -1009,21 +1242,21 @@ dd6 }
 e82 bool onAngle (pt p, pt q, pt r, pt g){
 999     if (!orientation(p,q,r)) return false;
 673     if (orientation(p,q,r) > 0) swap(q,r);
-d46     return orientation(p,q,g) >= 0 && orientation(p,r,g) <= 0; 
+d46     return orientation(p,q,g) >= 0 && orientation(p,r,g) <= 0;
 edb }
 
 // quadrante de um ponto
-c31 int quad(pt p) { 
+c31 int quad(pt p) {
 dbb 	return (p.x<0)^3*(p.y<0);
 fcf }
 
 //dist quadrada de dois pontos
 9ea int dist2(pt p, pt q){
-f24     return sq(p.x - q.x) + sq(p.y - q.y);
-d54 }
+fda     return sq(p - q);
+fb2 }
 
 // 2 * area com sinal
-a15 int sarea2(pt p, pt q, pt r) { 
+a15 int sarea2(pt p, pt q, pt r) {
 586 	return (q-p)^(r-q);
 9ef }
 
@@ -1032,7 +1265,7 @@ e32 bool col(pt p, pt q, pt r) { // se p, q e r sao colin.
 a08 }
 
 // 2 * area do poligono
-fc1 int polarea2(vector<pt> v) { 
+fc1 int polarea2(vector<pt> v) {
 7c9 	int ret = 0;
 c6e 	for (int i = 0; i < v.size(); i++)
 532 		ret += sarea2(pt(0, 0), v[i], v[(i + 1) % v.size()]);
@@ -1050,7 +1283,6 @@ f42         if (o > 0) hasPos = true;
 f61     return !(hasPos && hasNeg);
 61d }
 
-
 ae2 bool half(pt p) { // true if in blue half
 184     assert(p.x != 0 || p.y != 0); // the argument of (0,0) isundefined
 a12     return p.y > 0 || (p.y == 0 && p.x < 0);
@@ -1058,8 +1290,8 @@ a70 }
 
 //ordena os pontos de acordo com o angulo
 61f void polarSort(vector<pt> &v) {
-2f2     sort(v.begin(), v.end(), [](pt v, pt w) { 
-8ba         return make_tuple(half(v), 0, sq(v)) < 
+2f2     sort(v.begin(), v.end(), [](pt v, pt w) {
+8ba         return make_tuple(half(v), 0, sq(v)) <
 99d         make_tuple(half(w), (v^w), sq(w));
 486     });
 34d }
@@ -1071,14 +1303,21 @@ e4a }
 
 //retorna uma linha perpendicular a linha s que passa pelo ponto p
 9c9 line perpthrough(line s, pt p){
-e02     return {p, p + (rotate90(s.p - s.q))};//pode alterar a ordem
-d9d }
+2d4     return {p, p + rotate90(s.p - s.q)};
+299 }
+
+// se p esta na linha de r
+985 bool onLine(line r, pt p){
+489     return col(r.p, r.q, p);
+        // return ((r.q - r.p) ^ (p - r.p)) == 0;
+ea4 }
 
 // se p pertence ao seg de r
-63e bool isinseg (line r, pt p) { 
-f65 	pt a = r.p - p, b = r.q - p;
+63e bool isinseg (line r, pt p) {
+eb7 	pt a = r.p - p;
+e99     pt b = r.q - p;
 2ac 	return (a ^ b) == 0 and (a * b) <= 0;
-6e6 }
+336 }
 
 147 bool intersect(line r, line s){
 0d5     int o1 = orientation(r.p, r.q, s.p);
@@ -1097,17 +1336,9 @@ d1f     return false;
 e86 }
 
 // numero de pontos inteiros no segmento
-fae int segpts(line r) { 
+fae int segpts(line r) {
 508 	return 1 + gcd(abs(r.p.x - r.q.x), abs(r.p.y - r.q.y));
 28a }
-
-fc1 int polarea2(vector<pt> v){ // 2 * area do poligono
-7c9 	int ret = 0;
-f14 	for (int i = 0; i < v.size(); i++){
-532 		ret += sarea2(pt(0, 0), v[i], v[(i + 1) % v.size()]);
-1a6     }
-d03     return abs(ret);
-4b9 }
 
 // se o ponto ta dentro do poligono: retorna 0 se ta fora,
 // 1 se ta no interior e 2 se ta na borda
@@ -1128,18 +1359,196 @@ b47 		}
 9cf 	}
 b84 	return qt != 0;
 afd }
+\end{lstlisting}
 
-421 int paralelos(vector<pair<int,int>> &pontos){
-39c     int qnt = 0;
-c4f     pair<int,int> e0 = reta(pontos[0], pontos[1]);
-041     pair<int,int> e1 = reta(pontos[1], pontos[2]);
-634     pair<int,int> e2 = reta(pontos[2], pontos[3]);
-8ee     pair<int,int> e3 = reta(pontos[3], pontos[0]);
-b96     if (cross(e0, e2) == 0) ++qnt;
-67c     if (cross(e1, e3) == 0) ++qnt;
-72a     return qnt;
-eb6 }
- 
+\subsection{nclude <bits/stdc++.h>}
+\begin{lstlisting}
+
+613 #define all(x) x.begin(), x.end()
+1c9 #define rall(x) x.rbegin(), x.rend()
+42a #define endl '\n'
+a7f #define int long long
+d40 #define ld long double
+
+7f0 namespace dbg {
+f5b     constexpr const char* RESET      = "\033[0m";
+c6b     constexpr const char* BOLD_BLUE  = "\033[1;34m";
+2d5     constexpr const char* YELLOW     = "\033[33m";
+c5b     constexpr const char* BOLD_WHITE = "\033[1;37m";
+    
+1cc     template<typename T, typename = void> struct is_container : false_type {};
+d90     template<typename T> struct is_container<T, void_t<typename T::value_type>> : bool_constant<!is_same_v<T, string> && !is_same_v<T, string_view>> {};
+    
+9df     inline ostream& print_atom(ostream& os, bool b)         { return os << (b ? "true" : "false"); }
+de4     inline ostream& print_atom(ostream& os, char c)         { return os << '\'' << c << '\''; }
+c4a     inline ostream& print_atom(ostream& os, const string& s){ return os << '"' << s << '"'; }
+02d     inline ostream& print_atom(ostream& os, string_view s)  { return os << '"' << s << '"'; }
+9aa     inline ostream& print_atom(ostream& os, const char* s)  { return os << '"' << s << '"'; }
+    
+8c4     template<typename T, enable_if_t<!is_container<T>::value, int> = 0>
+b90     ostream& print_atom(ostream& os, const T& x) { return os << x; }
+    
+620     template<typename T1, typename T2>
+853     ostream& print_atom(ostream& os, const pair<T1, T2>& p) {
+881         os << '{'; print_atom(os, p.first); os << ", "; print_atom(os, p.second); return os << '}';
+3f2     }
+6d2     template<typename... T>
+c49     ostream& print_atom(ostream& os, const tuple<T...>& t) {
+b6a         os << '{';
+96d         apply([&os](auto const&... args) {
+890             size_t n = 0;
+f00             ((print_atom(os, args), os << (++n != sizeof...(T) ? ", " : "")), ...);
+8ee         }, t);
+925         return os << '}';
+32f     }
+    
+f91     template<typename T, typename C>
+127     ostream& print_atom(ostream& os, stack<T, C> s) {
+ba3         os << '{'; bool f = true; while (!s.empty()) { if (!f) os << ", "; print_atom(os, s.top()); s.pop(); f = false; } return os << '}';
+1fc     }
+f91     template<typename T, typename C>
+732     ostream& print_atom(ostream& os, queue<T, C> q) {
+b98         os << '{'; bool f = true; while (!q.empty()) { if (!f) os << ", "; print_atom(os, q.front()); q.pop(); f = false; } return os << '}';
+c48     }
+bab     template<typename T, typename C, typename Cmp>
+12d     ostream& print_atom(ostream& os, priority_queue<T, C, Cmp> q) {
+7f3         os << '{'; bool f = true; while (!q.empty()) { if (!f) os << ", "; print_atom(os, q.top()); q.pop(); f = false; } return os << '}';
+aa9     }
+    
+383     template<typename C, enable_if_t<is_container<C>::value, int> = 0>
+647     ostream& print_atom(ostream& os, const C& v) {
+b64         os << '{'; bool f = true;
+3c0         for (const auto& x : v) { if (!f) os << ", "; print_atom(os, x); f = false; }
+b9e         return os << '}';
+fa4     }
+    
+383     template<typename C, enable_if_t<is_container<C>::value, int> = 0>
+132     ostream& operator<<(ostream& os, const C& v)            { return print_atom(os, v); }
+620     template<typename T1, typename T2>
+51b     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return print_atom(os, p); }
+6d2     template<typename... T>
+86c     ostream& operator<<(ostream& os, const tuple<T...>& t)  { return print_atom(os, t); }
+    
+eb5     inline size_t split_arg(string_view s) {
+cea         int depth = 0;
+9f5         for (size_t i = 0; i < s.size(); ++i) {
+827             char c = s[i];
+47c             if (c == '"' || c == '\'') {
+d67                 char q = c; ++i;
+19f                 while (i < s.size() && s[i] != q) { if (s[i] == '\\' && i + 1 < s.size()) ++i; ++i; }
+2c2             } else if (c == '(' || c == '[' || c == '{' || c == '<') ++depth;
+edb             else if (c == ')' || c == ']' || c == '}' || c == '>') --depth;
+9c3             else if (c == ',' && depth == 0) return i;
+564         }
+ddb         return string_view::npos;
+cc4     }
+    
+720     inline void debug_out(string_view) { cerr << '\n' << flush; }
+2dc     template<typename H, typename... T>
+943     void debug_out(string_view s, const H& h, const T&... t) {
+940         size_t cpos = split_arg(s);
+77a         auto name = s.substr(0, cpos);
+df4         while (!name.empty() && (name.front() == ' ' || name.front() == '\t')) name.remove_prefix(1);
+3d4         while (!name.empty() && (name.back()  == ' ' || name.back()  == '\t')) name.remove_suffix(1);
+0d8         cerr << YELLOW << name << RESET << " = " << BOLD_WHITE;
+5c7         print_atom(cerr, h) << RESET;
+c4a         if constexpr (sizeof...(t) > 0) {
+57b             cerr << ", ";
+036             debug_out(cpos == string_view::npos ? string_view{} : s.substr(cpos + 1), t...);
+fad         } 
+419         else cerr << '\n' << flush;
+1d6     }
+bec }
+e4e using namespace dbg;
+
+344 #define DEBUG
+
+733 #if defined(DEBUG)
+769     #define winton (void)0
+240     #define debug(...) do { cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "] " << RESET; dbg::debug_out(#__VA_ARGS__, __VA_ARGS__); } while (0)
+8c1 #else
+62e     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
+3ae     #define debug(...) ((void)0)
+f2e #endif
+
+b2a struct pt {
+e91     int x, y;
+df1     pt(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+        
+5bc     bool operator < (const pt p) const {
+95a         if (x != p.x) return x < p.x;
+89c 		return y < p.y;
+dcd 	}
+        
+a83 	bool operator == (const pt p) const {
+d74         return x == p.x and y == p.y;
+7b4 	}
+        
+7af     pt operator + (const pt& p) const { return pt(x + p.x, y + p.y); }
+b23     pt operator - (const pt& p) const { return pt(x - p.x, y - p.y); }
+477     template<typename U>
+60f     pt operator * (const U c) const { return pt(x * c, y * c); }
+818     auto operator * (const pt& p) const { return (int)x * p.x + (int)y * p.y; }
+9a6     auto operator ^ (const pt& p) const { return (int)x * p.y - (int)y * p.x; }
+        
+e45     friend istream& operator >> (istream& in, pt& p) { return in >> p.x >> p.y; }
+03c     friend ostream& operator << (ostream& os, const pt& p) { return os << "(" << p.x << ", " << p.y << ")"; }
+        
+df0 };
+
+
+0dd signed main(){
+5d6     winton;
+6cb     pt a, b, c;;
+e22     cin >> a >> b >> c;
+56d     pt p(2,3);
+00f     pt q(4,1);
+    
+129     debug(a-c, b-c);
+57c     int area = (a-c) ^ (b-c);
+f4b     int area2 = (p) ^ (q);
+f31     debug(area2, area);
+    
+2dc }
+\end{lstlisting}
+
+\subsection{ruct matrix : vector<vector<int>> {}
+\begin{lstlisting}
+
+df8     matrix(int n_, int m_, bool ident = false) : vector<vector<int>>(n_, vector<int>(m_, 0)), n(n_), m(m_) {
+94e         if (ident) {
+df7             assert(n == m);
+a89 			for (int i = 0; i < n; i++) (*this)[i][i] = 1;
+359 		}
+456 	}
+
+483     matrix(const vector<vector<int>>& c) : vector<vector<int>>(c),
+a3d     n(c.size()), m(c[0].size()) {}
+
+d01     matrix operator*(const matrix &a) const {
+eda         assert(m == a.n);
+ca0         matrix res(n, a.m);
+603         for (int i = 0; i < n; i++){
+cf4             for (int j = 0; j < a.m; j++){
+917                 for (int k = 0; k < m; k++){
+956                     res[i][j] = (res[i][j] + ((*this)[i][k] * a[k][j]) % MOD) % MOD;
+368                 }
+830             }
+a00         }
+b50         return res;
+3b4     }
+
+3d2     matrix operator^(int e) const {
+cd2         matrix res(n,n,true);
+2de         matrix base = *this;
+c87         while (e) {
+d4a             if (e&1) res = res * base;
+6c1             base = base * base;
+cc2             e >>= 1;
+ece         }
+b50         return res;
+81d     }
+214 };
 \end{lstlisting}
 
 
@@ -1151,6 +1560,143 @@ eb6 }
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Problemas}
+
+\subsection{}
+\begin{lstlisting}
+41d inversion pairs before each removal. The number of inversion pairs of an array A is the number of
+a9e ordered pairs (i, j) such that i < j and A[i] > A[j].
+c4c */
+
+2b7 #include <bits/stdc++.h>
+ca4 using namespace std;
+
+613 #define all(x) x.begin(), x.end()
+1c9 #define rall(x) x.rbegin(), x.rend()
+42a #define endl '\n'
+a7f #define int long long
+d40 #define ld long double
+
+7f0 namespace dbg {
+404     const char* const RESET     = "\033[0m";
+646     const char* const BOLD_BLUE = "\033[1;34m";
+d39     const char* const YELLOW    = "\033[33m";
+e1d     const char* const BOLD_WHITE= "\033[1;37m";
+    
+620     template<typename T1, typename T2>
+c1f     ostream& operator<<(ostream& os, const pair<T1, T2>& p);
+    
+876     template<typename T_container, typename T = typename enable_if<!is_same_v<T_container, string> && !is_same_v<T_container, string_view>, typename T_container::value_type>::type>
+dab     ostream& operator<<(ostream& os, const T_container& v) {
+b6a         os << '{';
+ce4         bool first = true;
+dbd         for (const T& x : v) { os << (first ? "" : ", ") << x, first = false; }
+ff7         return os << '}';
+1d7     }
+    
+620     template<typename T1, typename T2>
+598     ostream& operator<<(ostream& os, const pair<T1, T2>& p) { return os << '{' << p.first << ", " << p.second << '}'; }
+    
+3a4     void debug_out(string_view) { cerr << endl; }
+2dc     template<typename H, typename... T>
+dc3     void debug_out(string_view s, H h, T... t) {
+196         auto cpos = s.find(',');
+53e         cerr << YELLOW << s.substr(0, cpos) << RESET << " = ";
+891         cerr << BOLD_WHITE << h << RESET;
+c4a         if constexpr (sizeof...(t) > 0) {
+57b             cerr << ", ";
+1cb             auto nx = s.find_first_not_of(" \t\n\r", cpos + 1);
+937             debug_out(s.substr(nx), t...);
+7eb         } else {
+016             cerr << endl;
+bf4         }
+6ed     }
+b19 } 
+e4e using namespace dbg;
+
+// #define DEBUG
+
+733 #if defined(DEBUG)
+769     #define winton (void)0
+c88     #define debug(...) cerr << BOLD_BLUE << "[" << __func__ << ":" << __LINE__ << "]" << RESET << " "; debug_out(#__VA_ARGS__, __VA_ARGS__)
+8c1 #else
+62e     #define winton ios_base::sync_with_stdio(false),cin.tie(NULL),cout.tie(NULL)
+e3e     #define debug(...) (void)0
+f2e #endif
+
+
+a6b template<class T = int> struct bit2d {
+acf 	vector<T> X;
+a84 	vector<vector<T>> Y, t;
+    
+709 	int ub(vector<T>& v, T x) {
+dde 		return upper_bound(v.begin(), v.end(), x) - v.begin();
+9cc 	}
+5cb 	bit2d(vector<pair<T, T>> v) {
+2e1 		for (auto [x, y] : v) X.push_back(x);
+fd4 		sort(X.begin(), X.end());
+1ee 		X.erase(unique(X.begin(), X.end()), X.end());
+    
+d56 		t.resize(X.size() + 1);
+d12 		Y.resize(t.size());
+3d0 		sort(v.begin(), v.end(), [](auto a, auto b) {
+e8f 			return a.second < b.second; });
+961 		for (auto [x, y] : v) for (int i = ub(X, x); i < t.size(); i += i&-i)
+b75 			if (!Y[i].size() or Y[i].back() != y) Y[i].push_back(y);
+    
+7c7 		for (int i = 0; i < t.size(); i++) t[i].resize(Y[i].size() + 1);
+8cc 	}
+    
+e78 	void update(T x, T y, T v) {
+2a9 		for (int i = ub(X, x); i < t.size(); i += i&-i)
+cd2 			for (int j = ub(Y[i], y); j < t[i].size(); j += j&-j) t[i][j] += v;
+533 	}
+    
+5d2 	T query(T x, T y) {
+966 		T ans = 0;
+c54 		for (int i = ub(X, x); i; i -= i&-i)
+4fb 			for (int j = ub(Y[i], y); j; j -= j&-j) ans += t[i][j];
+ba7 		return ans;
+62d 	}
+46d 	T query(T x1, T y1, T x2, T y2) {
+fcf 		return query(x2, y2)-query(x2, y1-1)-query(x1-1, y2)+query(x1-1, y1-1);
+232 	}
+6a7 };
+
+0dd signed main(){
+5d6     winton;
+3b9     int n, q;
+83f     while(cin >> n >> q){
+    
+7ed         vector<int> a(n), pos(n+1);
+a84         vector<pair<int,int>> plano(n);
+603         for (int i = 0; i < n; i++){
+788             cin >> a[i];
+d1d             pos[a[i]] = i+1;
+1b4             plano[i] = {i+1, a[i]};
+df0         }
+            
+9ff         bit2d bit(plano);
+2cb         for (auto [x,y] : plano) bit.update(x,y,1);
+a93         int sum = 0;
+e84         for (auto [x,y] : plano){
+d6b             sum += bit.query(x+1, 1, n, y-1);
+7db         } 
+cde         debug(sum);
+            
+1f4         while(q--){
+                // cout << "sum: " ;
+d94             cout << sum << endl;
+                
+93d             int y;
+e90             cin >> y;
+874             int x = pos[y];
+e04             bit.update(x,y,-1);
+053             sum -= bit.query(1, y+1, x-1, n);
+89a             sum -= bit.query(x+1, 1, n, y-1);
+5b7         }       
+7e6     }
+698 }
+\end{lstlisting}
 
 \subsection{Artwork}
 \begin{lstlisting}
@@ -2173,21 +2719,40 @@ a7b }
 \subsection{Combinatoria}
 \begin{lstlisting}
 3e4 const int MOD = 1e9+7;
+4e9 const int MOD = 998244353;
+
+183 const int MAX = 1e6+7;
+
+e4a int fat[MAX], invfat[MAX];
 
 bf9 int fastExpo(int base, int exp) {
 c92     int res = 1;
-479     base %= MOD;
-39a     while (exp > 0) {
-dea         if (exp % 2 == 1) res = (res * base) % MOD;
-aa5         base = (base * base) % MOD;
-727         exp /= 2;
-1e2     }
-b50     return res;
-ab3 }
+fb9     while(exp) {
+8ca         if (exp & 1) res = res * base % MOD;
+a6a         base = base * base % MOD;
+ef0         exp >>= 1;
+635     }
+542     return res%MOD;
+2e3 }
 
-c22 int modInverse(int n) {
+868 int modinv(int n) {
 562     return fastExpo(n, MOD - 2);
-c4f }
+92e }
+
+e9d int modiv(int a, int b) {
+a7c     return (a * modinv(b)) % MOD;
+a02 }
+
+0a8 void build(){
+557     fat[0] = 1;
+38a     for (int i = 1; i < MAX; i++) fat[i] = (fat[i-1] * i) % MOD;
+507     invfat[MAX-1] = modinv(fat[MAX-1]);
+e92     for (int i = MAX - 2; i >= 0; i--) invfat[i] = (invfat[i+1] * (i+1)) % MOD;
+4fa }
+c52 int comb(int a, int b){
+a75     if (b > a || b < 0 || a < 0) return 0;
+97d     return (((fat[a] * invfat[b]) % MOD) * invfat[a-b]) % MOD;
+395 }
 
 76f int combinations(int n, int k) {
         // Basic edge cases
@@ -2208,27 +2773,23 @@ b50     return res;
 ff6 }
 
 34a int combinations_mod(int n, int k) {
-032     if (k < 0 || k > n) {
-bb3         return 0;
-edf     }
-b62     if (k == 0 || k == n) {
-6a5         return 1;
-f14     }
-c44     if (k > n / 2) {
-1b5         k = n - k;
-b06     }
+e29     if (k < 0 || k > n)  return 0;
+bbe     if (k == 0 || k == n) return 1;
+63f     if (k > n / 2) k = n - k;
 bd9     int numerator = 1;
-b3d     for(int i = 0; i < k; i++) {
-f70         numerator = (numerator * (n - i)) % MOD;
-020     }
-    
+599     for(int i = 0; i < k; i++) numerator = (numerator * (n - i)) % MOD;
 cd4     int denominator = 1;
-db5     for(int i = 1; i <= k; i++) {
-060         denominator = (denominator * i) % MOD;
-1de     }
-    
-37d     return (numerator * modInverse(denominator)) % MOD;
-1e8 }
+e49     for(int i = 1; i <= k; i++) denominator = (denominator * i) % MOD;
+931     return (numerator * modinv(denominator)) % MOD;
+623 }
+\end{lstlisting}
+
+\subsection{ctor<int> divisors;}
+\begin{lstlisting}
+b32 if (tot % i == 0) {
+025     divisors.push_back(i);
+d73     if (i * i != tot) divisors.push_back(tot / i);
+7b3 }
 \end{lstlisting}
 
 \subsection{EV Máximo}
@@ -2256,6 +2817,9 @@ ef0         exp >>= 1;
 635     }
 542     return res%MOD;
 2e3 }
+e9d int modiv(int a, int b){
+659     return (((a % MOD )* (fastExpo(b, MOD-2) % MOD)) % MOD);
+e50 }
 
 bf9 int fastExpo(int base, int exp) {
 c92     int res = 1;
@@ -2287,6 +2851,7 @@ ef0         exp >>= 1;
 319     }
 b50     return res;
 b1b }
+
 \end{lstlisting}
 
 \subsection{Fatoração Prima}
@@ -2449,6 +3014,223 @@ d85 }
 
 \section{DP}
 
+\subsection{==========================================}
+\begin{lstlisting}
+// ==========================================
+730 int dp[20][11][2][2]; // [index][state][tight][ldz]
+
+c3f int pd(int index, int state, int tight, int ldz) {
+2e8     if(index == n) {
+505         return /* condicao base */;
+d0c     }
+        
+890     if (dp[index][state][tight][ldz] != -1) return dp[index][state][tight][ldz];
+    
+c23     int ub = tight ? r[index] - '0' : 9;
+1a4     int ans = 0;
+    
+70b     for (int digit = 0; digit <= ub; digit++) {
+            // if(!ldz && condicao_invalida) continue;
+    
+e16         int new_tight = tight && (digit == ub);
+d3b         int new_ldz = ldz && (digit == 0);
+            
+f1b         int new_state = state; // atualiza seu estado
+    
+cf0         ans += pd(index + 1, new_state, new_tight, new_ldz);
+572     }
+c77     return dp[index][state][tight][ldz] = ans; 
+18b }
+
+// ==========================================
+// TEMPLATE 2: RECURSIVA Range [L, R] Simultâneo
+// ==========================================
+377 int dp[20][11][2][2][2]; // [index][state][above][under][ldz]
+
+d6c int pd(int index, int state, int above, int under, int ldz) {
+817     if(index == n) return /* condicao base */;
+    
+2d4     if (dp[index][state][above][under][ldz] != -1) return dp[index][state][above][under][ldz];
+    
+c62     int ub = above ? r[index] - '0' : 9;
+f28     int lb = under ? l[index] - '0' : 0;
+1a4     int ans = 0;
+    
+369     for (int digit = lb; digit <= ub; digit++) {
+            // if(!ldz && condicao_invalida) continue;
+    
+394         int new_above = above && (digit == ub);
+4ff         int new_under = under && (digit == lb);
+d3b         int new_ldz = ldz && (digit == 0);
+            
+f1b         int new_state = state; // atualiza seu estado
+    
+a39         ans += pd(index + 1, new_state, new_above, new_under, new_ldz);
+510     }
+430     return dp[index][state][above][under][ldz] = ans; 
+f74 }
+
+// ==========================================
+// TEMPLATE 3: ITERATIVA PUSH DP
+// ==========================================
+518 void solve_iterative() {
+730     int dp[20][11][2][2]; // [index][last][tight][ldz]
+4b9     memset(dp, 0, sizeof(dp));
+    
+a87     dp[0][10][1][1] = 1;
+    
+03b     for (int index = 0; index < n; index++) {
+0c8         for (int last = 0; last <= 10; last++) {
+cc3             for (int tight = 0; tight < 2; tight++) {
+35d                 for (int ldz = 0; ldz < 2; ldz++) {
+                        
+dcf                     int ways = dp[index][last][tight][ldz];
+e6d                     if(!ways) continue;
+    
+b57                     int limit = tight ? r[index] - '0' : 9;
+                        
+865                     for (int digit = 0; digit <= limit; digit++) {
+                            
+5c6                         if(!ldz && last == digit) continue;
+    
+14f                         int new_tight = tight && (digit == limit);
+d3b                         int new_ldz = ldz && (digit == 0);
+                            
+ae9                         int next = new_ldz ? 10 : digit;
+    
+b2e                         dp[index+1][next][new_tight][new_ldz] += ways;
+660                     }
+cde                 }
+32b             }
+f27         }
+35b     }
+77e }
+
+
+7d8 int pd(int index, int sum, int above, int under){
+1df     if(index == n) return (sum == 0);
+    
+a73     if (!above && !under && dp[index][sum] != -1) return dp[index][sum];
+    
+c62     int ub = above ? r[index] - '0' : 9;
+f28     int lb = under ? l[index] - '0' : 0;
+1a4     int ans = 0;
+    
+369     for (int digit = lb; digit <= ub; digit++){
+    
+394         int new_above = above && (digit == ub);
+4ff         int new_under = under && (digit == lb);
+            
+f98         int new_sum = (sum * 10 + digit) % M;
+            
+e79         ans = (ans + pd(index + 1, new_sum, new_above, new_under)) % MOD;
+2ff     }
+        
+6aa     if (!above && !under) dp[index][sum] = ans; 
+ba7     return ans;
+bec }
+
+
+//so precisa fazer memset uma vez mas dai precisa fazer padding pra ambos os numeros terem o mesmo numero de digitos
+5db int count(int x){
+d06     s = to_string(x);
+        
+eda     int pad = 19 - s.size();
+a0e     if (pad > 0) s = string(pad, '0') + s;
+        
+25a     n = s.size();
+272     return pd(0,0,1);
+2b8 }
+
+63d void solve(){
+74f     int l, r;
+5a9     cin >> l >> r;
+27a     memset(dp, -1, sizeof(dp));
+aba     cout << count(r) - count(l-1) << endl;
+21c }
+
+/*
+b73 otimizacao super importante
+7ea desse jeito, o digito menos significativo sempre esta na posicao 0
+bb3 entao as posicoes dos digitos de cada numero sempre estarao na mesma posicao
+2c3 por exemplo 1234 e 12
+c6f do jeito normal ficaria 
+81d 1234
+c20   12
+
+47a desse jeito fica
+d93 4321
+3c5   21
+
+4be entao a potencia de 10 em cada posicao e sempre a mesma, permitindo so rodar o memset uma vez 
+c4c */
+990 vector<int> v; 
+7c2 int pd(int index, int tight, int mask, int ldz){
+789     if (index == -1) return ((__bit_width(mask) - 1) == __popcount(mask));
+        
+090     if (!tight && dp[index][mask][ldz] != -1) return dp[index][mask][ldz];
+    
+cce     int ub = tight ? v[index] : 9;
+1a4     int ans = 0;
+a93     int sum = 0;
+    
+70b     for (int digit = 0; digit <= ub; digit++){
+e16         int new_tight = tight && (digit == ub);
+    
+d3b         int new_ldz = ldz && (digit == 0);
+            
+963         int new_mask = mask;
+889         if (!new_ldz) new_mask |= (1 << digit);
+    
+6d6         ans += pd(index - 1, new_tight, new_mask, new_ldz);
+739     }
+    
+0ab     if (!tight) dp[index][mask][ldz] = ans; 
+ba7     return ans;
+1c6 }
+
+a7e int count(ll x){
+848     v.clear();
+f4c     while(x) {
+d6f         v.push_back(x % 10);
+6bd         x /= 10;
+053     }
+    
+            /* [L,R]
+3cd     int count(int x, int y){
+d65     v2.clear();
+f4c     while(x) {
+b64         v2.push_back(x % 10);
+6bd         x /= 10;
+d12     }
+848     v.clear();
+    
+1b8     while(y) {
+da8         v.push_back(y % 10);
+a53         y /= 10;
+38c     }
+de6     while(v2.size() < v.size()) v2.push_back(0LL);
+c4c     */
+       
+d6c     n = v.size();
+726     return pd(n-1,1,0,1);
+6ae }
+    
+63d void solve(){
+bb3     ll r;
+da1     cin >> r;
+226     cout << count(r) << endl;
+c01 }
+    
+0dd signed main(){
+5d6     winton;
+27a     memset(dp, -1, sizeof(dp));
+8bd     int t;
+f1b     cin >> t;
+6e6     while(t--) solve();
+f37 }
+\end{lstlisting}
+
 \subsection{Edit Distance}
 \begin{lstlisting}
 
@@ -2549,23 +3331,55 @@ c98             }
 
 \subsection{DSU }
 \begin{lstlisting}
+d56 struct DSU{
+1a8     int n;
+7d2     vector<int> p, r;
+5c7     void init(int _n){
+8fd         n = _n;
+1c4         p.resize(n);
+7e4         r.resize(n);
+603         for(int i = 0; i < n; i++){
+f13             p[i] = i;
+fd1             r[i] = 0;
+606         }
+55e     }
+    
+57b     int find(int x){
+c8c         return p[x] == x ? x : p[x] = find(p[x]);
+2d3     }
+    
+765     bool unite(int a, int b){
+bca         a = find(a);
+b88         b = find(b);
+5c2         if(a == b) return false;
+dac         if(r[a] == r[b]) r[a]++;
+d1b         if(r[a] > r[b]){
+264             p[b] = a;
+4e6             r[a]++;
+db5         }else{
+84b             p[a] = b;
+f6c             r[b]++;
+c3d         }
+8a6         return true;
+632     }
+31c }
+
+
 d56 struct DSU {
-8f3 	vector<int> comp, sz;
-c1b 	DSU(int n) : comp(n), sz(n, 1) {
-f7a 		iota(all(comp), 0);
-576 	}
-151 	int find(int u) {
-dc3 		if (u == comp[u]) return u;
-a07 		return comp[u] = find(comp[u]);
-65f 	}
-c3b 	void merge(int a, int b) {
+825 	vector<int> id, sz;
+    
+a56 	DSU(int n) : id(n), sz(n, 1) { iota(id.begin(), id.end(), 0); }
+    
+0cf 	int find(int a) { return a == id[a] ? a : id[a] = find(id[a]); }
+    
+440 	void unite(int a, int b) {
 605 		a = find(a), b = find(b);
-5c2 		if (a == b) return false;
-afa 		sz[a] += sz[b];
-ca8 		comp[b] = a;
-8a6 		return true;
-2a4 	}
-971 };
+d54 		if (a == b) return;
+956 		if (sz[a] < sz[b]) swap(a, b);
+6d0 		sz[a] += sz[b], id[b] = a;
+ea7 	}
+c1b };
+
 \end{lstlisting}
 
 \subsection{HLD - aresta}
@@ -2641,7 +3455,13 @@ bf2     }
 aa1         if (pos[a] < pos[b]) swap(a,b);
 0f9         return h[a] == h[b] ? b : lca(ancestor[h[a]], b);
 263     }
-ea8 }
+b5d     int dist(int a, int b) {
+2d5         if (a == b) return 0;
+aa1         if (pos[a] < pos[b]) swap(a,b);
+30a         if (h[a] == h[b]) return pos[a] - pos[b];
+13e         return pos[a] - pos[h[a]] + 1 + dist(ancestor[h[a]], b);
+58d     }
+16d }
 \end{lstlisting}
 
 \subsection{Kosaraju}
@@ -2695,11 +3515,12 @@ ad1 void build_component_graph() {
 b1e         }
 1fb     }
         //remove duplicatas
-002     for (int i = 1; i <= com; i++) {
+002     for (int i = 1; i <= com; i++){
 0a2         sort(g_scc[i].begin(), g_scc[i].end());
+1f9         if (g_scc[i].empty())continue;
 4ad         g_scc[i].erase(unique(g_scc[i].begin(), g_scc[i].end()), g_scc[i].end());
-6bd     }
-382 }
+1d4     }
+6b7 }
 \end{lstlisting}
 
 \subsection{LCA Binary Lifting}
@@ -2742,6 +3563,77 @@ fb0             u = ancestor[u][i];
 921     }
 6c2     return ancestor[v][0];
 40e }
+
+33e struct LCA {
+        //one indexed
+1c4     int n, l, cur;
+47c     vector<vector<int>> adj, up;
+991     vector<int> h, entry;
+8c5     LCA (int n_) {
+e95         n = n_;
+4e0         l = 31 - __builtin_clz(n);
+839         adj.resize(n + 1);
+a71         up.assign(n + 1, vector<int>(l + 1));
+717         h.resize(n + 1); entry.resize(n + 1);
+b59         cur = 0;
+521     }
+50f     void add(int a, int b) {
+fab         adj[a].push_back(b);
+c87         adj[b].push_back(a);
+386     }
+17c     void dfs(int v = 1, int p = 0, int hh = 0) {
+176         entry[v] = cur++;
+4de         up[v][0] = p;
+910         for(int i = 1; i <= l; i++) {
+73a             up[v][i] = up[up[v][i - 1]][i - 1];
+d67         }
+9bc         for(auto u : adj[v]) {
+58d             if(u != p) {
+828                 dfs(u, v, hh + 1);
+d5f             }
+693         }
+3bc         h[v] = hh;
+a4d     }
+7be     int lca(int a, int b) {
+a6b         if(h[a] > h[b]) {
+257             swap(a, b);
+79b         }
+14e         int dff = h[b] - h[a], cnt = 0;
+d84         while(dff) {
+57f             if(dff & 1) {
+5be                 b = up[b][cnt];
+0ce             }
+f65             cnt++;
+5e9             dff >>= 1;
+488         }
+a89         if(a == b) {
+3f5             return a;
+06e         }
+957         for(int i = l; i >= 0; i--) {
+c84             if(up[a][i] != up[b][i]) {
+3f4                 a = up[a][i];
+6c0                 b = up[b][i];
+568             }
+dc1         }
+e6f         return up[a][0];
+cb7     }
+699     int raise(int node, int dist) {
+            //if it returns 0, then it fucked up
+ac9         int cnt = 0;
+efd         while(dist) {
+e3d             if(dist & 1) {
+466                 node = up[node][cnt];
+0ed             }
+f65             cnt++;
+705             dist >>= 1;
+1c0         }
+192         return node;
+887     }
+b5d     int dist(int a, int b) {
+b80         int z = lca(a, b);
+421         return h[a] + h[b] - 2 * h[z];
+0a0     }
+434 };
 \end{lstlisting}
 
 \subsection{LCA Sparse Table}
@@ -2931,6 +3823,70 @@ f6a }
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Extra}
+
+\subsection{compressao.cpp}
+\begin{lstlisting}
+//compressao de coordenada para vector
+
+vector<int> v(n);
+vector<int> todos;
+for (int i = 0; i < n; i++){
+    cin >> v[i];
+    todos.push_back(v[i]);
+}
+
+sort(all(todos));
+todos.erase(unique(all(todos)), todos.end());
+int m = todos.size();
+
+auto comp = [&](int x) {
+    return (lower_bound(all(todos), x) - todos.begin());
+};
+
+vector<int> comp(n);
+for (int i = 0; i < n; i++){
+    comp[i] = lower_bound(all(todos), v[i]) - todos.begin();
+}
+\end{lstlisting}
+
+\subsection{lambda.cpp}
+\begin{lstlisting}
+long long ans = 0;
+
+auto lambda_padrao = [&](int x, int y) -> int {
+    return x + y;
+};
+
+auto lambda_generica = [&](const auto &v) {
+    return (int)v.size();
+};
+
+auto lambda_recursiva = [&](auto &&self, int x) -> int {
+    if (x <= 1) return 1;
+    return x * self(self, x - 1);
+};
+
+function<void(int, int)> dfs = [&](int v, int p) {
+    for (auto u :graph[v]){
+        if (u == v) continue;
+        dfs(u,v);
+    }
+};
+
+auto reduce = [&](const multiset<string> &ms) -> multiset<int> {
+    multiset<int> mi;
+    for (const auto &s : ms) {
+        if (s.size() > 1) {
+            mi.insert((int)s.size());
+            ans++;
+        } else {
+            mi.insert(s[0] - '0');
+        }
+    }
+    return mi;
+};
+
+\end{lstlisting}
 
 \subsection{random.cpp}
 \begin{lstlisting}
