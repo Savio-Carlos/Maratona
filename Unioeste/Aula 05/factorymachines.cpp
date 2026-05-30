@@ -1,39 +1,45 @@
 #include <bits/stdc++.h>
+
+#define int long long
+
 using namespace std;
-#define ll long long
 
+signed main(){
 
+    cin.tie(0)->sync_with_stdio(0);
 
-int main() {
-    ll t, n, mini = LLONG_MAX;
-    cin >> n >> t;
-    vector<ll> tempos(n);
+    vector<int> maquinas;
+
+    int n, t; cin >> n >> t;
 
     for (int i = 0; i < n; i++){
-        cin >> tempos[i];
-        mini = min(mini, tempos[i]);
+        int x; cin >> x;
+        maquinas.push_back(x);
     }
 
-    ll l = 0;
-    ll r = t*mini;
-    ll ans = 0;
+    int min = 0;
+    int max = 2*1e18;
+    int mid = 0;
 
-    while(l<=r){
-        ll mid = l + (r-l)/2;
-        ll sum = 0;
-        for (int i = 0; i < n; i++){
-            sum+=(mid/tempos[i]);
-            if (sum >= t) break;
+    while (min<max){
+        mid = (min+max)/2;
+        int sum = 0;
+        for (auto i : maquinas){
+            sum += mid/i;
+            if (sum >= t){
+                break;
+            }
         }
 
-        if (sum>=t){
-            ans = mid;
-            r = mid-1;
+        if (sum >= t){
+            max = mid;
         }
-        else {
-            l = mid+1;
+        if (sum < t){
+            min = mid+1;
         }
     }
 
-    cout << ans << endl;
+    cout << max;
+
+    return 0;
 }

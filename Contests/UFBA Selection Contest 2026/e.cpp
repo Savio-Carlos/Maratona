@@ -125,23 +125,34 @@ signed main(){
         int k, d;
         cin >> k >> d;
         if (d == -1){
-            //slope pra baixo
+            // slope pra baixo 
             if (ax > bx && ay < by){
+                // Indo para cima e para a esquerda (x diminui, y aumenta)
+                // O segmento da rua que podemos usar fica dentro da "bounding box" entre A e B.
+                // Interseção no eixo X: a viagem ocorre em x E [bx, ax].
+                // A rua nos limites y = by e y = ay abrange os valores x de (k-by) até (k-ay).
                 int l = min(ax, k - ay) - max(bx, k - by);
                 save = max(save, max(0LL, l));
             }
             if (ax < bx && ay > by){
+                // Indo para baixo e para a direita (x aumenta, y diminui)
+                // Interseção no eixo X: a viagem ocorre em x E [ax, bx].
                 int l = min(bx, k - by) - max(ax, k - ay);
                 save = max(save, max(0LL, l));
             }
         }
         else {
-            //slope pra cima
+            // slope pra cima
             if (ax < bx && ay < by){
+                // Indo para cima e para a direita (x aumenta, y aumenta)
+                // Interseção no eixo X: a viagem ocorre em x E [ax, bx].
+                // A rua nos limites de Y vai do x=(ay-k) até o x=(by-k).
                 int l = min(bx, by - k) - max(ax, ay - k);
                 save = max(save, max(0LL, l));
             }
             if (ax > bx && ay > by){
+                // Indo para baixo e para a esquerda (x diminui, y diminui)
+                // Interseção no eixo X: a viagem ocorre em x E [bx, ax].
                 int l = min(ax, ay - k) - max(bx, by - k);
                 save = max(save, max(0LL, l));                
             }
