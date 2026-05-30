@@ -14,6 +14,7 @@ signed main(){
     winton;
     int x, y;
     cin >> x >> y;
+
     int s = (x+y)/2;
     cout << s-y << " " << s << endl;
 }

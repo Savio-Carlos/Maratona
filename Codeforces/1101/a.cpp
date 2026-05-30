@@ -7,6 +7,12 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -111,22 +117,30 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
-    vector<int> deg(n+1);
-    for (int i = 0; i < n-1; i++){
-        int a, b;
-        cin >> a >> b;
-        deg[a]++;
-        deg[b]++;
+    vector<int> a(n);
+    for (auto &u : a) cin >> u;
+    sort(all(a));
+    int med = a[n/2];
+    int ans = 0;
+    int menor = 0, maior = 0;
+    for (int i = 0; i < n; i++){
+        if (a[i] > med) maior++;
+        if (a[i] < med) menor++;
     }
-    
-    sort(rall(deg));
-    
-    cout << n - deg[0] - deg[1] << endl;
+    debug(med, maior, menor);
+    int mn = min(maior,menor);
+    ans += mn;
+    menor -= mn;
+    maior -= mn;
+    int rem = maior + menor;
+    debug(rem);
+    cout << ans + rem << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
+
