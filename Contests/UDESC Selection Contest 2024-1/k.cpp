@@ -99,10 +99,8 @@ signed main(){
         return 0;
     }
 
-    vector<vector<int>> bb = {{1,1},{1,0}};
-    matrix b(bb);
+    matrix b({{1,1},{1,0}});
     b = b ^(n-1);
-    debug(b);
     int e = b[0][0]%(MOD-1);
     cout << fastExpo(2LL, e)%MOD << endl;
 }

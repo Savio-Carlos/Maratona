@@ -7,6 +7,12 @@ using namespace std;
 #define int long long
 #define ld long double
 
+template<typename T, typename U> istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+template<typename... T> istream& operator>>(istream& is, tuple<T...>& t) { apply([&is](auto&... args) { ((is >> args), ...); }, t); return is; }
+template<typename T> istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+template<typename T, size_t N> istream& operator>>(istream& is, T (&arr)[N]) { for (auto& x : arr) is >> x; return is; }
+template<size_t N> istream& operator>>(istream& is, array<int, N>& arr) { for (auto& x : arr) is >> x; return is; }
+
 namespace dbg {
     constexpr const char* RESET      = "\033[0m";
     constexpr const char* BOLD_BLUE  = "\033[1;34m";
@@ -111,22 +117,22 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
-    vector<int> deg(n+1);
-    for (int i = 0; i < n-1; i++){
-        int a, b;
-        cin >> a >> b;
-        deg[a]++;
-        deg[b]++;
+    vector<int> a(n);
+    cin >> a;
+    int sum = 0;
+    int ans = 1e18;
+    for(int i = 0; i < n; i++) {
+        sum += a[i];
+        ans = min(ans, sum / (i+1));
+        cout << ans << " ";
     }
-    
-    sort(rall(deg));
-    
-    cout << n - deg[0] - deg[1] << endl;
+    cout << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
+
