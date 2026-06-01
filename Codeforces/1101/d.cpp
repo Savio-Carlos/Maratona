@@ -104,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -115,28 +115,51 @@ using namespace dbg;
 #endif
 
 
-void towerOfHanoi(int n, int p1, int p3, int p2){
-    if (n == 0) return;
-    towerOfHanoi(n - 1, p1, p2, p3);
-    cout << p1 << " " << p3 << endl;
-    towerOfHanoi(n - 1, p2, p3, p1);
-}
-
-signed main(){
-    winton;
+void solve(){
     int n;
     cin >> n;
     bool pos = true;
     vector<int> a(n);
     for (int i = 0; i < n; i++){
         cin >> a[i];
-        if (a[i] > i+1) pos = false;
+        if (a[i] > i) pos = false;
     }
     if (!pos){
         cout << "NO" << endl;
-        return 0;
+        return;
     }
+    cout << "YES" << endl;
+    vector<tuple<int,int,int>> moves;
 
+    function<void(int,int,int)> hanoi = [&](int l, int s, int t){
+        if(!l) return;
+        l--;
+        int u = 6 - s - t;
+
+        if(!a[l]) {
+            hanoi(l, s, u);
+            moves.push_back({l+1, s, t});
+            hanoi(l, u, t);
+        }
+        else {
+            hanoi(l - a[l], s, u);
+            moves.push_back({l+1, s, t});
+            hanoi(l - a[l], u, s);
+            hanoi(l, s, t);
+        }
+    };
+    
+    hanoi(n, 1, 3);
+    cout << moves.size() << endl;
+    for (auto [u, d, t] : moves) cout << u << " " << d << " " << t << endl;
+}
+
+signed main(){
+    winton;
+
+    int t;
+    cin >> t;
+    while(t--) solve();
 }
 
 
