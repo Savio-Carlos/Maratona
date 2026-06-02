@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(g++ -std=c++17 -DLOCAL -Wall -Wextra -c carlos.cpp -o /tmp/carlos.o)"
-    ]
-  }
-}

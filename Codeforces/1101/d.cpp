@@ -114,7 +114,6 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
     int n;
     cin >> n;

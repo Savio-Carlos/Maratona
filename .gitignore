@@ -1,0 +1,20 @@
+# Windows executables
+*.exe
+
+# Object files
+*.o
+*.obj
+
+# Default Linux/Mac executables
+*.out
+a.out
+
+# macOS debug symbols
+*.dSYM/
+
+# Precompiled headers
+*.gch
+*.pch
+
+# If you use the output folder for compiled binaries
+output/
