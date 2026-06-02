@@ -92,20 +92,30 @@ struct Dinic {
         return cut;
     }
 
+    //funcao para achar todos os caminhos de arestas disjuntas(cada aresta so aparece em um caminho)
+    vector<vector<int>> get_paths(int s, int t){
+        if(!fluxo) max_flow(s,t);
+
+        
+    }
+
+
+
 };
 
 signed main(){
     fastio;
     int n, m;
     cin >> n >> m;
-    Dinic dinic(n+2);
+    Dinic dinic(n);
+
     for (int i = 0; i < m; i++){
-        int a, b, c;
+        int a, b;
         cin >> a >> b;
         dinic.add(a, b, 1);
-        dinic.add(b, a, 1);
     }
-    auto cut = dinic.get_cut(1, n);
-    cout << dinic.fluxo << endl;
-    for (auto [u, v] : cut) cout << u << " " << v << endl;
+
+    cout << dinic.max_flow(source, sink) << endl;
+
+
 }
