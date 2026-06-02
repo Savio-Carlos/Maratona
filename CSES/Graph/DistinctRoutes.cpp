@@ -1,19 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
 #define all(x) x.begin(), x.end()
 #define rall(x) x.rbegin(), x.rend()
 #define endl '\n'
 #define int long long
 #define ld long double
 #define fastio ios_base::sync_with_stdio(false), cin.tie(NULL)
- 
+
 #define debug(x)  cerr << #x << ": " << x << endl
 #define debugv(x) cerr << #x << ": "; for(auto i : x) cerr << i << " "; cerr << endl
 #define debugp(x) cerr << #x << ": " << x.first << " " << x.second << endl
- 
+
 const int INF = 1e18;
- 
+
 struct Dinic {
     struct edge { 
         int to, cap, rev, flow;
@@ -24,14 +24,14 @@ struct Dinic {
     vector<int> level, beg;
     int n;
     int fluxo;
- 
+
     Dinic(int n) : n(n), graph(n), level(n), beg(n), fluxo(0) {}
- 
+
     void add(int a, int b, int c) {
         graph[a].emplace_back(b, c, (int)graph[b].size(), false);
         graph[b].emplace_back(a, 0, (int)graph[a].size() - 1, true);
     }
- 
+
     bool bfs(int s, int t) {
         fill(level.begin(), level.end(), -1);
         fill(beg.begin(), beg.end(), 0);
@@ -50,14 +50,14 @@ struct Dinic {
         }
         return level[t] >= 0;
     }
- 
+
     int dfs(int v, int t, int f = INF) {
         if (v == t or !f) return f;
- 
+
         for (int &i = beg[v]; i < (int)graph[v].size(); i++) {
             auto &e = graph[v][i];
             if (level[e.to] != level[v] + 1) continue;
- 
+
             int d = dfs(e.to, t, min(f, e.cap - e.flow));
             
             if (!d) continue; 
@@ -67,14 +67,14 @@ struct Dinic {
             }
         return 0;
     }
- 
+
     int max_flow(int s, int t) {
         while (bfs(s, t)) {
             while (int f = dfs(s, t)) fluxo += f;
         }
         return fluxo;
     }
- 
+
     vector<pair<int, int>> get_cut(int s, int t) {
         if (!fluxo) max_flow(s, t);
         vector<pair<int, int>> cut;
@@ -91,37 +91,56 @@ struct Dinic {
         }
         return cut;
     }
- 
+
+    //funcao para achar todos os caminhos de arestas disjuntas(cada aresta so aparece em um caminho)
+    vector<vector<int>> get_paths(int s, int t){
+        if(!fluxo) max_flow(s,t);
+        vector<vector<int>> paths;
+        vector<int> ptr(n, 0);
+
+        for (int k = 0; k < fluxo; k++) {
+            vector<int> path = {s};
+            int cur = s;
+
+            while (cur != t) {
+                bool adv = false;
+                for (int &i = ptr[cur]; i < (int)graph[cur].size(); i++) {
+                    auto &e = graph[cur][i];
+                    if (e.flow > 0 && !e.res) {
+                        e.flow--;
+                        cur = e.to;
+                        path.push_back(cur);
+                        adv = true;
+                        break;
+                    }
+                }
+                
+                if (!adv) break;
+            }
+            if (cur == t) paths.push_back(path);
+        }
+        
+        return paths;
+    }
 };
- 
+
 signed main(){
     fastio;
-    int n, m, k;
-    cin >> n >> m >> k;
-    Dinic dinic(n+m+3);
-    int source = n+m+1;
-    int sink = n+m+2;
- 
-    for (int i = 1; i <= n; i++){
-        dinic.add(source, i, 1);
-    }
- 
-    for (int i = 1; i <= m; i++){
-        dinic.add(i+n, sink, 1);
-    }
- 
-    for (int i = 0; i < k; i++){
+    int n, m;
+    cin >> n >> m;
+    Dinic dinic(n+1);
+
+    for (int i = 0; i < m; i++){
         int a, b;
         cin >> a >> b;
-        dinic.add(a, b+n, 1);
+        dinic.add(a, b, 1);
     }
- 
-    cout << dinic.max_flow(source, sink) << endl;
-    
-    for (int i = 1; i <= n; i++){
-        for (auto &e : dinic.graph[i]){
-            if (e.flow == 1) cout << i << " " << e.to-n << endl;
-            // cout << i << " -> " << e.to << " flow: " << e.flow << endl;
-        }
+    auto paths = dinic.get_paths(1, n);
+    cout << dinic.fluxo << endl;
+    for (auto &v : paths){
+        cout << v.size() << endl;
+        for (auto u : v)cout << u << " ";
+        cout << endl;
     }
+
 }
