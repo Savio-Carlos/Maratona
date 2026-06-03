@@ -93,43 +93,37 @@ struct Dinic {
     }
 };
 
+
+
 signed main(){
     fastio;
     int n;
     cin >> n;
-    Dinic dinic(n*n+2*n+3);
+    Dinic dinic(2*n+3);
     vector<string> grid(n);
-    vector<int> r(n), c(n);
-    int source = n*n+2*n+1;
-    int sink = n*n+2*n+2;
+    
+    int source = 0;
+    int sink = 2*n+1;
+
     for (int i = 0; i < n; i++){
         cin >> grid[i];
-        int linha = n*n+i;
         for(int j = 0; j < n; j++){
-            int node = i*i + j;
-            int coluna = n*n+n+j;
             if (grid[i][j] == 'o'){
-                r[i]++;
-                c[j]++;
-                dinic.add(source, linha, 1);
-                dinic.add(source, coluna, 1);
-                dinic.add(coluna, node, 1);
-                dinic.add(linha, node, 1);
-                dinic.add(node, sink, 1);
-
-                // dinic.add(linha, sink, 1);
-                // dinic.add(coluna, sink, 1);
-                // dinic.add(node, linha, 1);
+                dinic.add(i+1, j+n+1, INF);
             }
         }
     }
-    // for (int i = 0; i < n; i++){
-    //     int linha = n*n+i;
-    //     int coluna = n*n+n+i; 
-    //     dinic.add(source, linha, r[i]);
-    //     dinic.add(source, coluna, c[i]);
-    // }
+    for (int i = 0; i < n; i++){
+        int linha = i+1;
+        int coluna = i+n+1;
+        dinic.add(source, linha, 1);
+        dinic.add(coluna, sink, 1);
+    }
     auto res = dinic.get_cut(source, sink);
     cout << dinic.fluxo << endl;
-    for (auto [u,v] : res) cout << u << " " << v << endl;
+    for (auto [u,v] : res){
+        if (u == source)cout << 1 << " " << v << endl;
+        else cout << 2 << " " << u-n << endl;
+        // cout << u << " " << v << endl;
+    } 
 }
