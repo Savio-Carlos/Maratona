@@ -111,18 +111,24 @@ signed main(){
             if (grid[i][j] == 'o'){
                 r[i]++;
                 c[j]++;
-                dinic.add(source, node, 1);
-                dinic.add(node, coluna, 1);
-                dinic.add(node, linha, 1);
+                dinic.add(source, linha, 1);
+                dinic.add(source, coluna, 1);
+                dinic.add(coluna, node, 1);
+                dinic.add(linha, node, 1);
+                dinic.add(node, sink, 1);
+
+                // dinic.add(linha, sink, 1);
+                // dinic.add(coluna, sink, 1);
+                // dinic.add(node, linha, 1);
             }
         }
     }
-    for (int i = 0; i < n; i++){
-        int linha = n*n+i;
-        int coluna = n*n+n+i; 
-        dinic.add(linha, sink, INF);
-        dinic.add(coluna, sink, INF);
-    }
+    // for (int i = 0; i < n; i++){
+    //     int linha = n*n+i;
+    //     int coluna = n*n+n+i; 
+    //     dinic.add(source, linha, r[i]);
+    //     dinic.add(source, coluna, c[i]);
+    // }
     auto res = dinic.get_cut(source, sink);
     cout << dinic.fluxo << endl;
     for (auto [u,v] : res) cout << u << " " << v << endl;
