@@ -135,7 +135,7 @@ void solve(){
         }
     }
     debug(grid);
-    for(int j = m-1; j>=0; j--){v
+    for(int j = m-1; j>=0; j--){
         int cur = 0;
         for (int i = n-1; i >=0;i--){
             cur = max(cur, grid[i][j]);
