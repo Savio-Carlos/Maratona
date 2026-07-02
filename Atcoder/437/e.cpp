@@ -114,54 +114,72 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    string s;
-    cin >> s;
-    int n = s.size();
-    vector<int> cnt(26, 0);
-    bool pos =true;
-    for (auto c : s){
-        cnt[c - 'a']++;
-        if (cnt[c - 'a']*2 > n+1) pos = false;
-    }
-    if (!pos){
-        cout << "No" << endl;
-        debug(cnt[0], n);
-        return;
-    }
-    cout << "Yes\n";
+const int MOD = 998244353;
 
-    priority_queue<pair<int,char>> pq;
-    for (int i = 0; i < 26; i++){
-        if (cnt[i]) pq.push(make_pair(cnt[i], i + 'a'));
-    } 
-    char last = '0';
-    while(!pq.empty()){
-        auto [q, c] = pq.top();
-        pq.pop();
-        if (c == last){
-            auto [q2, c2] = pq.top();
-            pq.pop();
-            cout << c2;
-            last = c2;
-            q2--;
-            if (q2 != 0) pq.push({q2,c2});
-            if (q  != 0) pq.push({q,c});
-        }
-        else{
-            cout << c;
-            last = c;
-            q--;
-            if (q !=0) pq.push({q,c});
-        }
+int fastExpo(int base, int exp) {
+    int res = 1;
+    while(exp) {
+        if (exp & 1) res = res * base % MOD;
+        base = base * base % MOD;
+        exp >>= 1;
     }
-    cout << endl;
+    return res%MOD;
+}
+
+int modinv(int n) {
+    return fastExpo(n, MOD - 2);
+}
+
+int comb(int n, int k) {
+    if (k < 0 || k > n)  return 0;
+    if (k == 0 || k == n) return 1;
+    if (k > n / 2) k = n - k;
+    int numerator = 1;
+    for(int i = 0; i < k; i++) numerator = (numerator * ((n - i + MOD) % MOD)) % MOD;
+    int denominator = 1;
+    for(int i = 1; i <= k; i++) denominator = (denominator * i) % MOD;
+    return (numerator * modinv(denominator)) % MOD;
+}
+
+void solve(){
+    int n;
+    cin >> n;
+    vector<vector<int>> graph(n);
+    for (int i = 1; i < n; i++){
+        int p;
+        cin >> p;
+        p--;
+        graph[p].push_back(i);
+    } 
+    vector<int> c(n), d(n);
+    cin >> c >> d;
+
+    vector<int> ways(n), rem(n);
+    function<void(int)> dfs = [&](int v){    
+        rem[v] = c[v];
+        for (auto u : graph[v]){
+            dfs(u);
+            rem[v] = (rem[v] + rem[u]);
+        }
+        if (rem[v] < d[v]) ways[v] = 0;
+        else{
+            debug(rem[v]);
+            ways[v] = comb(rem[v], d[v]) % MOD;
+            rem[v] = (rem[v] - d[v] + MOD) % MOD;
+        } 
+        for (auto u : graph[v]){
+            ways[v] = (ways[v] * ways[u]) % MOD;
+        }
+    };
+    dfs(0);
+    debug(c, d, rem, ways);
+    cout << ways[0] % MOD << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    cin >> t;
+    // cin >> t;
     while(t--) solve();
 }
 
