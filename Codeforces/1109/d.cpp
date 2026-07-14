@@ -114,15 +114,62 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(n);
+    cin >> a;
+    auto b = a;
+    for (auto &u : b) u *= -1;
+    vector<int> pfx2, pfx1;
+    pfx2.push_back(0);
+    pfx1.push_back(0);
+    int cur1 = 0, cur2 = 0;
+    for (int i = 1; i <= n; i++){
+        cur1 += a[i-1];
+        cur2 += b[i-1];
+        pfx1.push_back(cur1);
+        pfx2.push_back(cur2);
+    }
+    debug(a, b);
+    vector<int> c(m+1);
+    for (int i = 1; i <= m; i++) cin >> c[i];
+    sort(all(c));
+    debug(pfx1, pfx2);
+    debug(c);
+    vector<vector<int>> dp(n+1, vector<int>(2, -10000000000));
+    dp[0][0] = dp[0][1] = 0;
+    int j = 1;
+    for (int i = 1; i <= n; i++){
+        if (j <= m and c[j] == i){
+            //can flip
+            int prev = max(c[j-1], 0LL);
+            int sum1 = pfx1[i] - pfx1[prev];
+            int sum2 = pfx2[i] - pfx2[prev];
+            debug(sum1, sum2);
+            j++;
+            dp[i][0] = max(dp[prev][0] + sum1, dp[prev][1] + sum2);
+            dp[i][1] = max(dp[prev][1] + sum2, dp[prev][0] + sum1);
+            debug(dp);
+        }
+        else {
+            dp[i][0] = dp[i-1][0];
+            dp[i][1] = dp[i-1][1];
+            if (j > m){
+                dp[i][0] += a[i-1];
+                dp[i][1] += a[i-1];
+                
+            }
+        }
+    }
+    debug(dp);
+    cout << max(dp[n][0], dp[n][1]) << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

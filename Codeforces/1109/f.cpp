@@ -114,15 +114,25 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<vector<int>> graph(n);
+    for (int i = 1; i < n; i++){
+        int p;
+        cin >> p;
+        p--;
+        graph[p].push_back(i);
+    }
+    vector<int> a(n);
+    cin >> a;
+
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

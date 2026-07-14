@@ -114,15 +114,32 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
+    int n;
+    string s;
+    cin >> n >> s;
+    int mx = 0;
+    int cnt = 0;
+    for (int i = 0; i < n; i++){
+        if (s[i] == '#') cnt++;
+        else{
+            mx = max(cnt, mx);
+            cnt = 0;
+        }
+    }
+    mx = max(cnt, mx);
     
+    if (mx < 1) {
+        cout <<0 << endl;
+        return;
+    }
+    cout << (mx + 1) / 2 << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

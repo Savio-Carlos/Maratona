@@ -114,15 +114,31 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n, q;
+    cin >> n >> q;
+    string s;
+    cin >> s;
+    vector<int> pfx(n, 0);
+    for(int i = 1; i < n; i++){
+        pfx[i] = pfx[i-1];
+        if (s[i] == s[i-1]) pfx[i]++;
+    }
+
+    while(q--){
+        int l, r, k;
+        cin >> l >> r >> k;
+        int changes = pfx[r-1] - pfx[l-1];
+        int cnt = (changes + 1) / 2;
+        if (cnt <= k) cout << "YES" << endl;
+        else cout << "NO" << endl;
+    }
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

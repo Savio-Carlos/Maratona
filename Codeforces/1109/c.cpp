@@ -114,15 +114,38 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n, x, y;
+    cin >> n >> x >> y;
+    vector<int> a(n);
+    cin >> a;
+    int mn = min(x,y);
+    if (gcd(x,y) == 1){
+        cout << "YES" << endl;
+        return;
+    }
+    int g = gcd(x,y);
+    for (int st = 0; st < g; st++){
+        vector<int> teste;
+        for (int i = st; i < n; i+= g){
+            teste.push_back(a[i]);
+        }
+        int expect = st+1;
+        sort(all(teste));
+        for (int i = 0; i < teste.size(); i++, expect += g){
+            if (teste[i] != expect){
+                cout << "NO" << endl;
+                return;
+            }
+        }
+    }
+    cout << "YES" << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

@@ -114,15 +114,38 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n;
+    cin >> n;
+    vector<int> a(n+1, 0);
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    int rem = 0;
+    bool pos = true;
+    for (int i = 1; i <= n; i++){
+        int prev = a[i-1];
+        if (a[i] > prev){
+            rem += (a[i] - prev - 1);
+            a[i] = prev + 1;
+        } 
+        else {
+            int need = prev - a[i] + 1;
+            if (rem < need){
+                pos = false;
+                break;
+            }
+            else rem -= need;
+            a[i] = prev + 1;
+        }
+    }
+    debug (a, rem);
+    if (pos) cout << "YES" << endl;
+    else cout << "NO" << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 

@@ -114,15 +114,36 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-
 void solve(){
-    
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(n+1);
+    for (int i = 1; i <= n; i++) cin >> a[i];
+    vector<bool> can(n+1, false);
+    for (int i = 0; i < m; i++){
+        int x;
+        cin >> x;
+        can[x] = 1;
+    }
+    vector<vector<int>> dp(n+1,vector<int>(2,LLONG_MAX));
+    dp[0][0] = dp[0][1] = 0;
+    for (int i = 1; i <= n; i++){
+        dp[i][0] = max(dp[i-1][1], dp[i-1][0]) + a[i];
+        dp[i][1] = min(dp[i-1][0], dp[i-1][1]) + a[i];
+        if (can[i]){
+            dp[i][0] = max(dp[i][0], -dp[i-1][1] - a[i]);
+            dp[i][1] = min(dp[i][1], -dp[i-1][0] - a[i]);
+        }
+    }
+
+   
+    cout << dp[n][0] << endl;
 }
 
 signed main(){
     winton;
     int t = 1;
-    // cin >> t;
+    cin >> t;
     while(t--) solve();
 }
 
