@@ -117,17 +117,25 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
-    vector<vector<int>> graph(n);
-    for (int i = 1; i < n; i++){
-        int p;
-        cin >> p;
-        p--;
-        graph[p].push_back(i);
-    }
     vector<int> a(n);
     cin >> a;
-
-    
+    sort(all(a));
+    a.erase(unique(all(a)), a.end());
+    vector<int> diff;
+    diff.push_back(a[0]);
+    debug(a);
+    for (int i = 1; i < a.size(); i++){
+        diff.push_back(a[i] - a[i-1]);
+    }
+    int cnt = 0;
+    debug(diff);
+    for (int i = 0; i < diff.size(); i++){
+        if (diff[i] != 1) break;
+        cnt++;
+        if (i == diff.size() - 1) cnt++;
+    }
+    if (cnt&1) cout << "Bob" << endl;
+    else cout << "Alice" << endl;
 }
 
 signed main(){

@@ -117,17 +117,13 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
-    vector<vector<int>> graph(n);
-    for (int i = 1; i < n; i++){
-        int p;
-        cin >> p;
-        p--;
-        graph[p].push_back(i);
+    int ans = 0;
+    for (int i = 0; i < n; i++){
+        int x;
+        cin >> x;
+        if (i&1) ans ^= x;
     }
-    vector<int> a(n);
-    cin >> a;
-
-    
+    cout << (ans ? "first" : "second") << endl;
 }
 
 signed main(){
