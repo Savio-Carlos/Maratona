@@ -60,13 +60,8 @@ namespace dbg {
 
     template<typename C, enable_if_t<is_container<C>::value, int> = 0>
     ostream& print_atom(ostream& os, const C& v) {
-        constexpr bool nested = is_container<typename C::value_type>::value;
         os << '{'; bool f = true;
-        for (const auto& x : v) {
-            if (!f) os << (nested ? "," : ", ");
-            if (nested) os << "\n ";
-            print_atom(os, x); f = false;
-        }
+        for (const auto& x : v) { if (!f) os << ", "; print_atom(os, x); f = false; }
         return os << '}';
     }
 
@@ -109,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -119,12 +114,38 @@ using namespace dbg;
     #define debug(...) ((void)0)
 #endif
 
-void solve(){
-    
+const int MAX = 10000;
+
+vector<int> dp(MAX, 0);
+
+void build(){
+    dp[1] = dp[2] = 0;
+    for (int i = 3; i < MAX; i++){
+        set<int> s;
+        for (int j = i-1; j > i/2; j--){
+            s.insert(dp[j] ^ dp[i-j]);
+        }
+        int mex = 0;
+        while(s.find(mex) != s.end()) mex++;
+        dp[i] = mex;
+        if (!dp[i])debug(i,dp[i]);
+    }
 }
+
+void solve(){
+    int n;
+    cin >> n;
+    if (n > 1222) cout << "first" << endl;
+    else { 
+        if (dp[n]) cout << "first" << endl;
+        else cout << "second" << endl;
+    }
+}
+
 
 signed main(){
     winton;
+    build();
     int t = 1;
     cin >> t;
     while(t--) solve();

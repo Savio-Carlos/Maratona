@@ -60,13 +60,8 @@ namespace dbg {
 
     template<typename C, enable_if_t<is_container<C>::value, int> = 0>
     ostream& print_atom(ostream& os, const C& v) {
-        constexpr bool nested = is_container<typename C::value_type>::value;
         os << '{'; bool f = true;
-        for (const auto& x : v) {
-            if (!f) os << (nested ? "," : ", ");
-            if (nested) os << "\n ";
-            print_atom(os, x); f = false;
-        }
+        for (const auto& x : v) { if (!f) os << ", "; print_atom(os, x); f = false; }
         return os << '}';
     }
 
@@ -120,7 +115,15 @@ using namespace dbg;
 #endif
 
 void solve(){
-    
+    int n;
+    cin >> n;
+    int cnt1 = 0, cnt2 = 0;
+    for (int i = 0; i < n; i++){
+        int x;
+        cin >> x;
+        if (x == 1) cnt1++;
+        else cnt2++;  
+    }
 }
 
 signed main(){
