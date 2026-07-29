@@ -104,7 +104,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -117,13 +117,14 @@ using namespace dbg;
 void solve(){
     int n;
     cin >> n;
-    int cnt1 = 0, cnt2 = 0;
+    int ans = 0;
     for (int i = 0; i < n; i++){
         int x;
         cin >> x;
-        if (x == 1) cnt1++;
-        else cnt2++;  
+        if (x&1)
+        ans ^= i;
     }
+    cout << (ans ? "First" : "Second") << endl;
 }
 
 signed main(){
@@ -133,3 +134,4 @@ signed main(){
     while(t--) solve();
 }
 
+ 
