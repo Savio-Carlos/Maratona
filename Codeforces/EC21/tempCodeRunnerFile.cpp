@@ -1,0 +1,2 @@
+
+    string st = t + "#" + s;
