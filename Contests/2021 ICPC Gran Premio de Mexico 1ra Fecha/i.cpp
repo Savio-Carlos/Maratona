@@ -17,29 +17,33 @@ signed main(){
     cin >> n >> k >> t;
     vector<int> a(n);
     for (auto &u : a) cin >> u;
-    
+
     if (t >= k){
         cout << -1 << endl;
         return 0;
     }
     
-    int sum = accumulate(all(a), 0LL);
-    int tot = a.back() * n - sum;
+    int tot = 0;
+    for (int i = 0; i < n; i++) tot += (a.back() - a[i]);
+
     int best = 0;
     map<int,int> lazy;
-    tuple<int,int,int> ans = {-1,0,0};
-    for (int i = 0; i < n; i++){
-        auto it = lower_bound(all(a), a[i] + k);
+    lazy[a.back()] = n;
+    tuple<int,int,int> ans = {0,0,-1};
+    
+    for (int i = 0; i < n-1; i++){
+        auto it = upper_bound(all(a), a[i] + k);
         int r = *(prev(it));
 
         lazy[a[i]] = i+1;
         int cur = r - a[i];
-        int save = ((cur * (i+1)) - t * (i+1));
+        int save = ((cur * (i+1)) - (t * (i+1)));
         if (save > best){
             ans = {i+1, r, tot - save};
             best = save;
         } 
     }
     auto &[i,j,c] = ans;
-    cout << i << " " << lazy[j] << " " << c << endl; 
+    if (c == -1) cout << -1 << endl;
+    else cout << i << " " << lazy[j] << " " << c << endl; 
 } 
