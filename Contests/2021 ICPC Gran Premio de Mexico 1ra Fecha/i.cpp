@@ -39,10 +39,7 @@ signed main(){
             ans = {i+1, r, tot - save};
             best = save;
         } 
-
-
     }
-
     auto &[i,j,c] = ans;
     cout << i << " " << lazy[j] << " " << c << endl; 
-}
+} 
