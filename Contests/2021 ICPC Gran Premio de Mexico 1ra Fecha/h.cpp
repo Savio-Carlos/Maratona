@@ -19,19 +19,19 @@ struct hashing {
     string s;
     int n;
     
-    hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size(), 0) {} 
+    hashing(string _s) : n(_s.size()), s(_s), h(_s.size()+1, 0), p_pow(_s.size()+1, 0) {} 
 
     void build(){
         p_pow[0] = 1; 
 
         for (int i = 1; i < n; i++) p_pow[i] = (p_pow[i-1] * P) % MOD;
-        for (int i = 0; i < s.size(); i++) h[i+1] = (h[i] + (s[i] - '0' + 1) * p_pow[i]) % MOD;
+        for (int i = 0; i < s.size(); i++) h[i+1] = (h[i]*P + (s[i] - '0' + 1)) % MOD;
     }
     
 
     int get_hash(int l, int len){
         int r = l + len;
-        return ((h[r] + MOD - h[l]) % MOD);
+        return (h[l+len] - (h[l]*p_pow[len] % MOD) + MOD) % MOD;
     }
 
     bool equal_substrings(int len) {
@@ -39,10 +39,7 @@ struct hashing {
 
         int h1 = get_hash(0, len);
         int h2 = get_hash(n - len, len);
-
-        int left  = (h1 * p_pow[n-len]) % MOD;
-        int right = (h2) % MOD;
-        return left == right;
+        return h1 == h2;
     }
 };
 
@@ -60,23 +57,18 @@ signed main(){
     int n = s.size();
     int ans = n;
     for (int sz = 2; sz <= b and sz <= n; sz++){
-        vector<map<int,int>> dp(n+1);
-        
-        for (int i = 1; i+sz <= n; i++){
-            int st = i, en = i+sz-1;
-            int h = hash.get_hash(i-1, sz);
+        map<int,pair<int,int>> dp;
 
-            if (!dp[i-1].count(h)) dp[i-1][h] = 0;
-            dp[en][h] = dp[i-1][h] + 1;
-            for (auto [u,v] : dp[i-1]) dp[i][u] = max(dp[i][u], v);
-        
+        for (int i = 0; i+sz-1 < n; i++){
+            int h = hash.get_hash(i, sz);
+
+            auto &e = dp[h];
+            if (e.second <= i){
+                e.first++;
+                e.second = i+sz;
+            }
         }
-        for (auto [u,v] : dp[n]){
-            ans = min(n-v*sz+v, ans);
-            debug(u);
-            debug(v);
-            debug(sz);
-        } 
+        for (auto &[u,v] : dp) ans = min(n-v.first*sz+v.first, ans);
     }
     cout << ans << endl;
 }
