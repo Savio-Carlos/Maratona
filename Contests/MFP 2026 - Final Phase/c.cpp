@@ -109,7 +109,7 @@ namespace dbg {
 }
 using namespace dbg;
 
-#define DEBUG
+// #define DEBUG
 
 #if defined(DEBUG)
     #define winton (void)0
@@ -160,22 +160,26 @@ signed main(){
     int n, k;
     cin >> n >> k;
     int tot = fastExpo(k,n);
-    vector<int> cur(3,1);
-    cur[1] = 1;
-    for (int i = 2; i < n; i++){
-        vector<int> novo(cur.size()+1,1);
-        novo[0] = 0;
-        for (int j = 2; j < cur.size(); j++){
-            novo[j] = (cur[j-1] + (cur[j]*(j) % MOD)) % MOD;
-        }
-        // debug(novo);
-        cur = novo;
-    }
-    // debug(cur);
+    // vector<int> cur(3,1);
+    // cur[1] = 1;
+    // for (int i = 2; i < n; i++){
+    //     vector<int> novo(min(k, (int)cur.size())+1,1);
+    //     novo[0] = 0;
+    //     for (int j = 2; j < min(k+1 ,(int)cur.size()); j++){
+    //         novo[j] = (cur[j-1] + (cur[j]*(j) % MOD)) % MOD;
+    //     }
+    //     // debug(novo);
+    //     cur = novo;
+    // }
+    // // debug(cur);    
+    // debug(cur[k]*fat[k] % MOD);
     int ways = 0;
-    for (int i = k; i <= n; i++){
+    for (int i = 0; i <= k; i++){
+        ways = (ways + modiv((((fastExpo(i,n) * (((k-i)&1) ? -1LL : 1LL)) % MOD) + MOD) % MOD, (((fat[k-i] % MOD ) * (fat[i] % MOD)) % MOD) % MOD)) % MOD;
+        debug(ways);
     }
-    ways = (ways + (cur[k]*fat[k] % MOD)) % MOD;
+    ways = (ways * fat[k]) % MOD;
+    debug(ways);
     cout << modiv(ways,tot) << endl;
 
 }
